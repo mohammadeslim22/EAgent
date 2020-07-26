@@ -7,7 +7,8 @@ import 'package:agent_second/widgets/global_drawer.dart';
 import 'package:agent_second/widgets/text_form_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
+import 'package:agent_second/providers/global_variables.dart';
+import 'package:provider/provider.dart';
 class Beneficiaries extends StatefulWidget {
   const Beneficiaries({Key key}) : super(key: key);
 
@@ -24,11 +25,15 @@ class _BeneficiariesState extends State<Beneficiaries> {
   @override
   void initState() {
     super.initState();
-    beneficiaries = globalVars.beneficiaries;
+    final GlobalVars globalVarsProv =
+              Provider.of<GlobalVars>(context, listen: false);
+    beneficiaries = globalVarsProv.beneficiaries;
   }
 
   @override
   Widget build(BuildContext context) {
+    final GlobalVars globalVarsProv =
+              Provider.of<GlobalVars>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(trans(context, "altriq")),
@@ -61,7 +66,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
           crossAxisCount: 3,
           childAspectRatio: 2,
           addRepaintBoundaries: true,
-          children: beneficiaries.results.benList.map((Ben item) {
+          children: beneficiaries.data.map((Ben item) {
             return Card(
               color: Colors.white,
               child: InkWell(
@@ -123,7 +128,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                   children: <Widget>[
                                     // Text("رقم التواصل:  ",
                                     //     style: styles.underHeadgray),
-                                    Text(item.mobile,
+                                    Text(item.phone,
                                         style: styles.underHeadgray),
                                   ],
                                 )
@@ -177,7 +182,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                 borderRadius: BorderRadius.circular(18.0),
                                 side: const BorderSide(color: Colors.blue)),
                             onPressed: () async {
-                              globalVars.setBenInFocus(item);
+                              globalVarsProv.setBenInFocus(item);
                               Navigator.pushNamed(
                                   context, "/Beneficiary_Center",
                                   arguments: <String, Ben>{"ben": item});

@@ -3,8 +3,8 @@ import 'package:agent_second/constants/colors.dart';
 import 'package:agent_second/constants/styles.dart';
 import 'package:agent_second/localization/trans.dart';
 import 'package:agent_second/models/ben.dart';
+import 'package:agent_second/models/collection.dart';
 import 'package:agent_second/models/transactions.dart';
-import 'package:agent_second/providers/counter.dart';
 import 'package:agent_second/util/dio.dart';
 import 'package:animated_card/animated_card.dart';
 import 'package:dio/dio.dart';
@@ -14,8 +14,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
+// import 'package:intl/intl.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 
 class BeneficiaryCenter extends StatefulWidget {
@@ -31,12 +30,11 @@ class BeneficiaryCenter extends StatefulWidget {
 class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
   Ben ben;
   Transactions benTrans;
-  List<Items> items;
+  //List<MiniItems> items;
   Transaction transaction;
-  // bool orderOrReturn;
-  // bool transOrCollection;
+  Collections collection;
   int indexedStack;
-// Future<List<Transaction>> trasList;
+  Widget noItemFound;
   Future<void> _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
 
@@ -66,12 +64,14 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
     lat = widget.lat ?? 25.063054;
     long = widget.long ?? 55.170010;
     ben = widget.ben;
-    setState(() {
-      billIsOn = true;
-      // orderOrReturn = true;
-      // transOrCollection = true;
-      indexedStack = 0;
-    });
+    billIsOn = true;
+    indexedStack = 0;
+    noItemFound = Container(
+      width: 400,
+      height: 350,
+      child: const FlareActor("assets/images/empty.flr",
+          alignment: Alignment.center, fit: BoxFit.fill, animation: "default"),
+    );
   }
 
   @override
@@ -83,7 +83,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
   bool billIsOn = true;
   @override
   Widget build(BuildContext context) {
-    final MyCounter bolc = Provider.of<MyCounter>(context);
+    //final MyCounter bolc = Provider.of<MyCounter>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(trans(context, "altariq")),
@@ -121,7 +121,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Icon(Icons.person_outline,
-                                  color: Colors.blue, size: 40),
+                                  color: colors.blue, size: 40),
                               const SizedBox(width: 16),
                               Text(ben.name, style: styles.beneficiresNmae)
                             ],
@@ -132,7 +132,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Icon(Icons.location_on,
-                                  color: Colors.blue, size: 30),
+                                  color: colors.blue, size: 30),
                               const SizedBox(width: 16),
                               Text(ben.address, style: styles.underHeadgray)
                             ],
@@ -148,11 +148,11 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Icon(Icons.call, color: Colors.blue, size: 30),
+                              Icon(Icons.call, color: colors.blue, size: 30),
                               const SizedBox(width: 16),
                               Text(
                                 trans(context, "mobile_number") +
-                                    " : ${ben.mobile}",
+                                    " : ${ben.phone}",
                                 style: styles.beneficiresNmae,
                               )
                             ],
@@ -162,7 +162,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Icon(Icons.email, color: Colors.blue, size: 30),
+                              Icon(Icons.email, color: colors.blue, size: 30),
                               const SizedBox(width: 16),
                               Text(
                                 ben.email,
@@ -184,9 +184,10 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),
                           ),
-                          color: Colors.blue,
+                          color: colors.blue,
                           onPressed: () {
-                            Navigator.pushNamed(context, "/Order_Screen");
+                            Navigator.pushNamed(context, "/Order_Screen",
+                                arguments: <String, dynamic>{"ben": ben});
                           },
                           child: Text(trans(context, "order"),
                               style: styles.mywhitestyle),
@@ -199,7 +200,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),
                           ),
-                          color: Colors.red,
+                          color: colors.red,
                           onPressed: () {},
                           child: Text(
                             trans(context, "return"),
@@ -214,7 +215,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),
                           ),
-                          color: Colors.green,
+                          color: colors.green,
                           onPressed: () {},
                           child: Text(trans(context, "collection"),
                               style: styles.mywhitestyle),
@@ -222,7 +223,6 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       )
                     ],
                   ),
-                  // listSubChoices(bolc.language, bolc),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
@@ -231,21 +231,16 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       Container(
                         margin: const EdgeInsets.all(15.0),
                         decoration: BoxDecoration(
-                            border: Border.all(color: Colors.green),
-                            color: bolc.language[0]
+                            border: Border.all(color: colors.green),
+                            color: indexedStack == 0
                                 ? Colors.green[100]
                                 : Colors.transparent),
                         child: FlatButton(
                             padding: EdgeInsets.zero,
                             onPressed: () {
-                              print("why?");
                               setState(() {
                                 indexedStack = 0;
-
-                                //     orderOrReturn = true;
                               });
-
-                              bolc.changelanguageindex(0);
                             },
                             child: SvgPicture.asset(
                                 "assets/images/order_icon.svg")),
@@ -253,19 +248,16 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       Container(
                         margin: const EdgeInsets.all(15.0),
                         decoration: BoxDecoration(
-                            border: Border.all(color: Colors.red),
-                            color: bolc.language[1]
+                            border: Border.all(color: colors.red),
+                            color: indexedStack == 1
                                 ? Colors.red[100]
                                 : Colors.transparent),
                         child: FlatButton(
                             padding: EdgeInsets.zero,
                             onPressed: () {
-                              print("Noooooo?");
                               setState(() {
                                 indexedStack = 1;
-                                // orderOrReturn = false;
                               });
-                              bolc.changelanguageindex(1);
                             },
                             child: SvgPicture.asset(
                                 "assets/images/return_icon.svg")),
@@ -273,8 +265,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       Container(
                         margin: const EdgeInsets.all(15.0),
                         decoration: BoxDecoration(
-                            border: Border.all(color: Colors.yellow),
-                            color: bolc.language[2]
+                            border: Border.all(color: colors.yellow),
+                            color: indexedStack == 2
                                 ? Colors.yellow[100]
                                 : Colors.transparent),
                         child: FlatButton(
@@ -282,9 +274,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           onPressed: () {
                             setState(() {
                               indexedStack = 2;
-                              //   transOrCollection = false;
                             });
-                            bolc.changelanguageindex(2);
                           },
                           child: SvgPicture.asset(
                             "assets/images/collection_icon.svg",
@@ -353,11 +343,12 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                               initDelay: const Duration(milliseconds: 0),
                               duration: const Duration(seconds: 1),
                               curve: Curves.ease,
-                              child: _itemBuilder(context, entry),
+                              child: _transactionBuilder(
+                                  context, entry as Transaction),
                             );
                           },
                           noItemsFoundBuilder: (BuildContext context) {
-                            return Text(trans(context, "noting_to_show"));
+                            return noItemFound;
                           },
                           pageFuture: (int pageIndex) {
                             return getOrdersTransactions(pageIndex);
@@ -391,14 +382,14 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                               initDelay: const Duration(milliseconds: 0),
                               duration: const Duration(seconds: 1),
                               curve: Curves.ease,
-                              child: _itemBuilder(context, entry),
+                              child: _transactionBuilder(
+                                  context, entry as Transaction),
                             );
                           },
                           noItemsFoundBuilder: (BuildContext context) {
-                            return Text(trans(context, "noting_to_show"));
+                            return noItemFound;
                           },
                           pageFuture: (int pageIndex) {
-                            // return getOrdersTransactions(pageIndex);
                             return getReturnTransactions(pageIndex);
                           },
                         ),
@@ -425,11 +416,12 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                               initDelay: const Duration(milliseconds: 0),
                               duration: const Duration(seconds: 1),
                               curve: Curves.ease,
-                              child: _itemBuilder(context, entry),
+                              child:
+                                  collectionBuilder(entry as SingleCollection),
                             );
                           },
                           noItemsFoundBuilder: (BuildContext context) {
-                            return Text(trans(context, "noting_to_show"));
+                            return noItemFound;
                           },
                           pageFuture: (int pageIndex) {
                             return getCollectionTransactions(pageIndex);
@@ -469,7 +461,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           width: 40,
                           height: 40,
                           child: Material(
-                            color: Colors.white,
+                            color: colors.white,
                             borderRadius: BorderRadius.circular(6),
                             child: InkWell(
                               borderRadius: BorderRadius.circular(6),
@@ -531,37 +523,42 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                 ),
               )
             else
-              Expanded(child: bill(items)),
+           //   Expanded(child: bill(items)),
+                            Expanded(child: Container()),
+
           ],
         ),
       ),
     );
   }
 
-  Widget _itemBuilder(BuildContext context, Transaction entry) {
+  Widget _transactionBuilder(
+    BuildContext context,
+    Transaction entry,
+  ) {
     return Slidable(
         actionPane: const SlidableDrawerActionPane(),
         actionExtentRatio: 0.25,
         secondaryActions: <Widget>[
           IconSlideAction(
             caption: 'Share',
-            color: Colors.blue,
+            color: colors.blue,
             icon: Icons.share,
             onTap: () {},
           ),
           IconSlideAction(
             caption: 'Delete',
-            color: Colors.red,
+            color: colors.red,
             icon: Icons.delete,
             onTap: () {},
           ),
         ],
         child: FlatButton(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          color: entry.id % 2 == 0 ? Colors.blue[200] : Colors.transparent,
+          color: entry.status == "active" ? Colors.blue[200] : Colors.transparent,
           onPressed: () {
             setState(() {
-              items = entry.items;
+             // items = entry.items;
               billIsOn = false;
               transaction = entry;
             });
@@ -575,209 +572,249 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       style: styles.mystyle, textAlign: TextAlign.start)),
               Expanded(
                   flex: 2,
-                  child: Text(entry.agent.name, style: styles.mystyle)),
+                  child: Text(entry.agent, style: styles.mystyle)),
               Expanded(
                   flex: 2,
-                  child: Text(entry.transactionDate, style: styles.mystyle)),
+                  child: Text(entry.transDate, style: styles.mystyle)),
               Expanded(
-                  child: Text(entry.totalPrice.toString() + ".00",
+                  child: Text(entry.amount.toString() + ".00",
                       style: styles.mystyle, textAlign: TextAlign.end))
             ],
           ),
         ));
   }
 
-  Widget listSubChoices(List<bool> list, MyCounter bolc) {}
-
-  Widget bill(List<Items> items) {
-    return Column(
-      children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Row(
-                children: <Widget>[
-                  Column(
-                    children: <Widget>[
-                      Text(trans(context, "name"), style: styles.mybluestyle),
-                      const SizedBox(height: 24),
-                      Text(trans(context, "date"), style: styles.mybluestyle)
-                    ],
-                  ),
-                  const SizedBox(width: 32),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(ben.name, style: styles.mystyle),
-                      const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(transaction.transactionDate,
-                              style: styles.mystyle),
-                        ],
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-            if (!billIsOn)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                width: 130,
-                height: 130,
-                child: Column(
-                  children: <Widget>[
-                    Expanded(
-                      flex: 3,
-                      child: FlatButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          setState(() {
-                            billIsOn = !billIsOn;
-                          });
-                        },
-                        child: const FlareActor("assets/images/maps.flr",
-                            alignment: Alignment.center,
-                            fit: BoxFit.cover,
-                            animation: "anim"),
-                      ),
-                    ),
-                    Text(
-                      trans(context, "back_to_map"),
-                      style: TextStyle(color: colors.black),
-                    )
-                  ],
-                ),
-              )
-            else
-              Container(),
-          ],
-        ),
-        Expanded(
-          child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: DataTable(
-                columns: <DataColumn>[
-                  DataColumn(
-                    label: Text(trans(context, 'id'),
-                        style: const TextStyle(fontStyle: FontStyle.italic)),
-                  ),
-                  DataColumn(
-                    label: Text(trans(context, 'product_name'),
-                        style: const TextStyle(fontStyle: FontStyle.italic)),
-                  ),
-                  DataColumn(
-                    label: Text(trans(context, 'quantity'),
-                        style: const TextStyle(fontStyle: FontStyle.italic)),
-                  ),
-                  DataColumn(
-                    label: Text(trans(context, 'unit'),
-                        style: const TextStyle(fontStyle: FontStyle.italic)),
-                  ),
-                  DataColumn(
-                    label: Text(trans(context, 'unit_price'),
-                        style: const TextStyle(fontStyle: FontStyle.italic)),
-                  ),
-                  DataColumn(
-                    label: Text(trans(context, 'total'),
-                        style: const TextStyle(fontStyle: FontStyle.italic)),
-                  ),
-                ],
-                rows: items.map((Items e) {
-                  return DataRow(cells: <DataCell>[
-                    DataCell(Text(e.id.toString())),
-                    DataCell(Text(e.item.name)),
-                    DataCell(Text(e.quantity.toString())),
-                    DataCell(Text(e.unit)),
-                    DataCell(Text(e.unitPrice.toString())),
-                    DataCell(Text(e.price.toString()))
-                  ]);
-                }).toList(),
-              )),
-        ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                FlatButton(
-                  onPressed: () {},
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: <Widget>[
-                      Text(trans(context, "share"), style: styles.mybluestyle),
-                      Icon(
-                        Icons.share,
-                        size: 20,
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-            Row(
-              children: <Widget>[
-                Text(trans(context, "total"), style: styles.mybluestyle),
-                const SizedBox(width: 12),
-                Text(trans(context, transaction.totalPrice.toString() + ".00"),
-                    style: styles.mystyle),
-                const SizedBox(width: 32),
-              ],
-            ),
-          ],
-        )
-      ],
-    );
+  Widget collectionBuilder(SingleCollection collection) {
+    return Slidable(
+        actionPane: const SlidableDrawerActionPane(),
+        actionExtentRatio: 0.25,
+        secondaryActions: <Widget>[
+          IconSlideAction(
+            caption: 'Share',
+            color: colors.blue,
+            icon: Icons.share,
+            onTap: () {},
+          ),
+          IconSlideAction(
+            caption: 'Delete',
+            color: colors.red,
+            icon: Icons.delete,
+            onTap: () {},
+          ),
+        ],
+        child: FlatButton(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          color: collection.status == "active" ? Colors.blue[200] : Colors.transparent,
+          onPressed: () {},
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                  child: Text(collection.id.toString(),
+                      style: styles.mystyle, textAlign: TextAlign.start)),
+              Expanded(
+                  flex: 2,
+                  child: Text(collection.user??"اسم المندوب هنا", style: styles.mystyle)),
+              Expanded(
+                  flex: 2, child: Text(collection.createdAt, style: styles.mystyle)),
+              Expanded(
+                  child: Text(collection.amount.toString() + ".00",
+                      style: styles.mystyle, textAlign: TextAlign.end))
+            ],
+          ),
+        ));
   }
+
+  // Widget bill(List<MiniItems> items) {
+  //   return Column(
+  //     children: <Widget>[
+  //       Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: <Widget>[
+  //           Padding(
+  //             padding: const EdgeInsets.all(24.0),
+  //             child: Row(
+  //               children: <Widget>[
+  //                 Column(
+  //                   children: <Widget>[
+  //                     Text(trans(context, "name"), style: styles.mybluestyle),
+  //                     const SizedBox(height: 24),
+  //                     Text(trans(context, "date"), style: styles.mybluestyle)
+  //                   ],
+  //                 ),
+  //                 const SizedBox(width: 32),
+  //                 Column(
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: <Widget>[
+  //                     Text(ben.name, style: styles.mystyle),
+  //                     const SizedBox(height: 24),
+  //                     Row(
+  //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                       children: <Widget>[
+  //                         Text(transaction.transDate,
+  //                             style: styles.mystyle),
+  //                       ],
+  //                     )
+  //                   ],
+  //                 )
+  //               ],
+  //             ),
+  //           ),
+  //           if (!billIsOn)
+  //             Container(
+  //               padding:
+  //                   const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+  //               width: 130,
+  //               height: 130,
+  //               child: Column(
+  //                 children: <Widget>[
+  //                   Expanded(
+  //                     flex: 3,
+  //                     child: FlatButton(
+  //                       padding: EdgeInsets.zero,
+  //                       onPressed: () {
+  //                         setState(() {
+  //                           billIsOn = !billIsOn;
+  //                         });
+  //                       },
+  //                       child: const FlareActor("assets/images/maps.flr",
+  //                           alignment: Alignment.center,
+  //                           fit: BoxFit.cover,
+  //                           animation: "anim"),
+  //                     ),
+  //                   ),
+  //                   Text(
+  //                     trans(context, "back_to_map"),
+  //                     style: TextStyle(color: colors.black),
+  //                   )
+  //                 ],
+  //               ),
+  //             )
+  //           else
+  //             Container(),
+  //         ],
+  //       ),
+  //       Expanded(
+  //         child: SingleChildScrollView(
+  //             scrollDirection: Axis.vertical,
+  //             child: DataTable(
+  //               columns: <DataColumn>[
+  //                 DataColumn(
+  //                   label: Text(trans(context, 'id'),
+  //                       style: const TextStyle(fontStyle: FontStyle.italic)),
+  //                 ),
+  //                 DataColumn(
+  //                   label: Text(trans(context, 'product_name'),
+  //                       style: const TextStyle(fontStyle: FontStyle.italic)),
+  //                 ),
+  //                 DataColumn(
+  //                   label: Text(trans(context, 'quantity'),
+  //                       style: const TextStyle(fontStyle: FontStyle.italic)),
+  //                 ),
+  //                 DataColumn(
+  //                   label: Text(trans(context, 'unit'),
+  //                       style: const TextStyle(fontStyle: FontStyle.italic)),
+  //                 ),
+  //                 DataColumn(
+  //                   label: Text(trans(context, 'unit_price'),
+  //                       style: const TextStyle(fontStyle: FontStyle.italic)),
+  //                 ),
+  //                 DataColumn(
+  //                   label: Text(trans(context, 'total'),
+  //                       style: const TextStyle(fontStyle: FontStyle.italic)),
+  //                 ),
+  //               ],
+  //               rows: items.map((MiniItems e) {
+  //                 return DataRow(cells: <DataCell>[
+  //                   DataCell(Text(e.id.toString())),
+  //                   DataCell(Text(e.item.name)),
+  //                   DataCell(Text(e.quantity.toString())),
+  //                   DataCell(Text(e.unit)),
+  //                   DataCell(Text(e.unitPrice.toString())),
+  //                   DataCell(Text(e.price.toString()))
+  //                 ]);
+  //               }).toList(),
+  //             )),
+  //       ),
+  //       Row(
+  //         crossAxisAlignment: CrossAxisAlignment.center,
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: <Widget>[
+  //           Row(
+  //             children: <Widget>[
+  //               FlatButton(
+  //                 onPressed: () {},
+  //                 child: Row(
+  //                   crossAxisAlignment: CrossAxisAlignment.end,
+  //                   children: <Widget>[
+  //                     Text(trans(context, "share"), style: styles.mybluestyle),
+  //                     Icon(
+  //                       Icons.share,
+  //                       size: 20,
+  //                     )
+  //                   ],
+  //                 ),
+  //               )
+  //             ],
+  //           ),
+  //           Row(
+  //             children: <Widget>[
+  //               Text(trans(context, "total"), style: styles.mybluestyle),
+  //               const SizedBox(width: 12),
+  //               Text(trans(context, transaction.amount.toString() + ".00"),
+  //                   style: styles.mystyle),
+  //               const SizedBox(width: 32),
+  //             ],
+  //           ),
+  //         ],
+  //       )
+  //     ],
+  //   );
+  // }
 
   Future<List<Transaction>> getOrdersTransactions(int page) async {
     final Response<dynamic> response = await dio
-        .get<dynamic>("transactions", queryParameters: <String, dynamic>{
-       "page": page,
+        .get<dynamic>("btransactions", queryParameters: <String, dynamic>{
+      "page": page,
       "beneficiary_id": ben.id,
-      "transaction_type": 1,
+     // "transaction_type": 1,
     });
     print(response.data);
     setState(() {
       benTrans = Transactions.fromJson(response.data);
     });
 
-    return benTrans.results.transactions;
+    return benTrans.transactions;
   }
 
   Future<List<Transaction>> getReturnTransactions(int page) async {
     final Response<dynamic> response = await dio
-        .get<dynamic>("transactions", queryParameters: <String, dynamic>{
+        .get<dynamic>("btransactions", queryParameters: <String, dynamic>{
       "page": page,
       "beneficiary_id": ben.id,
-      "transaction_type": 2,
+      //"transaction_type": 2,
     });
     print(response.data);
     setState(() {
       benTrans = Transactions.fromJson(response.data);
     });
 
-    return benTrans.results.transactions;
+    return benTrans.transactions;
   }
 
-  Future<List<Transaction>> getCollectionTransactions(int page) async {
+  Future<List<SingleCollection>> getCollectionTransactions(int page) async {
     final Response<dynamic> response = await dio
-        .get<dynamic>("collections", queryParameters: <String, dynamic>{
+        .get<dynamic>("collection", queryParameters: <String, dynamic>{
       "page": page,
       "beneficiary_id": ben.id,
     });
-    print(response.data);
+    print("collexctions  ${ben.id}");
     setState(() {
-      benTrans = Transactions.fromJson(response.data);
+      collection = Collections.fromJson(response.data);
     });
 
-    return benTrans.results.transactions;
+    return collection.collectionList;
   }
 }

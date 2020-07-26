@@ -1,7 +1,10 @@
 import 'package:agent_second/providers/auth.dart';
 import 'package:agent_second/providers/counter.dart';
 import 'package:agent_second/providers/language.dart';
+import 'package:agent_second/providers/global_variables.dart';
+import 'package:agent_second/services/navigationService.dart';
 import 'package:agent_second/ui/auth/login_screen.dart';
+import 'package:agent_second/ui/home.dart';
 import 'package:agent_second/util/data.dart';
 import 'package:agent_second/util/dio.dart';
 import 'package:flutter/material.dart';
@@ -11,10 +14,15 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'constants/route.dart';
 import 'constants/themes.dart';
 import 'localization/localization_delegate.dart';
+import 'util/service_locator.dart';
+import 'package:agent_second/providers/order_provider.dart';
+
 // import 'package:flutter/scheduler.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+    setupLocator();
+dioDefaults();
   SystemChrome.setPreferredOrientations(<DeviceOrientation>[
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight
@@ -30,6 +38,12 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<MyCounter>(
           create: (_) => MyCounter(),
+        ),
+        ChangeNotifierProvider<GlobalVars>(
+          create: (_) => GlobalVars(),
+        ),
+        ChangeNotifierProvider<OrderListProvider>.value(
+          value: getIt<OrderListProvider>(),
         ),
       ],
       child: MyApp(),
@@ -58,6 +72,7 @@ class MyApp extends StatelessWidget {
     final Language lang = Provider.of<Language>(context);
 
     return MaterialApp(
+        navigatorKey: getIt<NavigationService>().navigatorKey,
         debugShowCheckedModeBanner: false,
         localizationsDelegates: <LocalizationsDelegate<dynamic>>[
           DemoLocalizationsDelegate(),
@@ -90,6 +105,6 @@ class MyApp extends StatelessWidget {
         },
         theme: mainThemeData(),
         onGenerateRoute: onGenerateRoute,
-        home: const LoginScreen());
+        home: const Home());
   }
 }

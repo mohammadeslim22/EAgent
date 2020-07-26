@@ -1,11 +1,13 @@
 import 'package:agent_second/constants/colors.dart';
 import 'package:agent_second/constants/styles.dart';
 import 'package:agent_second/localization/trans.dart';
+import 'package:agent_second/providers/order_provider.dart';
+import 'package:agent_second/util/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class TransactionDeleteDialog extends StatefulWidget {
- const TransactionDeleteDialog({Key key}) : super(key: key);
+  const TransactionDeleteDialog({Key key}) : super(key: key);
 
   @override
   _TransactionDeleteDialogState createState() =>
@@ -33,11 +35,13 @@ class _TransactionDeleteDialogState extends State<TransactionDeleteDialog> {
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: SvgPicture.asset("assets/images/transaction_delete.svg"),
+                  child:
+                      SvgPicture.asset("assets/images/transaction_delete.svg"),
                 ),
-                Text(trans(context, "are_u_sure_cancel"),style: styles.thirtyblack),
-              const  Spacer(),
-              const  Divider(thickness: 2, color: Colors.grey),
+                Text(trans(context, "are_u_sure_cancel"),
+                    style: styles.thirtyblack),
+                const Spacer(),
+                const Divider(thickness: 2, color: Colors.grey),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
@@ -48,7 +52,9 @@ class _TransactionDeleteDialogState extends State<TransactionDeleteDialog> {
                         color: colors.trans,
                         child: FlatButton(
                           autofocus: true,
-                          onPressed: () {},
+                          onPressed: () {
+                            getIt<OrderListProvider>().clearOrcerList();
+                          },
                           child: Text(trans(context, "ok_delete"),
                               style: styles.underHeadgreen),
                         ),
@@ -62,7 +68,9 @@ class _TransactionDeleteDialogState extends State<TransactionDeleteDialog> {
                           color: colors.trans,
                         ),
                         child: FlatButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
                           child: Text(trans(context, "cancel"),
                               style: styles.underHeadred),
                         ),

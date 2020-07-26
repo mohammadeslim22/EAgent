@@ -10,7 +10,7 @@ class Config {
 
   static final Config _config = Config._internal();
 
-   String baseUrl = "http://edisagents.altariq.ps/public/api/v1/";
+   String baseUrl = "http://edisagents.altariq.ps/public/api/";
   // String baseUrl = "http://space.co.ps/joker/api/ar/v1/customer/";
 
   String onesignal = "bc4208c6-1-48c0-b4d5-390029a340dc"; // ca9a

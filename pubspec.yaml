@@ -48,7 +48,10 @@ dependencies:
   intl: ^0.16.1
   flutter_slidable: ^0.5.4
   dotted_border: ^1.0.5
-  
+  after_layout: ^1.0.7+2
+  cron: ^0.2.3
+  get_it: ^4.0.2
+  giffy_dialog: ^1.8.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

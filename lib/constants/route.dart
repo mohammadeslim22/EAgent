@@ -34,7 +34,7 @@ Route<PageController> onGenerateRoute(RouteSettings settings) {
       break;
     case "/Order_Screen":
       page = PageTransition<PageController>(
-        child:const OrderScreen(),
+        child: OrderScreen(ben: args['ben'] as Ben,),
         type: PageTransitionType.rightToLeftWithFade,
       );
       break;

@@ -1,147 +1,124 @@
 class BeneficiariesModel {
-  BeneficiariesModel({this.status, this.results});
+  BeneficiariesModel({this.data});
 
   BeneficiariesModel.fromJson(dynamic json) {
-    status = json['status'].toString();
-    results =
-        json['results'] != null ? Results.fromJson(json['results']) : null;
-  }
-  String status;
-  Results results;
-}
-
-class Results {
-  Results({
-    this.benList,
-  });
-
-  Results.fromJson(dynamic json) {
     if (json['data'] != null) {
-      benList = <Ben>[];
+      data = <Ben>[];
       json['data'].forEach((dynamic v) {
-        benList.add(Ben.fromJson(v));
+        data.add(Ben.fromJson(v));
       });
     }
   }
-  List<Ben> benList;
+  List<Ben> data;
 }
 
 class Ben {
   Ben(
       {this.id,
       this.name,
-      this.commercialRegister,
-      this.status,
-      this.classificationId,
-      this.agentId,
-      this.contactPerson,
-      this.mobile,
-      this.mobile2,
-      this.email,
+      this.commercialRecord,
       this.city,
-      this.area,
       this.address,
-      this.priceUsed,
-      this.contactDetails,
-      this.allowReturn,
+      this.latitude,
+      this.longitude,
+      this.region,
+      this.managerName,
+      this.phone,
+      this.phone2,
+      this.email,
+      this.classification,
+      this.status,
+      this.price,
+      this.isreturn,
+      this.limitDebt,
       this.notes,
-      this.location,
-      this.debitLimit,
-      this.balancesLimit,
-      this.transactionsOrderedCount,
-      this.transactionsReturnedCount,
-      this.collectionsCount,
-      this.transactionsOrderedSum,
-      this.transactionsReturnedSum,
-      this.collectionsSum,
-      this.classification});
+      this.lastTransDate,
+      this.itemsCap});
 
   Ben.fromJson(dynamic json) {
     id = json['id'] as int;
     name = json['name'].toString();
-    commercialRegister = json['commercial_register'].toString();
-    status = json['status'] as int;
-    classificationId = json['classification_id'] as int;
-    agentId = json['agent_id'] as int;
-    contactPerson = json['contact_person'].toString();
-    mobile = json['mobile'].toString();
-    mobile2 = json['mobile2'].toString();
-    email = json['email'].toString();
-    city = json['city'].toString();
-    area = json['area'].toString();
-    address = json['address'].toString();
-    priceUsed = json['price_used'] as int;
-    contactDetails = json['contact_details'].toString();
-    allowReturn = json['allow_return'] as int;
-    notes = json['notes'].toString();
-    location = json['location'].toString();
-    debitLimit = json['debit_limit'].toString();
-    if (json['balances_limit'] != null) {
-      balancesLimit = <BalancesLimit>[];
-      json['balances_limit'].forEach((dynamic v) {
-        balancesLimit.add(BalancesLimit.fromJson(v));
+    commercialRecord = json['commercial_record'].toString();
+    if (json['city'] != null) {
+      city = <City>[];
+      json['city'].forEach((dynamic v) {
+        city.add(City.fromJson(v));
       });
     }
-    transactionsOrderedCount = json['transactions_ordered_count']as int;
-    transactionsReturnedCount = json['transactions_returned_count']as int;
-    collectionsCount = json['collections_count']as int;
-    transactionsOrderedSum = json['transactions_ordered_sum']as int;
-    transactionsReturnedSum = json['transactions_returned_sum']as int;
-    collectionsSum = json['collections_sum']as int;
-    classification = json['classification'] != null
-        ? Classification.fromJson(json['classification'])
-        : null;
+    address = json['address'].toString();
+    latitude = json['latitude'] as double;
+    longitude = json['longitude'] as double;
+    region = json['region'].toString();
+    managerName = json['manager_name'].toString();
+    phone = json['phone'].toString();
+    phone2 = json['phone2'].toString();
+    email = json['email'].toString();
+    classification = json['classification'].toString();
+    status = json['status'].toString();
+    price = json['price'] as int;
+    isreturn = json['isreturn'] as int;
+    limitDebt = json['limit_debt'] as int;
+    notes = json['notes'].toString();
+    if (json['items_cap'] != null) {
+      itemsCap = <ItemsCap>[];
+      itemsBalances = <String, String>{};
+      json['items_cap'].forEach((dynamic v) {
+        itemsCap.add(ItemsCap.fromJson(v));
+      });
+    }
+    lastTransDate = json['last_trans_date'].toString();
+    itemsCap.forEach((ItemsCap element) {
+      itemsBalances[element.itemId.toString()] = element.balanceCap.toString();
+    });
   }
   int id;
   String name;
-  String commercialRegister;
-  int status;
-  int classificationId;
-  int agentId;
-  String contactPerson;
-  String mobile;
-  String mobile2;
-  String email;
-  String city;
-  String area;
+  String commercialRecord;
+  List<City> city;
   String address;
-  int priceUsed;
-  String contactDetails;
-  int allowReturn;
+  double latitude;
+  double longitude;
+  String region;
+  String managerName;
+  String phone;
+  String phone2;
+  String email;
+  String classification;
+  String status;
+  int price;
+  int isreturn;
+  int limitDebt;
   String notes;
-  String location;
-  String debitLimit;
-  List<BalancesLimit> balancesLimit;
-  int transactionsOrderedCount;
-  int transactionsReturnedCount;
-  int collectionsCount;
-  int transactionsOrderedSum;
-  int transactionsReturnedSum;
-  int collectionsSum;
-
-  Classification classification;
+  String lastTransDate;
+  Map<String, String> itemsBalances;
+  List<ItemsCap> itemsCap;
 }
 
-class BalancesLimit {
-  BalancesLimit({this.itemId, this.limit, this.itemName});
+class City {
+  City({this.id, this.name, this.createdAt, this.updatedAt});
 
-  BalancesLimit.fromJson(dynamic json) {
-    itemId = json['item_id'].toString();
-    limit = json['limit '].toString();
-    itemName = json['item_name'].toString();
-  }
-  String itemId;
-  String limit;
-  String itemName;
-}
-
-class Classification {
-  Classification({this.id, this.name});
-
-  Classification.fromJson(dynamic json) {
+  City.fromJson(dynamic json) {
     id = json['id'] as int;
     name = json['name'].toString();
+    createdAt = json['created_at'].toString();
+    updatedAt = json['updated_at'].toString();
   }
+
   int id;
   String name;
+  String createdAt;
+  String updatedAt;
+}
+
+class ItemsCap {
+  ItemsCap({this.itemId, this.balanceCap, this.price});
+
+  ItemsCap.fromJson(dynamic json) {
+    itemId = json['item_id'] as int;
+    balanceCap = json['balance_cap'] as int;
+    price = json['price'].toString();
+  }
+  int itemId;
+  int balanceCap;
+  String price;
 }

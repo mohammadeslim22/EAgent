@@ -76,7 +76,7 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
                 )
               ],
             ),
-            decoration:const BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.blue,
             ),
           ),
@@ -93,12 +93,12 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
           ),
           ListTile(
             onTap: () {
-              Navigator.pushNamed(
-                widget.sourceContext, "/Home",
-                // arguments: <String, List<MemberShip>>{
-                //   "membershipsData": MemberShip.membershipsData
-                // }
-              );
+              Navigator.pushNamedAndRemoveUntil(
+                  widget.sourceContext, "/Home", (_) => false
+                  // arguments: <String, List<MemberShip>>{
+                  //   "membershipsData": MemberShip.membershipsData
+                  // }
+                  );
             },
             title: Text(trans(context, "home")),
           ),
