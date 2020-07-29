@@ -9,6 +9,7 @@ import 'package:agent_second/providers/transaction_provider.dart';
 import 'package:agent_second/util/service_locator.dart';
 import 'package:animated_card/animated_card.dart';
 import 'package:flare_flutter/flare_actor.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -16,6 +17,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 // import 'package:intl/intl.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class BeneficiaryCenter extends StatefulWidget {
   const BeneficiaryCenter({Key key, this.long, this.lat, this.ben})
@@ -35,6 +37,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
   Collections collection;
   int indexedStack;
   Widget noItemFound;
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
   Future<void> _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
 
@@ -72,6 +76,27 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
       child: const FlareActor("assets/images/empty.flr",
           alignment: Alignment.center, fit: BoxFit.fill, animation: "default"),
     );
+    getIt<TransactionProvider>().pagewiseCollectionController =
+        PagewiseLoadController<dynamic>(
+            pageSize: 3,
+            pageFuture: (int pageIndex) async {
+              return getIt<TransactionProvider>()
+                  .getCollectionTransactions(pageIndex, ben.id);
+            });
+    getIt<TransactionProvider>().pagewiseOrderController =
+        PagewiseLoadController<dynamic>(
+            pageSize: 3,
+            pageFuture: (int pageIndex) async {
+              return getIt<TransactionProvider>()
+                  .getOrdersTransactions(pageIndex, ben.id);
+            });
+    getIt<TransactionProvider>().pagewiseReturnController =
+        PagewiseLoadController<dynamic>(
+            pageSize: 3,
+            pageFuture: (int pageIndex) async {
+              return getIt<TransactionProvider>()
+                  .getReturnTransactions(pageIndex, ben.id);
+            });
   }
 
   @override
@@ -320,108 +345,234 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                     child: IndexedStack(
                       index: indexedStack,
                       children: <Widget>[
-                        PagewiseListView<dynamic>(
-                          physics: const ScrollPhysics(),
-                          shrinkWrap: true,
-                          loadingBuilder: (BuildContext context) {
-                            return Container(
-                              width: 400,
-                              height: 400,
-                              child: const FlareActor(
-                                  "assets/images/counter.flr",
-                                  alignment: Alignment.center,
-                                  fit: BoxFit.cover,
-                                  animation: "play"),
-                            );
-                          },
-                          pageSize: 10,
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-                          itemBuilder:
-                              (BuildContext context, dynamic entry, int index) {
-                            return AnimatedCard(
-                              direction: AnimatedCardDirection.left,
-                              initDelay: const Duration(milliseconds: 0),
-                              duration: const Duration(seconds: 1),
-                              curve: Curves.ease,
-                              child: _transactionBuilder(
-                                  context, entry as Transaction),
-                            );
-                          },
-                          noItemsFoundBuilder: (BuildContext context) {
-                            return noItemFound;
-                          },
-                          pageFuture: (int pageIndex) {
-                            return getIt<TransactionProvider>().getOrdersTransactions(pageIndex,ben.id);
-                          },
-                        ),
-                        PagewiseListView<dynamic>(
-                          physics: const ScrollPhysics(),
-                          shrinkWrap: true,
-                          loadingBuilder: (BuildContext context) {
-                            return Container(
-                              width: 400,
-                              height: 400,
-                              child: const FlareActor(
-                                  "assets/images/counter.flr",
-                                  alignment: Alignment.center,
-                                  fit: BoxFit.cover,
-                                  animation: "play"),
-                            );
-                          },
-                          pageSize: 10,
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-                          itemBuilder:
-                              (BuildContext context, dynamic entry, int index) {
-                            return AnimatedCard(
-                              direction: AnimatedCardDirection.left,
-                              initDelay: const Duration(milliseconds: 0),
-                              duration: const Duration(seconds: 1),
-                              curve: Curves.ease,
-                              child: _transactionBuilder(
-                                  context, entry as Transaction),
-                            );
-                          },
-                          noItemsFoundBuilder: (BuildContext context) {
-                            return noItemFound;
-                          },
-                          pageFuture: (int pageIndex) {
-                            return getIt<TransactionProvider>(). getReturnTransactions(pageIndex,ben.id);
-                          },
-                        ),
-                        PagewiseListView<dynamic>(
-                          physics: const ScrollPhysics(),
-                          shrinkWrap: true,
-                          loadingBuilder: (BuildContext context) {
-                            return Container(
-                              width: 400,
-                              height: 400,
-                              child: const FlareActor(
-                                  "assets/images/counter.flr",
-                                  alignment: Alignment.center,
-                                  fit: BoxFit.cover,
-                                  animation: "play"),
-                            );
-                          },
-                          pageSize: 10,
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-                          itemBuilder:
-                              (BuildContext context, dynamic entry, int index) {
-                            return AnimatedCard(
-                              direction: AnimatedCardDirection.left,
-                              initDelay: const Duration(milliseconds: 0),
-                              duration: const Duration(seconds: 1),
-                              curve: Curves.ease,
-                              child:
-                                  collectionBuilder(entry as SingleCollection),
-                            );
-                          },
-                          noItemsFoundBuilder: (BuildContext context) {
-                            return noItemFound;
-                          },
-                          pageFuture: (int pageIndex) {
-                            return getIt<TransactionProvider>().getCollectionTransactions(pageIndex,ben.id);
-                          },
-                        ),
+                        SmartRefresher(
+                            enablePullDown: true,
+                            enablePullUp: true,
+                            header: WaterDropHeader(
+                              complete: Container(),
+                              waterDropColor: Colors.blue,
+                            ),
+                            footer: CustomFooter(
+                              builder: (BuildContext context, LoadStatus mode) {
+                                Widget body;
+                                if (mode == LoadStatus.idle) {
+                                  body = const Text("pull up load");
+                                } else if (mode == LoadStatus.loading) {
+                                  body = const CupertinoActivityIndicator();
+                                } else if (mode == LoadStatus.failed) {
+                                  body = const Text("Load Failed!Click retry!");
+                                } else if (mode == LoadStatus.canLoading) {
+                                  body = const Text("release to load more");
+                                } else {
+                                  body = const Text("No more Data");
+                                }
+                                return Container(
+                                  height: 55.0,
+                                  child: Center(child: body),
+                                );
+                              },
+                            ),
+                            controller: _refreshController,
+                            onRefresh: () async {
+                              getIt<TransactionProvider>()
+                                  .pagewiseCollectionController
+                                  .reset();
+                              _refreshController.refreshCompleted();
+                            },
+                            onLoading: () async {
+                              await Future<void>.delayed(
+                                  const Duration(milliseconds: 1000));
+                              if (mounted) {
+                                setState(() {});
+                                _refreshController.loadComplete();
+                              }
+                            },
+                            child: PagewiseListView<dynamic>(
+                              physics: const ScrollPhysics(),
+                              shrinkWrap: true,
+                              loadingBuilder: (BuildContext context) {
+                                return Container(
+                                  width: 400,
+                                  height: 400,
+                                  child: const FlareActor(
+                                      "assets/images/counter.flr",
+                                      alignment: Alignment.center,
+                                      fit: BoxFit.cover,
+                                      animation: "play"),
+                                );
+                              },
+                              pageSize: 10,
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+                              itemBuilder: (BuildContext context, dynamic entry,
+                                  int index) {
+                                return AnimatedCard(
+                                  direction: AnimatedCardDirection.left,
+                                  initDelay: const Duration(milliseconds: 0),
+                                  duration: const Duration(seconds: 1),
+                                  curve: Curves.ease,
+                                  child: _transactionBuilder(
+                                      context, entry as Transaction),
+                                );
+                              },
+                              noItemsFoundBuilder: (BuildContext context) {
+                                return noItemFound;
+                              },
+                              pageFuture: (int pageIndex) {
+                                return getIt<TransactionProvider>()
+                                    .getOrdersTransactions(pageIndex, ben.id);
+                              },
+                            )),
+                        SmartRefresher(
+                            enablePullDown: true,
+                            enablePullUp: true,
+                            header: WaterDropHeader(
+                              complete: Container(),
+                              waterDropColor: Colors.blue,
+                            ),
+                            footer: CustomFooter(
+                              builder: (BuildContext context, LoadStatus mode) {
+                                Widget body;
+                                if (mode == LoadStatus.idle) {
+                                  body = const Text("pull up load");
+                                } else if (mode == LoadStatus.loading) {
+                                  body = const CupertinoActivityIndicator();
+                                } else if (mode == LoadStatus.failed) {
+                                  body = const Text("Load Failed!Click retry!");
+                                } else if (mode == LoadStatus.canLoading) {
+                                  body = const Text("release to load more");
+                                } else {
+                                  body = const Text("No more Data");
+                                }
+                                return Container(
+                                  height: 55.0,
+                                  child: Center(child: body),
+                                );
+                              },
+                            ),
+                            controller: _refreshController,
+                            onRefresh: () async {
+                              getIt<TransactionProvider>()
+                                  .pagewiseCollectionController
+                                  .reset();
+                              _refreshController.refreshCompleted();
+                            },
+                            onLoading: () async {
+                              await Future<void>.delayed(
+                                  const Duration(milliseconds: 1000));
+                              if (mounted) {
+                                setState(() {});
+                                _refreshController.loadComplete();
+                              }
+                            },
+                            child: PagewiseListView<dynamic>(
+                              physics: const ScrollPhysics(),
+                              shrinkWrap: true,
+                              loadingBuilder: (BuildContext context) {
+                                return Container(
+                                  width: 400,
+                                  height: 400,
+                                  child: const FlareActor(
+                                      "assets/images/counter.flr",
+                                      alignment: Alignment.center,
+                                      fit: BoxFit.cover,
+                                      animation: "play"),
+                                );
+                              },
+                              pageSize: 10,
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+                              itemBuilder: (BuildContext context, dynamic entry,
+                                  int index) {
+                                return AnimatedCard(
+                                  direction: AnimatedCardDirection.left,
+                                  initDelay: const Duration(milliseconds: 0),
+                                  duration: const Duration(seconds: 1),
+                                  curve: Curves.ease,
+                                  child: _transactionBuilder(
+                                      context, entry as Transaction),
+                                );
+                              },
+                              noItemsFoundBuilder: (BuildContext context) {
+                                return noItemFound;
+                              },
+                              pageFuture: (int pageIndex) {
+                                return getIt<TransactionProvider>()
+                                    .getReturnTransactions(pageIndex, ben.id);
+                              },
+                            )),
+                        SmartRefresher(
+                            enablePullDown: true,
+                            enablePullUp: true,
+                            header: WaterDropHeader(
+                              complete: Container(),
+                              waterDropColor: Colors.blue,
+                            ),
+                            footer: CustomFooter(
+                              builder: (BuildContext context, LoadStatus mode) {
+                                Widget body;
+                                if (mode == LoadStatus.idle) {
+                                  body = const Text("pull up load");
+                                } else if (mode == LoadStatus.loading) {
+                                  body = const CupertinoActivityIndicator();
+                                } else if (mode == LoadStatus.failed) {
+                                  body = const Text("Load Failed!Click retry!");
+                                } else if (mode == LoadStatus.canLoading) {
+                                  body = const Text("release to load more");
+                                } else {
+                                  body = const Text("No more Data");
+                                }
+                                return Container(
+                                  height: 55.0,
+                                  child: Center(child: body),
+                                );
+                              },
+                            ),
+                            controller: _refreshController,
+                            onRefresh: () async {
+                              getIt<TransactionProvider>()
+                                  .pagewiseCollectionController
+                                  .reset();
+                              _refreshController.refreshCompleted();
+                            },
+                            onLoading: () async {
+                              await Future<void>.delayed(
+                                  const Duration(milliseconds: 1000));
+                              if (mounted) {
+                                setState(() {});
+                                _refreshController.loadComplete();
+                              }
+                            },
+                            child: PagewiseListView<dynamic>(
+                              physics: const ScrollPhysics(),
+                              shrinkWrap: true,
+                              loadingBuilder: (BuildContext context) {
+                                return Container(
+                                  width: 400,
+                                  height: 400,
+                                  child: const FlareActor(
+                                      "assets/images/counter.flr",
+                                      alignment: Alignment.center,
+                                      fit: BoxFit.cover,
+                                      animation: "play"),
+                                );
+                              },
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+                              itemBuilder: (BuildContext context, dynamic entry,
+                                  int index) {
+                                return AnimatedCard(
+                                  direction: AnimatedCardDirection.left,
+                                  initDelay: const Duration(milliseconds: 0),
+                                  duration: const Duration(seconds: 1),
+                                  curve: Curves.ease,
+                                  child: collectionBuilder(
+                                      entry as SingleCollection),
+                                );
+                              },
+                              pageLoadController: getIt<TransactionProvider>()
+                                  .pagewiseCollectionController,
+                              noItemsFoundBuilder: (BuildContext context) {
+                                return noItemFound;
+                              },
+                            )),
                       ],
                     ),
                   )
@@ -518,9 +669,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                 ),
               )
             else
-           //   Expanded(child: bill(items)),
-                            Expanded(child: Container()),
-
+              //   Expanded(child: bill(items)),
+              Expanded(child: Container()),
           ],
         ),
       ),
@@ -550,10 +700,10 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
         ],
         child: FlatButton(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          color: entry.status == "active" ? Colors.blue[200] : Colors.transparent,
+          color: entry.id % 2 == 1 ? Colors.blue[400] : Colors.transparent,
           onPressed: () {
             setState(() {
-             // items = entry.items;
+              // items = entry.items;
               billIsOn = false;
               transaction = entry;
             });
@@ -566,11 +716,9 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                   child: Text(entry.id.toString(),
                       style: styles.mystyle, textAlign: TextAlign.start)),
               Expanded(
-                  flex: 2,
-                  child: Text(entry.agent, style: styles.mystyle)),
+                  flex: 2, child: Text(entry.agent, style: styles.mystyle)),
               Expanded(
-                  flex: 2,
-                  child: Text(entry.transDate, style: styles.mystyle)),
+                  flex: 2, child: Text(entry.transDate, style: styles.mystyle)),
               Expanded(
                   child: Text(entry.amount.toString() + ".00",
                       style: styles.mystyle, textAlign: TextAlign.end))
@@ -599,7 +747,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
         ],
         child: FlatButton(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          color: collection.status == "active" ? Colors.blue[200] : Colors.transparent,
+          color: collection.id % 2 == 0 ? Colors.blue[200] : Colors.transparent,
           onPressed: () {},
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -610,9 +758,11 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       style: styles.mystyle, textAlign: TextAlign.start)),
               Expanded(
                   flex: 2,
-                  child: Text(collection.user??"اسم المندوب هنا", style: styles.mystyle)),
+                  child: Text(collection.agent ?? "اسم المندوب هنا",
+                      style: styles.mystyle)),
               Expanded(
-                  flex: 2, child: Text(collection.createdAt, style: styles.mystyle)),
+                  flex: 2,
+                  child: Text(collection.createdAt, style: styles.mystyle)),
               Expanded(
                   child: Text(collection.amount.toString() + ".00",
                       style: styles.mystyle, textAlign: TextAlign.end))

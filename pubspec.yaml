@@ -52,6 +52,7 @@ dependencies:
   cron: ^0.2.3
   get_it: ^4.0.2
   giffy_dialog: ^1.8.0
+  pull_to_refresh: ^1.5.7
 dev_dependencies:
   flutter_test:
     sdk: flutter

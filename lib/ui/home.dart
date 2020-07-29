@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert' as Convert;
+import 'dart:convert' as convert;
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:agent_second/constants/config.dart';
@@ -93,7 +93,9 @@ class _DashBoardState extends State<DashBoard> {
     super.initState();
     lat = widget.lat ?? 25.063054;
     long = widget.long ?? 55.170010;
-    getUserData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getUserData();
+    });
   }
 
   @override
@@ -183,7 +185,6 @@ class _DashBoardState extends State<DashBoard> {
 
     print('hello world ${response.data}');
     daielyLog = DailyLog.fromJson(response.data);
-
     getIt<GlobalVars>().setDailyLog(
         daielyLog.tBeneficiariryCount.toString(),
         daielyLog.orderCount.toString(),
@@ -203,59 +204,86 @@ class _DashBoardState extends State<DashBoard> {
             resizeToAvoidBottomInset: false,
             appBar: AppBar(title: const Text("Altariq"), centerTitle: true),
             drawer: GlobalDrawer(sourceContext: context),
-            body: Consumer<GlobalVars>(
-              builder: (BuildContext context, GlobalVars golbalValues,
-                  Widget child) {
-                return Column(
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        card(
-                            'assets/images/remain_bin.svg',
-                            trans(context, 'remain_transaction'),
+            body: Column(
+              children: <Widget>[
+                Consumer<GlobalVars>(builder: (BuildContext context,
+                    GlobalVars golbalValues, Widget child) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      card(
+                          'assets/images/remain_bin.svg',
+                          trans(context, 'remain_transaction'),
+                          Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                color: Colors.orange,
+                              )),
+                              child: Text(golbalValues.benRemaining,
+                                  style: styles.redstyle))),
+                      card(
+                        'assets/images/order_transaction.svg',
+                        trans(context, 'order_transaction'),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
                             Container(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 8),
                                 decoration: BoxDecoration(
                                     border: Border.all(
-                                  color: Colors.orange,
+                                  color: const Color(0xFF008585),
                                 )),
-                                child: Text(golbalValues.benRemaining,
-                                    style: styles.redstyle))),
-                        card(
-                          'assets/images/order_transaction.svg',
-                          trans(context, 'order_transaction'),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                    color: Colors.green[200],
-                                  )),
-                                  child: Text(golbalValues.orderscount,
-                                      style: styles.greenstyle)),
-                              const SizedBox(
-                                width: 12,
-                              ),
-                              Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                    color: const Color(0xFF008585),
-                                  )),
-                                  child: Text(golbalValues.orderTotal,
-                                      style: styles.greenstyle))
-                            ],
-                          ),
+                                child: Text(golbalValues.orderscount??"",
+                                    style: styles.greenstyle)),
+                            const SizedBox(
+                              width: 12,
+                            ),
+                            Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                  color: const Color(0xFF008585),
+                                )),
+                                child: Text(golbalValues.orderTotal,
+                                    style: styles.greenstyle))
+                          ],
                         ),
-                        card(
-                          'assets/images/return_transaction.svg',
-                          trans(context, 'return_transaction'),
+                      ),
+                      card(
+                        'assets/images/return_transaction.svg',
+                        trans(context, 'return_transaction'),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                  color: Colors.purple,
+                                )),
+                                child: Text(golbalValues.returnscount,
+                                    style: styles.purplestyle)),
+                            const SizedBox(width: 12),
+                            Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                  color: Colors.purple,
+                                )),
+                                child: Text(golbalValues.returnTotal,
+                                    style: styles.purplestyle))
+                          ],
+                        ),
+                      ),
+                      card(
+                          'assets/images/collection.svg',
+                          trans(context, 'collection_transaction'),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
@@ -264,168 +292,136 @@ class _DashBoardState extends State<DashBoard> {
                                       const EdgeInsets.symmetric(horizontal: 8),
                                   decoration: BoxDecoration(
                                       border: Border.all(
-                                    color: Colors.purple,
+                                    color: Colors.blue,
                                   )),
-                                  child: Text(golbalValues.returnscount,
-                                      style: styles.purplestyle)),
+                                  child: Text(golbalValues.collectionscount,
+                                      style: styles.darkbluestyle)),
                               const SizedBox(width: 12),
                               Container(
                                   padding:
                                       const EdgeInsets.symmetric(horizontal: 8),
                                   decoration: BoxDecoration(
                                       border: Border.all(
-                                    color: const Color(0xFF008585),
+                                    color: Colors.blue,
                                   )),
-                                  child: Text(golbalValues.returnTotal,
-                                      style: styles.purplestyle))
+                                  child: Text(golbalValues.collectionTotal,
+                                      style: styles.darkbluestyle))
                             ],
-                          ),
+                          )),
+                      card(
+                          'assets/images/login_time.svg',
+                          trans(context, 'time_since_login'),
+                          Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                color: Colors.green,
+                              )),
+                              child: Text(golbalValues.timeSinceLogin,
+                                  style: styles.darkgreenstyle))),
+                      card(
+                          'assets/images/last_trip_time.svg',
+                          trans(context, 'time_since_last_trip'),
+                          Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                color: const Color(0xFF00158F),
+                              )),
+                              child: Text(golbalValues.timeSinceLastTrans,
+                                  style: styles.bluestyle))),
+                    ],
+                  );
+                }),
+                Expanded(
+                  child: Stack(
+                    children: <Widget>[
+                      GoogleMap(
+                        onMapCreated: _onMapCreated,
+                        mapType: MapType.normal,
+                        markers: Set<Marker>.of(markers.values),
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(lat, long),
+                          zoom: 13,
                         ),
-                        card(
-                            'assets/images/collection.svg',
-                            trans(context, 'collection_transaction'),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8),
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                      color: Colors.blue,
-                                    )),
-                                    child: Text(golbalValues.collectionscount,
-                                        style: styles.darkbluestyle)),
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8),
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                      color: const Color(0xFF008585),
-                                    )),
-                                    child: Text(golbalValues.collectionTotal,
-                                        style: styles.darkbluestyle))
-                              ],
-                            )),
-                        card(
-                            'assets/images/login_time.svg',
-                            trans(context, 'time_since_login'),
-                            Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                  color: Colors.green,
-                                )),
-                                child: Text(golbalValues.timeSinceLogin,
-                                    style: styles.darkgreenstyle))),
-                        card(
-                            'assets/images/last_trip_time.svg',
-                            trans(context, 'time_since_last_trip'),
-                            Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                  color: const Color(0xFF00158F),
-                                )),
-                                child:
-                                    Text("00:48:33", style: styles.bluestyle))),
-                      ],
-                    ),
-                    Expanded(
-                      child: Stack(
-                        children: <Widget>[
-                          GoogleMap(
-                            onMapCreated: _onMapCreated,
-                            mapType: MapType.normal,
-                            markers: Set<Marker>.of(markers.values),
-                            initialCameraPosition: CameraPosition(
-                              target: LatLng(lat, long),
-                              zoom: 13,
-                            ),
-                            onCameraMove: (CameraPosition pos) {
-                              setState(() {
-                                lat = pos.target.latitude;
-                                long = pos.target.longitude;
-                              });
-                            },
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 8.0, bottom: 69),
-                            child: Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Container(
-                                width: 40,
-                                height: 40,
-                                child: Material(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(6),
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(6),
-                                    onTap: () {},
-                                    child: GestureDetector(
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.my_location,
-                                          color: const Color.fromARGB(
-                                              1023, 150, 150, 150),
-                                        ),
-                                      ),
-                                      onTap: () async {
-                                        serviceEnabled =
-                                            await location.serviceEnabled();
-                                        if (!serviceEnabled) {
-                                          serviceEnabled =
-                                              await location.requestService();
-                                          if (!serviceEnabled) {
-                                          } else {
-                                            permissionGranted =
-                                                await location.hasPermission();
-                                            if (permissionGranted ==
-                                                PermissionStatus.denied) {
-                                              permissionGranted = await location
-                                                  .requestPermission();
-                                              if (permissionGranted ==
-                                                  PermissionStatus.granted) {
-                                                _animateToUser();
-                                              }
-                                            } else {
-                                              _animateToUser();
-                                            }
-                                          }
-                                        } else {
-                                          permissionGranted =
-                                              await location.hasPermission();
-                                          if (permissionGranted ==
-                                              PermissionStatus.denied) {
-                                            permissionGranted = await location
-                                                .requestPermission();
-                                            if (permissionGranted ==
-                                                PermissionStatus.granted) {
-                                              _animateToUser();
-                                            }
-                                          } else {
-                                            _animateToUser();
-                                          }
-                                        }
-                                      },
+                        onCameraMove: (CameraPosition pos) {
+                          setState(() {
+                            lat = pos.target.latitude;
+                            long = pos.target.longitude;
+                          });
+                        },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, bottom: 69),
+                        child: Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            child: Material(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(6),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(6),
+                                onTap: () {},
+                                child: GestureDetector(
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.my_location,
+                                      color: const Color.fromARGB(
+                                          1023, 150, 150, 150),
                                     ),
                                   ),
+                                  onTap: () async {
+                                    serviceEnabled =
+                                        await location.serviceEnabled();
+                                    if (!serviceEnabled) {
+                                      serviceEnabled =
+                                          await location.requestService();
+                                      if (!serviceEnabled) {
+                                      } else {
+                                        permissionGranted =
+                                            await location.hasPermission();
+                                        if (permissionGranted ==
+                                            PermissionStatus.denied) {
+                                          permissionGranted = await location
+                                              .requestPermission();
+                                          if (permissionGranted ==
+                                              PermissionStatus.granted) {
+                                            _animateToUser();
+                                          }
+                                        } else {
+                                          _animateToUser();
+                                        }
+                                      }
+                                    } else {
+                                      permissionGranted =
+                                          await location.hasPermission();
+                                      if (permissionGranted ==
+                                          PermissionStatus.denied) {
+                                        permissionGranted =
+                                            await location.requestPermission();
+                                        if (permissionGranted ==
+                                            PermissionStatus.granted) {
+                                          _animateToUser();
+                                        }
+                                      } else {
+                                        _animateToUser();
+                                      }
+                                    }
+                                  },
                                 ),
                               ),
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  ),
+                ),
+              ],
             )));
   }
 

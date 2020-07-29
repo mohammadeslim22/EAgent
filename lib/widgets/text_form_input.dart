@@ -19,6 +19,7 @@ class TextFormInput extends StatelessWidget {
       this.focusNode,
       this.nextfocusNode,
       this.onFieldSubmitted,
+      this.onFieldChanged,
       this.validator,
       this.prefixWidget})
       : super(key: key);
@@ -34,6 +35,8 @@ class TextFormInput extends StatelessWidget {
   final FocusNode focusNode;
   final FocusNode nextfocusNode;
   final Function onFieldSubmitted;
+    final Function(String st) onFieldChanged;
+
   final String Function(String error) validator;
   final Widget prefixWidget;
 
@@ -84,6 +87,8 @@ class TextFormInput extends StatelessWidget {
         onFieldSubmitted: (String v) {
           onFieldSubmitted();
         },
+        onChanged: onFieldChanged,
+        
         validator: (String error) {
           return validator(error);
         },

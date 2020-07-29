@@ -1,15 +1,28 @@
+import 'package:agent_second/util/dio.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:agent_second/models/Items.dart';
 
 class OrderListProvider with ChangeNotifier {
-  List<SingleItem> ordersList = <SingleItem>[];
+  List<SingleItemForSend> ordersList = <SingleItemForSend>[];
+  List<SingleItem> itemsList;
+  bool dataLoaded = false;
+  int indexedStack = 0;
+  Set<int> selectedOptions = <int>{};
 
-  List<SingleItem> get currentordersList => ordersList;
+  List<SingleItemForSend> get currentordersList => ordersList;
 
-  void addItemToList(SingleItem item) {
-    if (ordersList.contains(item)) {
+  void addItemToList(int id, String name, String note, int queantity,
+      String unit, String unitPrice) {
+    if (selectedOptions.contains(id)) {
     } else {
-      ordersList.add(item);
+      ordersList.add(SingleItemForSend(
+          id: id,
+          name: name,
+          notes: note,
+          queantity: queantity,
+          unit: unit,
+          unitPrice: unitPrice));
       notifyListeners();
     }
   }
@@ -18,17 +31,25 @@ class OrderListProvider with ChangeNotifier {
     ordersList.clear();
   }
 
-  void removeItemToList(SingleItem item) {
-    ordersList.remove(item);
+  void removeItemFromList(int itemId) {
+    ordersList.removeWhere((SingleItemForSend element) {
+      return element.id == itemId;
+    });
     notifyListeners();
   }
 
   void modifyItemUnit(String unit, int itemId) {
-    for (int i = 0; i < ordersList.length; i++) {
-      if (ordersList[i].id == itemId) {
-        ordersList[i].unit = unit;
-      }
-    }
+    ordersList
+        .where((SingleItemForSend element) {
+          return element.id == itemId;
+        })
+        .first
+        .unit = unit;
+    // for (int i = 0; i < ordersList.length; i++) {
+    //   if (ordersList[i].id == itemId) {
+    //     ordersList[i].unit = unit;
+    //   }
+    // }
     notifyListeners();
   }
 
@@ -39,13 +60,22 @@ class OrderListProvider with ChangeNotifier {
     }
 
     // ignore: avoid_function_literals_in_foreach_calls
-    ordersList.forEach((SingleItem element) {
-      sumtoTotal(double.parse(element.price5));
+    ordersList.forEach((SingleItemForSend element) {
+      sumtoTotal(double.parse(element.unitPrice));
     });
     return sumTotal;
   }
 
-  void sendOrder() {
-    
+  void sendOrder() {}
+  Future<void> getItems() async {
+    dataLoaded = false;
+    indexedStack = 0;
+    notifyListeners();
+    await dio.get<dynamic>("items").then((Response<dynamic> value) {
+      itemsList = Items.fromJson(value.data).itemsList;
+      dataLoaded = true;
+      indexedStack = 1;
+      notifyListeners();
+    });
   }
 }

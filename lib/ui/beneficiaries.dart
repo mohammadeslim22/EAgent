@@ -7,7 +7,6 @@ import 'package:agent_second/widgets/global_drawer.dart';
 import 'package:agent_second/widgets/text_form_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:agent_second/providers/global_variables.dart';
 import 'package:provider/provider.dart';
 class Beneficiaries extends StatefulWidget {
   const Beneficiaries({Key key}) : super(key: key);

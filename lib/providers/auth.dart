@@ -37,7 +37,6 @@ class Auth with ChangeNotifier {
           data.setData("agent_email", value.data['email'].toString());
           final GlobalVars globalVarsProv =
               Provider.of<GlobalVars>(context, listen: false);
-          final Cron cron = Cron();
           cron.schedule(Schedule.parse('*/1 * * * *'), () async {
             print("wahat time is it ? ");
             globalVarsProv.incrementTimeSinceLogin();

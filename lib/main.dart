@@ -21,8 +21,8 @@ import 'package:agent_second/providers/order_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-    setupLocator();
-dioDefaults();
+  setupLocator();
+  dioDefaults();
   SystemChrome.setPreferredOrientations(<DeviceOrientation>[
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight
@@ -39,8 +39,8 @@ dioDefaults();
         ChangeNotifierProvider<MyCounter>(
           create: (_) => MyCounter(),
         ),
-        ChangeNotifierProvider<GlobalVars>(
-          create: (_) => GlobalVars(),
+        ChangeNotifierProvider<GlobalVars>.value(
+          value: getIt<GlobalVars>(),
         ),
         ChangeNotifierProvider<OrderListProvider>.value(
           value: getIt<OrderListProvider>(),

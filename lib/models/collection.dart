@@ -1,74 +1,68 @@
 class Collections {
-
-
   Collections({this.collectionList});
 
   Collections.fromJson(dynamic json) {
     if (json['data'] != null) {
-      collectionList =  <SingleCollection>[];
+      collectionList = <SingleCollection>[];
       json['data'].forEach((dynamic v) {
-        collectionList.add( SingleCollection.fromJson(v));
+        collectionList.add(SingleCollection.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data =  <String, dynamic>{};
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (collectionList != null) {
-      data['data'] = collectionList.map((SingleCollection v) => v.toJson()).toList();
+      data['data'] =
+          collectionList.map((SingleCollection v) => v.toJson()).toList();
     }
     return data;
   }
-    List<SingleCollection> collectionList;
+
+  List<SingleCollection> collectionList;
 }
 
 class SingleCollection {
-
-
-  SingleCollection(
-      {this.id,
-      this.beneficiaryId,
-      this.userId,
-      this.vehicle,
-      this.amount,
-      this.status,
-      this.createdAt,
-      this.updatedAt,
-      this.user,
-      });
+  SingleCollection({
+    this.id,
+    this.beneficiaryId,
+    this.agentId,
+    this.vehicleId,
+    this.amount,
+    this.createdAt,
+    this.agent,
+    this.beneficiary,
+  });
 
   SingleCollection.fromJson(dynamic json) {
-    id = json['id']as int;
-    beneficiaryId = json['beneficiary_id']as int;
-    userId = json['user_id']as int;
-    vehicle = json['vehicle'].toString();
-    amount = json['amount']as int;
-    status = json['status'].toString();
+    id = json['id'] as int;
+    beneficiaryId = json['beneficiary_id'].toString();
+    agentId = json['agent_id'] as int;
+    vehicleId = json['vehicle_id'] as int;
+    amount = json['amount'] as int;
     createdAt = json['created_at'].toString();
-    updatedAt = json['updated_at'].toString();
-    user = json['user'].toString();
+    agent = json['agent'].toString();
+    beneficiary = json['beneficiary'].toString();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data =  <String, dynamic>{};
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['beneficiary_id'] = beneficiaryId;
-    data['user_id'] = userId;
-    data['vehicle'] =vehicle;
+    data['agent_id'] = agentId;
+    data['vehicle_id'] = vehicleId;
     data['amount'] = amount;
-    data['status'] = status;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
-    data['user'] = user;
+    data['agent'] = createdAt;
+    data['beneficiary'] = beneficiary;
     return data;
   }
-    int id;
-  int beneficiaryId;
-  int userId;
-  String vehicle;
+
+  int id;
+  String beneficiaryId;
+  int agentId;
+  int vehicleId;
   int amount;
-  String status;
   String createdAt;
-  String updatedAt;
-  String user;
+  String agent;
+  String beneficiary;
 }

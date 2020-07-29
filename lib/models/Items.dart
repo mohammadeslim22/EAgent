@@ -42,7 +42,7 @@ class SingleItem {
     name = json['name'].toString();
     unit = json['unit'].toString();
     unitPrice = json['unit_price'].toString();
-    price1 = json['price1'] .toString();
+    price1 = json['price1'].toString();
     price2 = json['price2'].toString();
     price3 = json['price3'].toString();
     price4 = json['price4'].toString();
@@ -102,7 +102,38 @@ class SingleItem {
   String notes;
   String createdAt;
   String updatedAt;
-  int queantity=1;
+  int queantity = 1;
+}
+
+class SingleItemForSend {
+  SingleItemForSend(
+      {this.id,
+      this.name,
+      this.unit,
+      this.unitPrice,
+      this.notes,
+      this.queantity,
+      this.image});
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['name'] = name;
+    data['unit'] = unit;
+    data['unit_price'] = unitPrice;
+    data['notes'] = notes;
+    data['quantity'] = queantity;
+    return data;
+  }
+
+  int id;
+  String name;
+  String unit;
+  String unitPrice;
+  String image;
+  String notes;
+
+  int queantity = 1;
   String get getUnit => unit;
 
   set setUnit(String unit) => this.unit = unit;
