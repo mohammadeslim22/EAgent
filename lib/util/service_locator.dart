@@ -1,4 +1,5 @@
 import 'package:agent_second/providers/global_variables.dart';
+import 'package:agent_second/providers/transaction_provider.dart';
 import 'package:get_it/get_it.dart';
 import '../providers/order_provider.dart';
 import '../services/navigationService.dart';
@@ -8,6 +9,8 @@ void setupLocator() {
 getIt.registerLazySingleton(() => NavigationService());
 getIt.registerLazySingleton(() => OrderListProvider());
 getIt.registerLazySingleton(() => GlobalVars());
+getIt.registerLazySingleton(() => TransactionProvider());
+
 
 
 

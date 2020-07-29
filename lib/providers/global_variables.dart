@@ -5,8 +5,8 @@ import 'package:intl/intl.dart';
 class GlobalVars with ChangeNotifier {
    BeneficiariesModel beneficiaries;
   Ben benInFocus;
-  String benRemaining = "0";
-  String orderscount = "0";
+  String benRemaining = "";
+  String orderscount = "";
   String orderTotal = "0.00";
   String returnscount = "0";
   String returnTotal = "0.00";

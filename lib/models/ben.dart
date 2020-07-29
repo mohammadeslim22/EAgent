@@ -46,8 +46,8 @@ class Ben {
       });
     }
     address = json['address'].toString();
-    latitude = json['latitude'] as double;
-    longitude = json['longitude'] as double;
+    latitude = json['latitude'] as int;
+    longitude = json['longitude'] as int;
     region = json['region'].toString();
     managerName = json['manager_name'].toString();
     phone = json['phone'].toString();
@@ -76,8 +76,8 @@ class Ben {
   String commercialRecord;
   List<City> city;
   String address;
-  double latitude;
-  double longitude;
+  int latitude;
+  int longitude;
   String region;
   String managerName;
   String phone;

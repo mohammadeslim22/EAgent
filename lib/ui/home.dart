@@ -109,7 +109,7 @@ class _DashBoardState extends State<DashBoard> {
         child: InkWell(
           onTap: () {},
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -182,7 +182,7 @@ class _DashBoardState extends State<DashBoard> {
     final Response<dynamic> response = await dio.get<dynamic>("day_log");
 
     print('hello world ${response.data}');
-    daielyLog = DailyLog.fromJson(Convert.jsonDecode(response.data.toString()));
+    daielyLog = DailyLog.fromJson(response.data);
 
     getIt<GlobalVars>().setDailyLog(
         daielyLog.tBeneficiariryCount.toString(),

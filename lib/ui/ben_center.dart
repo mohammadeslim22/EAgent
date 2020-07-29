@@ -5,9 +5,9 @@ import 'package:agent_second/localization/trans.dart';
 import 'package:agent_second/models/ben.dart';
 import 'package:agent_second/models/collection.dart';
 import 'package:agent_second/models/transactions.dart';
-import 'package:agent_second/util/dio.dart';
+import 'package:agent_second/providers/transaction_provider.dart';
+import 'package:agent_second/util/service_locator.dart';
 import 'package:animated_card/animated_card.dart';
-import 'package:dio/dio.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -351,12 +351,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             return noItemFound;
                           },
                           pageFuture: (int pageIndex) {
-                            return getOrdersTransactions(pageIndex);
-                            // return bolc.language[2]
-                            //     ? bolc.language[0]
-                            //         ? getOrdersTransactions(pageIndex)
-                            //         : getReturnTransactions(pageIndex)
-                            //     : getCollectionTransactions(pageIndex);
+                            return getIt<TransactionProvider>().getOrdersTransactions(pageIndex,ben.id);
                           },
                         ),
                         PagewiseListView<dynamic>(
@@ -390,7 +385,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             return noItemFound;
                           },
                           pageFuture: (int pageIndex) {
-                            return getReturnTransactions(pageIndex);
+                            return getIt<TransactionProvider>(). getReturnTransactions(pageIndex,ben.id);
                           },
                         ),
                         PagewiseListView<dynamic>(
@@ -424,7 +419,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             return noItemFound;
                           },
                           pageFuture: (int pageIndex) {
-                            return getCollectionTransactions(pageIndex);
+                            return getIt<TransactionProvider>().getCollectionTransactions(pageIndex,ben.id);
                           },
                         ),
                       ],
@@ -774,47 +769,4 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
   //   );
   // }
 
-  Future<List<Transaction>> getOrdersTransactions(int page) async {
-    final Response<dynamic> response = await dio
-        .get<dynamic>("btransactions", queryParameters: <String, dynamic>{
-      "page": page,
-      "beneficiary_id": ben.id,
-     // "transaction_type": 1,
-    });
-    print(response.data);
-    setState(() {
-      benTrans = Transactions.fromJson(response.data);
-    });
-
-    return benTrans.transactions;
-  }
-
-  Future<List<Transaction>> getReturnTransactions(int page) async {
-    final Response<dynamic> response = await dio
-        .get<dynamic>("btransactions", queryParameters: <String, dynamic>{
-      "page": page,
-      "beneficiary_id": ben.id,
-      //"transaction_type": 2,
-    });
-    print(response.data);
-    setState(() {
-      benTrans = Transactions.fromJson(response.data);
-    });
-
-    return benTrans.transactions;
-  }
-
-  Future<List<SingleCollection>> getCollectionTransactions(int page) async {
-    final Response<dynamic> response = await dio
-        .get<dynamic>("collection", queryParameters: <String, dynamic>{
-      "page": page,
-      "beneficiary_id": ben.id,
-    });
-    print("collexctions  ${ben.id}");
-    setState(() {
-      collection = Collections.fromJson(response.data);
-    });
-
-    return collection.collectionList;
-  }
 }

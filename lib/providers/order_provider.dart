@@ -44,4 +44,8 @@ class OrderListProvider with ChangeNotifier {
     });
     return sumTotal;
   }
+
+  void sendOrder() {
+    
+  }
 }
