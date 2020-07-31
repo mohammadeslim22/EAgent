@@ -90,8 +90,6 @@ class _OrderScreenState extends State<OrderScreen> {
     if (getIt<OrderListProvider>().dataLoaded) {
     } else {
       getIt<OrderListProvider>().indexedStack = 0;
-
-      //  getIt<OrderListProvider>().dataLoaded = false;
       getIt<OrderListProvider>().getItems();
     }
   }
@@ -105,7 +103,7 @@ class _OrderScreenState extends State<OrderScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            getIt<OrderListProvider>().clearOrcerList();
+            //  getIt<OrderListProvider>().clearOrcerList();
             Navigator.pop(context);
           },
         ),
@@ -485,15 +483,42 @@ class _OrderScreenState extends State<OrderScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      CircleAvatar(maxRadius: 16, child: Icon(Icons.add)),
-                      const SizedBox(width: 12),
-                      Text(item.queantity.toString(), style: styles.mystyle),
-                      const SizedBox(width: 12),
                       CircleAvatar(
-                          maxRadius: 16,
-                          child: Icon(
-                            Icons.remove,
-                          )),
+                        backgroundColor: Colors.blue[700],
+                        radius: 16,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: Icon(Icons.add),
+                          color: Colors.white,
+                          onPressed: () {
+                            getIt<OrderListProvider>()
+                                .incrementQuantity(item.id);
+                          },
+                        ),
+                      ),
+                      InkWell(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(item.queantity.toString(),
+                              style: styles.mystyle),
+                        ),
+                        onTap: () {
+                          showQuantityDialog(item.id);
+                        },
+                      ),
+                      CircleAvatar(
+                        backgroundColor: Colors.blue[700],
+                        radius: 16,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: Icon(Icons.remove),
+                          color: Colors.white,
+                          onPressed: () {
+                            getIt<OrderListProvider>()
+                                .decrementQuantity(item.id);
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -506,19 +531,19 @@ class _OrderScreenState extends State<OrderScreen> {
                     },
                     child: Row(
                       children: <Widget>[
-                        Text("كرتونة",
+                        Text(item.unit,
                             style: styles.mystyle, textAlign: TextAlign.start),
                       ],
                     ),
                   ),
                 ),
                 Expanded(
-                  child: Text("20.00",
+                  child: Text(item.unitPrice,
                       style: styles.mystyle, textAlign: TextAlign.center),
                 ),
                 Expanded(
                   child: Text(
-                    "260.00",
+                    "${double.parse(item.unitPrice) * item.queantity}",
                     style: styles.mystyle,
                     textAlign: TextAlign.end,
                   ),
@@ -532,90 +557,144 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Widget bottomTotal() {
-    return Column(
-      children: <Widget>[
-        Card(
-          color: Colors.grey,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+    return Consumer<OrderListProvider>(
+        builder: (BuildContext context, OrderListProvider value, Widget child) {
+      return Column(
+        children: <Widget>[
+          Card(
+            color: Colors.grey,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Text(trans(context, 'total') + " ",
+                      style: styles.mywhitestyle),
+                  Text(value.sumTotal.toString(), style: styles.mywhitestyle)
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                Text(trans(context, 'total') + " ", style: styles.mywhitestyle),
-                Text(getIt<OrderListProvider>().getTotla().toString(),
-                    style: styles.mywhitestyle)
+                Container(
+                  width: 160,
+                  child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    color: Colors.green,
+                    onPressed: () {},
+                    child: Text(trans(context, "draft"),
+                        style: styles.mywhitestyle),
+                  ),
+                ),
+                const SizedBox(width: 32),
+                Container(
+                  width: 160,
+                  child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    color: Colors.blue,
+                    onPressed: () {
+                      Navigator.pushNamed(context, "/Payment_Screen");
+                    },
+                    child: Text(trans(context, "order"),
+                        style: styles.mywhitestyle),
+                  ),
+                ),
+                const SizedBox(width: 32),
+                Container(
+                  width: 160,
+                  child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    color: Colors.red,
+                    onPressed: () {
+                      showDialog<dynamic>(
+                          context: context,
+                          builder: (_) => FlareGiffyDialog(
+                                flarePath: 'assets/images/space_demo.flr',
+                                flareAnimation: 'loading',
+                                title: Text(
+                                  trans(context, "are_u_sure_cancel"),
+                                  textAlign: TextAlign.center,
+                                  style: styles.underHeadblack,
+                                ),
+                                flareFit: BoxFit.cover,
+                                entryAnimation: EntryAnimation.TOP,
+                                onOkButtonPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                  value.clearOrcerList();
+                                },
+                              ));
+                    },
+                    child: Text(trans(context, "cancel"),
+                        style: styles.mywhitestyle),
+                  ),
+                ),
               ],
             ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+          )
+        ],
+      );
+    });
+  }
+
+  TextEditingController quantityController = TextEditingController();
+  Future<dynamic> showQuantityDialog(int itemId) async {
+    await showDialog<String>(
+      context: context,
+      builder: (_) => _SystemPadding(
+        child: AlertDialog(
+          contentPadding: const EdgeInsets.all(16.0),
+          content: Row(
             children: <Widget>[
-              Container(
-                width: 160,
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  color: Colors.green,
-                  onPressed: () {},
-                  child:
-                      Text(trans(context, "draft"), style: styles.mywhitestyle),
+              Expanded(
+                child: TextField(
+                  autofocus: true,
+                  controller: quantityController,
+                  keyboardType: TextInputType.number,
                 ),
-              ),
-              const SizedBox(width: 32),
-              Container(
-                width: 160,
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  color: Colors.blue,
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/Payment_Screen");
-                  },
-                  child:
-                      Text(trans(context, "order"), style: styles.mywhitestyle),
-                ),
-              ),
-              const SizedBox(width: 32),
-              Container(
-                width: 160,
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  color: Colors.red,
-                  onPressed: () {
-                    showDialog<dynamic>(
-                        context: context,
-                        builder: (_) => FlareGiffyDialog(
-                              flarePath: 'assets/images/space_demo.flr',
-                              flareAnimation: 'loading',
-                              title: Text(
-                                trans(context, "are_u_sure_cancel"),
-                                textAlign: TextAlign.center,
-                                style: styles.underHeadblack,
-                              ),
-                              flareFit: BoxFit.cover,
-                              entryAnimation: EntryAnimation.TOP,
-                              onOkButtonPressed: () {
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                                getIt<OrderListProvider>().clearOrcerList();
-                              },
-                            ));
-                  },
-                  child: Text(trans(context, "cancel"),
-                      style: styles.mywhitestyle),
-                ),
-              ),
+              )
             ],
           ),
-        )
-      ],
+          actions: <Widget>[
+            FlatButton(
+                child: Text(trans(context, "cancel")),
+                onPressed: () {
+                  Navigator.pop(context);
+                }),
+            FlatButton(
+                child: Text(trans(context, "set")),
+                onPressed: () {
+                  getIt<OrderListProvider>()
+                      .setQuantity(itemId, int.parse(quantityController.text));
+                  quantityController.clear();
+                  Navigator.pop(context);
+                })
+          ],
+        ),
+      ),
     );
+  }
+}
+
+class _SystemPadding extends StatelessWidget {
+  const _SystemPadding({Key key, this.child}) : super(key: key);
+  final Widget child;
+  @override
+  Widget build(BuildContext context) {
+    final MediaQueryData mediaQuery = MediaQuery.of(context);
+    return AnimatedContainer(
+        padding: mediaQuery.viewPadding,
+        duration: const Duration(milliseconds: 300),
+        child: child);
   }
 }

@@ -54,6 +54,7 @@ class _TransactionDeleteDialogState extends State<TransactionDeleteDialog> {
                           autofocus: true,
                           onPressed: () {
                             getIt<OrderListProvider>().clearOrcerList();
+                            Navigator.pop(context);
                           },
                           child: Text(trans(context, "ok_delete"),
                               style: styles.underHeadgreen),

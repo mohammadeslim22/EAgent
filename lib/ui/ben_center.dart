@@ -375,7 +375,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             controller: _refreshController,
                             onRefresh: () async {
                               getIt<TransactionProvider>()
-                                  .pagewiseCollectionController
+                                  .pagewiseOrderController
                                   .reset();
                               _refreshController.refreshCompleted();
                             },
@@ -398,6 +398,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                       "assets/images/counter.flr",
                                       alignment: Alignment.center,
                                       fit: BoxFit.cover,
+                                      
                                       animation: "play"),
                                 );
                               },
@@ -452,7 +453,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             controller: _refreshController,
                             onRefresh: () async {
                               getIt<TransactionProvider>()
-                                  .pagewiseCollectionController
+                                  .pagewiseReturnController
                                   .reset();
                               _refreshController.refreshCompleted();
                             },

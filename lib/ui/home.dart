@@ -33,11 +33,27 @@ class _HomeState extends State<Home> {
     //final GlobalVars globalVarsProv = Provider.of<GlobalVars>(context);
     final Response<dynamic> response = await dio.get<dynamic>("beneficaries");
     print("wooww?  ${response.data}");
+
     await Future<void>.delayed(const Duration(seconds: 3), () {});
     getIt<GlobalVars>().setBens(BeneficiariesModel.fromJson(response.data));
-    // globalVarsProv.beneficiaries = BeneficiariesModel.fromJson(response.data);
-
+    getUserData();
     return getIt<GlobalVars>().beneficiaries;
+  }
+
+  DailyLog daielyLog;
+  Future<void> getUserData() async {
+    final Response<dynamic> response = await dio.get<dynamic>("day_log");
+
+    print('hello world ${response.data}');
+    daielyLog = DailyLog.fromJson(response.data);
+    getIt<GlobalVars>().setDailyLog(
+        daielyLog.tBeneficiariryCount.toString(),
+        daielyLog.orderCount.toString(),
+        daielyLog.totalOrderCount.toString(),
+        daielyLog.returnCount.toString(),
+        daielyLog.totalReturnCount.toString(),
+        daielyLog.collectionCount.toString(),
+        daielyLog.totalCollectionCount.toString());
   }
 
   @override
@@ -94,7 +110,7 @@ class _DashBoardState extends State<DashBoard> {
     lat = widget.lat ?? 25.063054;
     long = widget.long ?? 55.170010;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      getUserData();
+      // getUserData();
     });
   }
 
@@ -178,23 +194,6 @@ class _DashBoardState extends State<DashBoard> {
       }
     }
   }
-
-  DailyLog daielyLog;
-  Future<void> getUserData() async {
-    final Response<dynamic> response = await dio.get<dynamic>("day_log");
-
-    print('hello world ${response.data}');
-    daielyLog = DailyLog.fromJson(response.data);
-    getIt<GlobalVars>().setDailyLog(
-        daielyLog.tBeneficiariryCount.toString(),
-        daielyLog.orderCount.toString(),
-        daielyLog.totalOrderCount.toString(),
-        daielyLog.returnCount.toString(),
-        daielyLog.totalReturnCount.toString(),
-        daielyLog.collectionCount.toString(),
-        daielyLog.totalCollectionCount.toString());
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -236,7 +235,7 @@ class _DashBoardState extends State<DashBoard> {
                                     border: Border.all(
                                   color: const Color(0xFF008585),
                                 )),
-                                child: Text(golbalValues.orderscount??"",
+                                child: Text(golbalValues.orderscount ?? "",
                                     style: styles.greenstyle)),
                             const SizedBox(
                               width: 12,
