@@ -80,17 +80,7 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
               color: Colors.blue,
             ),
           ),
-          ListTile(
-            onTap: () {
-              Navigator.pushNamed(
-                widget.sourceContext, "/Beneficiaries",
-                // arguments: <String, List<MemberShip>>{
-                //   "membershipsData": MemberShip.membershipsData
-                // }
-              );
-            },
-            title: Text(trans(context, "beneficiaries")),
-          ),
+    
           ListTile(
             onTap: () {
               Navigator.pushNamedAndRemoveUntil(
@@ -102,15 +92,37 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
             },
             title: Text(trans(context, "home")),
           ),
-          const Divider(),
-          ListTile(
-            onTap: () {},
+                ListTile(
+            onTap: () {
+              Navigator.pushNamed(
+                widget.sourceContext, "/Beneficiaries",
+                // arguments: <String, List<MemberShip>>{
+                //   "membershipsData": MemberShip.membershipsData
+                // }
+              );
+            },
             title: Text(trans(context, "beneficiaries")),
           ),
-          ListTile(
-            onTap: () {},
-            title: Text(trans(context, "home")),
+                ListTile(
+            onTap: () {
+              Navigator.pushNamed(
+                widget.sourceContext, "/Beneficiaries",
+                // arguments: <String, List<MemberShip>>{
+                //   "membershipsData": MemberShip.membershipsData
+                // }
+              );
+            },
+            title: Text(trans(context, "stock_transaction")),
           ),
+          const Divider(),
+          // ListTile(
+          //   onTap: () {},
+          //   title: Text(trans(context, "beneficiaries")),
+          // ),
+          // ListTile(
+          //   onTap: () {},
+          //   title: Text(trans(context, "home")),
+          // ),
         ],
       ),
     );

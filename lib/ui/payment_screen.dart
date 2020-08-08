@@ -1,12 +1,15 @@
 import 'package:agent_second/constants/colors.dart';
 import 'package:agent_second/constants/styles.dart';
 import 'package:agent_second/localization/trans.dart';
+import 'package:agent_second/models/ben.dart';
+import 'package:agent_second/providers/export.dart';
+import 'package:agent_second/util/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class PaymentScreen extends StatefulWidget {
- const PaymentScreen({Key key}) : super(key: key);
-
+  const PaymentScreen({Key key, this.transOrCollection}) : super(key: key);
+  final int transOrCollection;
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
 }
@@ -14,17 +17,30 @@ class PaymentScreen extends StatefulWidget {
 class _PaymentScreenState extends State<PaymentScreen> {
   int groupValue = 0;
   bool patmentTypeCash = true;
+
+  final TextEditingController paymentAmountController = TextEditingController();
   final TextEditingController paymentCashController = TextEditingController();
   final TextEditingController paymentDeptController = TextEditingController();
   final TextEditingController exDateController = TextEditingController();
   final TextEditingController cardNoController = TextEditingController();
   final TextEditingController cvcCashController = TextEditingController();
   final TextEditingController ammountPayController = TextEditingController();
+  Ben ben;
+  String type;
+  String deptValue = "00.00";
   @override
   void initState() {
     super.initState();
-    paymentCashController.text = "1,000.00/00,00";
-    paymentDeptController.text = "00.00";
+    type = widget.transOrCollection != 2
+        ? widget.transOrCollection == 0 ? "order" : "return"
+        : "";
+    ben = getIt<GlobalVars>().getbenInFocus();
+    final String temp = getIt<OrderListProvider>().sumTotal.toString();
+    paymentAmountController.text = "$temp  ";
+    paymentCashController.text = "$temp  ";
+    paymentCashController.selection =
+        TextSelection(baseOffset: 0, extentOffset: temp.length);
+    paymentDeptController.text = deptValue;
   }
 
   @override
@@ -112,16 +128,33 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       height: MediaQuery.of(context).size.height / 1.5,
                       child: Column(
                         children: <Widget>[
-                          SvgPicture.asset("assets/images/payment_cash.svg"),
+                          SvgPicture.asset(
+                            "assets/images/payment_cash.svg",
+                            height: 200,
+                            width: 200,
+                          ),
                           const SizedBox(height: 16),
                           TextFormField(
                             readOnly: false,
                             keyboardType: TextInputType.number,
                             onTap: () {},
+                            autofocus: true,
                             textAlign: TextAlign.center,
                             controller: paymentCashController,
                             style: styles.paymentCashStyle,
                             obscureText: false,
+                            onChanged: (String t) {
+                              setState(() {
+                                deptValue = (double.parse(
+                                            paymentAmountController.text
+                                                .trim()) -
+                                        double.parse(
+                                            paymentCashController.text.trim()))
+                                    .toString();
+
+                                paymentDeptController.text = "$deptValue.00";
+                              });
+                            },
                             decoration: InputDecoration(
                                 enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -132,7 +165,48 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 hintText: trans(context, 'cash_recieved'),
                                 hintStyle: TextStyle(
                                     color: colors.ggrey, fontSize: 15),
-                                disabledBorder:const OutlineInputBorder(
+                                disabledBorder: const OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.green)),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: colors.green),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                                prefixIcon: Icon(Icons.attach_money),
+                                prefix: Text(
+                                  trans(context, 'cash_recieved'),
+                                )),
+                            validator: (String error) {
+                              return "";
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            readOnly: true,
+                            keyboardType: TextInputType.number,
+                            onTap: () {},
+                            autofocus: false,
+                            textAlign: TextAlign.center,
+                            controller: paymentAmountController,
+                            style: styles.paymentCashStyle,
+                            obscureText: false,
+                            enabled: false,
+                            decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide:
+                                        BorderSide(color: colors.green)),
+                                filled: true,
+                                fillColor: Colors.white70,
+                                hintText: trans(context, 'cash_rquired'),
+                                hintStyle: TextStyle(
+                                    color: colors.ggrey, fontSize: 15),
+                                disabledBorder: const OutlineInputBorder(
                                     borderSide: BorderSide(
                                   color: Colors.green,
                                 )),
@@ -151,21 +225,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   Icons.attach_money,
                                 ),
                                 prefix: Text(
-                                  trans(context, 'cash_recieved'),
+                                  trans(context, 'cash_rquired'),
                                 )),
-                            onFieldSubmitted: (String v) {
-                              //  onFieldSubmitted();
-                            },
                             validator: (String error) {
                               return "";
                             },
                           ),
                           const SizedBox(height: 16),
                           TextFormField(
-                            readOnly: false,
+                            readOnly: true,
                             keyboardType: TextInputType.number,
                             onTap: () {},
-                            controller: paymentCashController,
+                            enabled: true,
+                            controller: paymentDeptController,
                             style: styles.paymentCashStyle,
                             obscureText: false,
                             textAlign: TextAlign.center,
@@ -179,7 +251,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 hintText: trans(context, 'debt'),
                                 hintStyle: TextStyle(
                                     color: colors.ggrey, fontSize: 15),
-                                disabledBorder:const OutlineInputBorder(
+                                disabledBorder: const OutlineInputBorder(
                                     borderSide: BorderSide(
                                   color: Colors.green,
                                 )),
@@ -272,45 +344,31 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ),
                         color: Colors.green,
                         onPressed: () {
-                          showGeneralDialog<dynamic>(
-                              barrierLabel: "Label",
-                              barrierDismissible: true,
-                              barrierColor: Colors.black.withOpacity(0.73),
-                              transitionDuration:
-                                  const Duration(milliseconds: 350),
-                              context: context,
-                              pageBuilder: (BuildContext context,
-                                  Animation<double> anim1,
-                                  Animation<double> anim2) {
-                                return Container(
-                                  color: Colors.white,
-                                  height: 600,
-                                  width: 600,
-                                   margin: const EdgeInsets.only(bottom: 60, left: 260, right: 260,top: 60),
-                                  child: Material(
-                                    type: MaterialType.transparency,
-                                    child: SizedBox.expand(
-                                      child: Column(
-                                        children: <Widget>[
-                                          SvgPicture.asset(
-                                              "assets/images/payment_done.svg"),
-                                          Text(
-                                              trans(context, 'payment_success'),
-                                              style: styles.angrygreenstyle),
-                                          Text(trans(
-                                                  context, 'transaction_no:') +
-                                              " 1335647946",style: styles.underHeadblack,),
-                                        const  Divider(),
-                                          Text(trans(context, 'ammount_payed:'"  800.00"),style: styles.mystyle,),
-                                          Text(trans(context, 'order_no:') +
-                                              "   5958",style: styles.mystyle,),
-                                          Text("Mon , 22-9-2020   2:25 PM",style: styles.mystyle,)
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              });
+                          if (widget.transOrCollection == 2) {
+                    
+                            print("iam sem=nding collection");
+                            if (getIt<OrderListProvider>().sendCollection(
+                                context,
+                                ben.id,
+                                int.parse(paymentCashController.text),
+                                "confirmed")) {}
+                          }
+                          if (getIt<OrderListProvider>().sendOrder(
+                              context,
+                              ben.id,
+                              getIt<OrderListProvider>().sumTotal.round(),
+                              double.parse(deptValue).round(),
+                              "return",
+                              "confirmed")) {
+                          } else {}
+
+                                  setState(() {
+                              paymentAmountController.text = "00.00";
+
+                              paymentCashController.text = "00.00";
+
+                              paymentDeptController.text = "00.00";
+                            });
                         },
                         child: Text(trans(context, "confirm"),
                             style: styles.mywhitestyle),
@@ -324,7 +382,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                         color: Colors.grey,
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                         child: Text(trans(context, "cancel"),
                             style: styles.mywhitestyle),
                       ),
@@ -383,7 +443,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         fillColor: Colors.white70,
         hintText: hinttext,
         hintStyle: TextStyle(color: colors.ggrey, fontSize: 15),
-        disabledBorder:const OutlineInputBorder(
+        disabledBorder: const OutlineInputBorder(
             borderSide: BorderSide(
           color: Colors.green,
         )),

@@ -33,6 +33,8 @@ class Ben {
       this.limitDebt,
       this.notes,
       this.lastTransDate,
+      this.transTotal,
+      this.transCount,
       this.itemsCap});
 
   Ben.fromJson(dynamic json) {
@@ -67,6 +69,9 @@ class Ben {
       });
     }
     lastTransDate = json['last_trans_date'].toString();
+    transTotal = json['trans_total'].toString();
+    transCount = json['trans_count'] as int;
+
     itemsCap.forEach((ItemsCap element) {
       itemsBalances[element.itemId.toString()] = element.balanceCap.toString();
     });
@@ -90,6 +95,8 @@ class Ben {
   int limitDebt;
   String notes;
   String lastTransDate;
+  String transTotal;
+  int transCount;
   Map<String, String> itemsBalances;
   List<ItemsCap> itemsCap;
 }

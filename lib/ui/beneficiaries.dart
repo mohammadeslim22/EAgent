@@ -8,6 +8,7 @@ import 'package:agent_second/widgets/text_form_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+
 class Beneficiaries extends StatefulWidget {
   const Beneficiaries({Key key}) : super(key: key);
 
@@ -18,21 +19,18 @@ class Beneficiaries extends StatefulWidget {
 class _BeneficiariesState extends State<Beneficiaries> {
   Set<int> selectedOptions = <int>{};
   BeneficiariesModel beneficiaries;
-
-  //List<int> specializations = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
   final TextEditingController searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
     final GlobalVars globalVarsProv =
-              Provider.of<GlobalVars>(context, listen: false);
+        Provider.of<GlobalVars>(context, listen: false);
     beneficiaries = globalVarsProv.beneficiaries;
   }
 
   @override
   Widget build(BuildContext context) {
-    final GlobalVars globalVarsProv =
-              Provider.of<GlobalVars>(context);
+    final GlobalVars globalVarsProv = Provider.of<GlobalVars>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(trans(context, "altriq")),
@@ -49,6 +47,9 @@ class _BeneficiariesState extends State<Beneficiaries> {
               obscureText: false,
               readOnly: false,
               onTab: () {},
+              onFieldChanged: (String st) {
+                setState(() {});
+              },
               onFieldSubmitted: () {},
             ),
           ),
@@ -65,7 +66,12 @@ class _BeneficiariesState extends State<Beneficiaries> {
           crossAxisCount: 3,
           childAspectRatio: 2,
           addRepaintBoundaries: true,
-          children: beneficiaries.data.map((Ben item) {
+          children: beneficiaries.data.where((Ben element) {
+            return element.name
+                .trim()
+                .toLowerCase()
+                .contains(searchController.text.trim().toLowerCase());
+          }).map((Ben item) {
             return Card(
               color: Colors.white,
               child: InkWell(
@@ -88,7 +94,8 @@ class _BeneficiariesState extends State<Beneficiaries> {
                         children: <Widget>[
                           Column(
                             children: <Widget>[
-                              Text(item.id.toString(), style: styles.beneficires),
+                              Text(item.id.toString(),
+                                  style: styles.beneficires),
                               const SizedBox(
                                 height: 32,
                               ),
@@ -108,8 +115,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Expanded(
-                                      child: Text(
-                                          item.name,
+                                      child: Text(item.name,
                                           style: styles.beneficiresNmae),
                                     ),
                                   ],
@@ -125,8 +131,6 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
-                                    // Text("رقم التواصل:  ",
-                                    //     style: styles.underHeadgray),
                                     Text(item.phone,
                                         style: styles.underHeadgray),
                                   ],
@@ -148,7 +152,15 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                   InkWell(
                                     splashColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
-                                    onTap: () {},
+                                    onTap: () {
+                                      globalVarsProv.setBenInFocus(item);
+                                      Navigator.pushNamed(
+                                          context, "/Order_Screen",
+                                          arguments: <String, dynamic>{
+                                            "ben": item,
+                                            "isORderOrReturn": true
+                                          });
+                                    },
                                     child: SvgPicture.asset(
                                         "assets/images/orderButton.svg",
                                         height: 90),
@@ -156,7 +168,15 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                   InkWell(
                                     splashColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
-                                    onTap: () {},
+                                    onTap: () {
+                                      globalVarsProv.setBenInFocus(item);
+                                      Navigator.pushNamed(
+                                          context, "/Order_Screen",
+                                          arguments: <String, dynamic>{
+                                            "ben": item,
+                                            "isORderOrReturn": false
+                                          });
+                                    },
                                     child: SvgPicture.asset(
                                         "assets/images/returnButton.svg",
                                         height: 90),
@@ -164,7 +184,13 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                   InkWell(
                                     splashColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
-                                    onTap: () {},
+                                    onTap: () {
+                                      globalVarsProv.setBenInFocus(item);
+                                      Navigator.pushNamed(
+                                          context, "/Payment_Screen",arguments: <String,dynamic>{
+                              "transOrCollection":2
+                            });
+                                    },
                                     child: SvgPicture.asset(
                                         "assets/images/collectionButton.svg",
                                         height: 90),

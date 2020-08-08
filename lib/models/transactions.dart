@@ -22,8 +22,6 @@ class Transactions {
 }
 
 class Transaction {
-
-
   Transaction(
       {this.id,
       this.beneficiary,
@@ -38,7 +36,8 @@ class Transaction {
       this.shortage,
       this.latitude,
       this.longitude,
-      this.createdAt});
+      this.createdAt,
+      this.details});
 
   Transaction.fromJson(dynamic json) {
     id = json['id'] as int;
@@ -55,6 +54,12 @@ class Transaction {
     latitude = json['latitude'] as double;
     longitude = json['longitude'] as double;
     createdAt = json['created_at'].toString();
+    if (json['details'] != null) {
+      details = <MiniItems>[];
+      json['details'].forEach((dynamic v) {
+        details.add(MiniItems.fromJson(v));
+      });
+    }
   }
 
   dynamic toJson() {
@@ -73,9 +78,13 @@ class Transaction {
     data['latitude'] = latitude;
     data['longitude'] = longitude;
     data['created_at'] = createdAt;
+    if (details != null) {
+      data['details'] = details.map((MiniItems v) => v.toJson()).toList();
+    }
     return data;
   }
-    int id;
+
+  int id;
   String beneficiary;
   String agent;
   String transDate;
@@ -89,4 +98,42 @@ class Transaction {
   double latitude;
   double longitude;
   String createdAt;
+  List<MiniItems> details;
+}
+
+class MiniItems {
+  MiniItems(
+      {this.id,
+      this.itemId,
+      this.unit,
+      this.itemPrice,
+      this.quantity,
+      this.notes});
+
+  MiniItems.fromJson(dynamic json) {
+    id = json['id'] as int;
+    itemId = json['item_id'] as int;
+    unit = json['unit'] as int;
+    itemPrice = json['item_price'] as int;
+    quantity = json['quantity'] as int;
+    notes = json['notes'].toString();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['item_id'] = itemId;
+    data['unit'] = unit;
+    data['item_price'] = itemPrice;
+    data['quantity'] = quantity;
+    data['notes'] = notes;
+    return data;
+  }
+
+  int id;
+  int itemId;
+  int unit;
+  int itemPrice;
+  int quantity;
+  String notes;
 }

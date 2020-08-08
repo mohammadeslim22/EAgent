@@ -32,7 +32,7 @@ class BeneficiaryCenter extends StatefulWidget {
 class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
   Ben ben;
   Transactions benTrans;
-  //List<MiniItems> items;
+  List<MiniItems> items;
   Transaction transaction;
   Collections collection;
   int indexedStack;
@@ -78,21 +78,21 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
     );
     getIt<TransactionProvider>().pagewiseCollectionController =
         PagewiseLoadController<dynamic>(
-            pageSize: 3,
+            pageSize: 15,
             pageFuture: (int pageIndex) async {
               return getIt<TransactionProvider>()
                   .getCollectionTransactions(pageIndex, ben.id);
             });
     getIt<TransactionProvider>().pagewiseOrderController =
         PagewiseLoadController<dynamic>(
-            pageSize: 3,
+            pageSize: 15,
             pageFuture: (int pageIndex) async {
               return getIt<TransactionProvider>()
                   .getOrdersTransactions(pageIndex, ben.id);
             });
     getIt<TransactionProvider>().pagewiseReturnController =
         PagewiseLoadController<dynamic>(
-            pageSize: 3,
+            pageSize: 15,
             pageFuture: (int pageIndex) async {
               return getIt<TransactionProvider>()
                   .getReturnTransactions(pageIndex, ben.id);
@@ -110,6 +110,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
   Widget build(BuildContext context) {
     //final MyCounter bolc = Provider.of<MyCounter>(context);
     return Scaffold(
+      
       appBar: AppBar(
         title: Text(trans(context, "altariq")),
         centerTitle: true,
@@ -212,7 +213,10 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           color: colors.blue,
                           onPressed: () {
                             Navigator.pushNamed(context, "/Order_Screen",
-                                arguments: <String, dynamic>{"ben": ben});
+                                arguments: <String, dynamic>{
+                                  "ben": ben,
+                                  "isORderOrReturn": true
+                                });
                           },
                           child: Text(trans(context, "order"),
                               style: styles.mywhitestyle),
@@ -226,7 +230,13 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                           color: colors.red,
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(context, "/Order_Screen",
+                                arguments: <String, dynamic>{
+                                  "ben": ben,
+                                  "isORderOrReturn": false
+                                });
+                          },
                           child: Text(
                             trans(context, "return"),
                             style: styles.mywhitestyle,
@@ -241,7 +251,11 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                           color: colors.green,
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(context, "/Payment_Screen",arguments: <String,dynamic>{
+                              "transOrCollection":2
+                            });
+                          },
                           child: Text(trans(context, "collection"),
                               style: styles.mywhitestyle),
                         ),
@@ -251,7 +265,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      Text(trans(context, "count") + "(22)",
+                      Text(trans(context, "count") + "   ${ben.transCount}",
                           style: styles.mystyle),
                       Container(
                         margin: const EdgeInsets.all(15.0),
@@ -307,8 +321,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           ),
                         ),
                       ),
-                      Text(trans(context, "total" "(222)"),
-                          style: styles.mystyle)
+                      Text(trans(context, "total" "    ${ben.transTotal}"), style: styles.mystyle)
                     ],
                   ),
                   Container(
@@ -398,11 +411,10 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                       "assets/images/counter.flr",
                                       alignment: Alignment.center,
                                       fit: BoxFit.cover,
-                                      
                                       animation: "play"),
                                 );
                               },
-                              pageSize: 10,
+                              pageSize: 15,
                               padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
                               itemBuilder: (BuildContext context, dynamic entry,
                                   int index) {
@@ -479,7 +491,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                       animation: "play"),
                                 );
                               },
-                              pageSize: 10,
+                              pageSize: 15,
                               padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
                               itemBuilder: (BuildContext context, dynamic entry,
                                   int index) {
@@ -670,8 +682,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                 ),
               )
             else
-              //   Expanded(child: bill(items)),
-              Expanded(child: Container()),
+              Expanded(child: bill(items)),
+            //    Expanded(child: Container()),
           ],
         ),
       ),
@@ -704,7 +716,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
           color: entry.id % 2 == 1 ? Colors.blue[400] : Colors.transparent,
           onPressed: () {
             setState(() {
-              // items = entry.items;
+              items = entry.details;
               billIsOn = false;
               transaction = entry;
             });
@@ -772,152 +784,150 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
         ));
   }
 
-  // Widget bill(List<MiniItems> items) {
-  //   return Column(
-  //     children: <Widget>[
-  //       Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: <Widget>[
-  //           Padding(
-  //             padding: const EdgeInsets.all(24.0),
-  //             child: Row(
-  //               children: <Widget>[
-  //                 Column(
-  //                   children: <Widget>[
-  //                     Text(trans(context, "name"), style: styles.mybluestyle),
-  //                     const SizedBox(height: 24),
-  //                     Text(trans(context, "date"), style: styles.mybluestyle)
-  //                   ],
-  //                 ),
-  //                 const SizedBox(width: 32),
-  //                 Column(
-  //                   crossAxisAlignment: CrossAxisAlignment.start,
-  //                   children: <Widget>[
-  //                     Text(ben.name, style: styles.mystyle),
-  //                     const SizedBox(height: 24),
-  //                     Row(
-  //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                       children: <Widget>[
-  //                         Text(transaction.transDate,
-  //                             style: styles.mystyle),
-  //                       ],
-  //                     )
-  //                   ],
-  //                 )
-  //               ],
-  //             ),
-  //           ),
-  //           if (!billIsOn)
-  //             Container(
-  //               padding:
-  //                   const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-  //               width: 130,
-  //               height: 130,
-  //               child: Column(
-  //                 children: <Widget>[
-  //                   Expanded(
-  //                     flex: 3,
-  //                     child: FlatButton(
-  //                       padding: EdgeInsets.zero,
-  //                       onPressed: () {
-  //                         setState(() {
-  //                           billIsOn = !billIsOn;
-  //                         });
-  //                       },
-  //                       child: const FlareActor("assets/images/maps.flr",
-  //                           alignment: Alignment.center,
-  //                           fit: BoxFit.cover,
-  //                           animation: "anim"),
-  //                     ),
-  //                   ),
-  //                   Text(
-  //                     trans(context, "back_to_map"),
-  //                     style: TextStyle(color: colors.black),
-  //                   )
-  //                 ],
-  //               ),
-  //             )
-  //           else
-  //             Container(),
-  //         ],
-  //       ),
-  //       Expanded(
-  //         child: SingleChildScrollView(
-  //             scrollDirection: Axis.vertical,
-  //             child: DataTable(
-  //               columns: <DataColumn>[
-  //                 DataColumn(
-  //                   label: Text(trans(context, 'id'),
-  //                       style: const TextStyle(fontStyle: FontStyle.italic)),
-  //                 ),
-  //                 DataColumn(
-  //                   label: Text(trans(context, 'product_name'),
-  //                       style: const TextStyle(fontStyle: FontStyle.italic)),
-  //                 ),
-  //                 DataColumn(
-  //                   label: Text(trans(context, 'quantity'),
-  //                       style: const TextStyle(fontStyle: FontStyle.italic)),
-  //                 ),
-  //                 DataColumn(
-  //                   label: Text(trans(context, 'unit'),
-  //                       style: const TextStyle(fontStyle: FontStyle.italic)),
-  //                 ),
-  //                 DataColumn(
-  //                   label: Text(trans(context, 'unit_price'),
-  //                       style: const TextStyle(fontStyle: FontStyle.italic)),
-  //                 ),
-  //                 DataColumn(
-  //                   label: Text(trans(context, 'total'),
-  //                       style: const TextStyle(fontStyle: FontStyle.italic)),
-  //                 ),
-  //               ],
-  //               rows: items.map((MiniItems e) {
-  //                 return DataRow(cells: <DataCell>[
-  //                   DataCell(Text(e.id.toString())),
-  //                   DataCell(Text(e.item.name)),
-  //                   DataCell(Text(e.quantity.toString())),
-  //                   DataCell(Text(e.unit)),
-  //                   DataCell(Text(e.unitPrice.toString())),
-  //                   DataCell(Text(e.price.toString()))
-  //                 ]);
-  //               }).toList(),
-  //             )),
-  //       ),
-  //       Row(
-  //         crossAxisAlignment: CrossAxisAlignment.center,
-  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         children: <Widget>[
-  //           Row(
-  //             children: <Widget>[
-  //               FlatButton(
-  //                 onPressed: () {},
-  //                 child: Row(
-  //                   crossAxisAlignment: CrossAxisAlignment.end,
-  //                   children: <Widget>[
-  //                     Text(trans(context, "share"), style: styles.mybluestyle),
-  //                     Icon(
-  //                       Icons.share,
-  //                       size: 20,
-  //                     )
-  //                   ],
-  //                 ),
-  //               )
-  //             ],
-  //           ),
-  //           Row(
-  //             children: <Widget>[
-  //               Text(trans(context, "total"), style: styles.mybluestyle),
-  //               const SizedBox(width: 12),
-  //               Text(trans(context, transaction.amount.toString() + ".00"),
-  //                   style: styles.mystyle),
-  //               const SizedBox(width: 32),
-  //             ],
-  //           ),
-  //         ],
-  //       )
-  //     ],
-  //   );
-  // }
-
+  Widget bill(List<MiniItems> items) {
+    return Column(
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Row(
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      Text(trans(context, "name"), style: styles.mybluestyle),
+                      const SizedBox(height: 24),
+                      Text(trans(context, "date"), style: styles.mybluestyle)
+                    ],
+                  ),
+                  const SizedBox(width: 32),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(ben.name, style: styles.mystyle),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(transaction.transDate, style: styles.mystyle),
+                        ],
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+            if (!billIsOn)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                width: 130,
+                height: 130,
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 3,
+                      child: FlatButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          setState(() {
+                            billIsOn = !billIsOn;
+                          });
+                        },
+                        child: const FlareActor("assets/images/maps.flr",
+                            alignment: Alignment.center,
+                            fit: BoxFit.cover,
+                            animation: "anim"),
+                      ),
+                    ),
+                    Text(
+                      trans(context, "back_to_map"),
+                      style: TextStyle(color: colors.black),
+                    )
+                  ],
+                ),
+              )
+            else
+              Container(),
+          ],
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: DataTable(
+                columns: <DataColumn>[
+                  DataColumn(
+                    label: Text(trans(context, 'id'),
+                        style: const TextStyle(fontStyle: FontStyle.italic)),
+                  ),
+                  DataColumn(
+                    label: Text(trans(context, 'product_name'),
+                        style: const TextStyle(fontStyle: FontStyle.italic)),
+                  ),
+                  DataColumn(
+                    label: Text(trans(context, 'quantity'),
+                        style: const TextStyle(fontStyle: FontStyle.italic)),
+                  ),
+                  DataColumn(
+                    label: Text(trans(context, 'unit'),
+                        style: const TextStyle(fontStyle: FontStyle.italic)),
+                  ),
+                  DataColumn(
+                    label: Text(trans(context, 'unit_price'),
+                        style: const TextStyle(fontStyle: FontStyle.italic)),
+                  ),
+                  DataColumn(
+                    label: Text(trans(context, 'total'),
+                        style: const TextStyle(fontStyle: FontStyle.italic)),
+                  ),
+                ],
+                rows: items.map((MiniItems e) {
+                  return DataRow(cells: <DataCell>[
+                    DataCell(Text(e.id.toString())),
+                    DataCell(Text("e.name")),
+                    DataCell(Text(e.quantity.toString())),
+                    DataCell(Text(e.unit.toString())),
+                    DataCell(Text(e.itemPrice.toString())),
+                    DataCell(Text((e.itemPrice * e.quantity).toString()))
+                  ]);
+                }).toList(),
+              )),
+        ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                FlatButton(
+                  onPressed: () {},
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Text(trans(context, "share"), style: styles.mybluestyle),
+                      Icon(
+                        Icons.share,
+                        size: 20,
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                Text(trans(context, "total"), style: styles.mybluestyle),
+                const SizedBox(width: 12),
+                Text(trans(context, transaction.amount.toString() + ".00"),
+                    style: styles.mystyle),
+                const SizedBox(width: 32),
+              ],
+            ),
+          ],
+        )
+      ],
+    );
+  }
 }

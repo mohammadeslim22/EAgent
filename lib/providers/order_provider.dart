@@ -1,8 +1,12 @@
+import 'package:agent_second/models/ben.dart';
+import 'package:agent_second/providers/export.dart';
 import 'package:agent_second/util/dio.dart';
+import 'package:agent_second/util/service_locator.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:agent_second/models/Items.dart';
 import 'package:vibration/vibration.dart';
+import 'package:agent_second/ui/ben_center.dart';
 
 class OrderListProvider with ChangeNotifier {
   List<SingleItemForSend> ordersList = <SingleItemForSend>[];
@@ -12,7 +16,8 @@ class OrderListProvider with ChangeNotifier {
   Set<int> selectedOptions = <int>{};
   double sumTotal = 0;
   List<SingleItemForSend> get currentordersList => ordersList;
-
+  ItemsCap dummyItemCap = ItemsCap(balanceCap: 99999999);
+  SingleItem dummySiglItem = SingleItem(balanceInventory: 99999999);
   void addItemToList(int id, String name, String note, int queantity,
       String unit, String unitPrice) {
     if (selectedOptions.contains(id)) {
@@ -36,30 +41,38 @@ class OrderListProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void changeUnit(int itemId, String unit) {
+    ordersList.firstWhere((SingleItemForSend element) {
+      return element.id == itemId;
+    }).unit = unit;
+
+    notifyListeners();
+  }
+
   void incrementQuantity(int itemId) {
-    ordersList
-        .where((SingleItemForSend element) {
-          return element.id == itemId;
-        })
-        .first
-        .queantity += 1;
-    sumTotal += double.parse(ordersList
-        .where((SingleItemForSend element) {
-          return element.id == itemId;
-        })
-        .first
-        .unitPrice);
+    final int quantity = ordersList.firstWhere((SingleItemForSend element) {
+      return element.id == itemId;
+    }).queantity;
+    if (checkValidation(itemId, quantity + 1)) {
+      ordersList.firstWhere((SingleItemForSend element) {
+        return element.id == itemId;
+      }).queantity += 1;
+      sumTotal +=
+          double.parse(ordersList.firstWhere((SingleItemForSend element) {
+        return element.id == itemId;
+      }).unitPrice);
+    } else {
+      Vibration.vibrate(duration: 600);
+    }
+
     notifyListeners();
   }
 
   void setQuantity(int itemId, int quantity) {
-    if (quantity < 1000 && quantity > 0) {
-      ordersList
-          .where((SingleItemForSend element) {
-            return element.id == itemId;
-          })
-          .first
-          .queantity = quantity;
+    if (checkValidation(itemId, quantity)) {
+      ordersList.firstWhere((SingleItemForSend element) {
+        return element.id == itemId;
+      }).queantity = quantity;
       getTotla();
     } else {
       Vibration.vibrate(duration: 600);
@@ -69,26 +82,18 @@ class OrderListProvider with ChangeNotifier {
   }
 
   void decrementQuantity(int itemId) {
-    if (ordersList
-            .where((SingleItemForSend element) {
-              return element.id == itemId;
-            })
-            .first
-            .queantity >
+    if (ordersList.firstWhere((SingleItemForSend element) {
+          return element.id == itemId;
+        }).queantity >
         1) {
-      ordersList
-          .where((SingleItemForSend element) {
-            return element.id == itemId;
-          })
-          .first
-          .queantity -= 1;
+      ordersList.firstWhere((SingleItemForSend element) {
+        return element.id == itemId;
+      }).queantity -= 1;
 
-      sumTotal -= double.parse(ordersList
-          .where((SingleItemForSend element) {
-            return element.id == itemId;
-          })
-          .first
-          .unitPrice);
+      sumTotal -=
+          double.parse(ordersList.firstWhere((SingleItemForSend element) {
+        return element.id == itemId;
+      }).unitPrice);
     } else {
       Vibration.vibrate(duration: 600);
     }
@@ -104,12 +109,9 @@ class OrderListProvider with ChangeNotifier {
   }
 
   void modifyItemUnit(String unit, int itemId) {
-    ordersList
-        .where((SingleItemForSend element) {
-          return element.id == itemId;
-        })
-        .first
-        .unit = unit;
+    ordersList.firstWhere((SingleItemForSend element) {
+      return element.id == itemId;
+    }).unit = unit;
     notifyListeners();
   }
 
@@ -126,7 +128,108 @@ class OrderListProvider with ChangeNotifier {
     return sumTotal;
   }
 
-  void sendOrder() {}
+  bool sendCollection(BuildContext c, int benId, int amount, String status) {
+    bool res = false;
+    dio.post<dynamic>("collection", data: <String, dynamic>{
+      "beneficiary_id": benId,
+      "amount": amount,
+      "status": status,
+      "vehicle_id":1
+    }).then((Response<dynamic> value) {
+      print("hhooooooooollllllllllllaaaaaaaaaaaaa collection   ${value.data}");
+      if (value.statusCode == 200) {
+        res = true;
+      } else {
+        res = false;
+      }
+    });
+getIt<TransactionProvider>().pagewiseCollectionController.reset();
+    Navigator.pop(c);
+    // Navigator.pushNamed(c, "/Beneficiary_Center",arguments: <String, dynamic>{"ben": getIt<GlobalVars>().getbenInFocus()});
+    // Navigator.pushNamedAndRemoveUntil(c, "/Beneficiary_Center", (_) => false,
+    //     arguments: <String, dynamic>{
+    //       "ben": getIt<GlobalVars>().getbenInFocus()
+    //     });
+    //  getIt<NavigationService>().navigateTo("Beneficiary_Center",
+    //         <String, dynamic>{"ben": getIt<GlobalVars>().getbenInFocus()});
+    notifyListeners();
+    return res;
+  }
+
+  bool sendOrder(BuildContext c, int benId, int ammoutn, int shortage,
+      String type, String status) {
+    final List<int> itemsId = <int>[];
+    final List<int> quantity = <int>[];
+    final List<int> itemsPrice = <int>[];
+    final List<String> itemsUnit = <String>[];
+    final List<String> itemsNote = <String>[];
+    bool res = false;
+    for (int i = 0; i < ordersList.length; i++) {
+      itemsId.add(ordersList[i].id);
+      quantity.add(ordersList[i].queantity);
+      itemsPrice.add(double.parse(ordersList[i].unitPrice).round());
+      itemsUnit.add(ordersList[i].unit);
+      itemsNote.add(ordersList[i].notes);
+      //'item_id[]': ordersList[i].toJson(),
+    }
+
+    dio.post<dynamic>("btransactions", data: <String, dynamic>{
+      "beneficiary_id": benId,
+      "status": status,
+      "type": type,
+      "notes": "notes",
+      "amount": ammoutn,
+      "shortage": shortage,
+
+      // "item_id[]":1,
+      // "quantity[]":19,
+      // "item_price[]":100,
+      // "unit[]":"دزينة"
+      // for (int i = 0; i < ordersList.length; i++)
+      // "item_id[]": ordersList[i].id.toString(),
+
+      // for (int i = 0; i < ordersList.length; i++)
+      // "quantity[]": ordersList[i].queantity.toString(),
+
+      // for (int i = 0; i < ordersList.length; i++)
+      // "item_price[]": ordersList[i].unitPrice,
+
+      // for (int i = 0; i < ordersList.length; i++)
+      // "unit[]": ordersList[i].unit,
+
+      "item_id[]": itemsId,
+      "item_price[]": itemsPrice,
+      "quantity[]": quantity,
+      "unit[]": itemsId,
+      // "notes": itemsNote
+    }).then((Response<dynamic> value) {
+      print("hhooooooooollllllllllllaaaaaaaaaaaaa    ${value.data}");
+      if (value.statusCode == 200) {
+        // getIt<NavigationService>().navigateTo("Beneficiary_Center",
+        //     <String, dynamic>{"ben": getIt<GlobalVars>().getbenInFocus()});
+        clearOrcerList();
+        res = true;
+      } else {
+        res = false;
+      }
+    });
+     clearOrcerList();
+    getIt<TransactionProvider>().pagewiseOrderController.reset();
+    getIt<TransactionProvider>().pagewiseReturnController.reset();
+    Navigator.of(c).pushNamedAndRemoveUntil(
+        '/Beneficiary_Center', ModalRoute.withName('/Beneficiaries'),
+        arguments: <String, dynamic>{
+          "ben": getIt<GlobalVars>().getbenInFocus()
+        });
+    // Navigator.of(c).popUntil((Route<dynamic> route) =>
+    //     route.settings.name ==
+    //     "/Beneficiary_Center");
+    // getIt<NavigationService>().navigateTo("Beneficiary_Center",
+    //     <String, dynamic>{"ben": getIt<GlobalVars>().getbenInFocus()});
+    notifyListeners();
+    return res;
+  }
+
   Future<void> getItems() async {
     dataLoaded = false;
     indexedStack = 0;
@@ -137,5 +240,33 @@ class OrderListProvider with ChangeNotifier {
       indexedStack = 1;
       notifyListeners();
     });
+  }
+
+  SingleItem getItemForUnit(int itemId) {
+    return itemsList.firstWhere((SingleItem element) {
+      return element.id == itemId;
+    });
+  }
+
+  bool checkValidation(int itemId, int quantity) {
+    if (quantity <=
+            itemsList.firstWhere((SingleItem element) {
+              return element.id == itemId;
+            }).balanceInventory &&
+        quantity > 0) {
+      if (quantity <=
+          getIt<GlobalVars>().benInFocus.itemsCap.firstWhere(
+              (ItemsCap element) {
+            return element.itemId == itemId;
+          }, orElse: () {
+            return dummyItemCap;
+          }).balanceCap) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 }

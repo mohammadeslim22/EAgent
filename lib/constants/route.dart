@@ -16,31 +16,33 @@ Route<PageController> onGenerateRoute(RouteSettings settings) {
   switch (settings.name) {
     case "/Home":
       page = PageTransition<PageController>(
-        child:const Home(),
+        child: const Home(),
         type: PageTransitionType.rightToLeftWithFade,
       );
       break;
     case "/Beneficiaries":
       page = PageTransition<PageController>(
-        child:const Beneficiaries(),
+        child: const Beneficiaries(),
         type: PageTransitionType.rightToLeftWithFade,
       );
       break;
     case "/Beneficiary_Center":
       page = PageTransition<PageController>(
-        child: BeneficiaryCenter(ben: args['ben']as Ben),
+        child: BeneficiaryCenter(ben: args['ben'] as Ben),
         type: PageTransitionType.rightToLeftWithFade,
       );
       break;
     case "/Order_Screen":
       page = PageTransition<PageController>(
-        child: OrderScreen(ben: args['ben'] as Ben,),
+        child: OrderScreen(
+            ben: args['ben'] as Ben,
+            isORderOrReturn: args['isORderOrReturn'] as bool),
         type: PageTransitionType.rightToLeftWithFade,
       );
       break;
-          case "/Payment_Screen":
+    case "/Payment_Screen":
       page = PageTransition<PageController>(
-        child:const PaymentScreen(),
+        child:  PaymentScreen(transOrCollection: args['transOrCollection'] as int,),
         type: PageTransitionType.rightToLeftWithFade,
       );
       break;

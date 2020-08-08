@@ -1,3 +1,4 @@
+import 'package:agent_second/constants/colors.dart';
 import 'package:agent_second/constants/styles.dart';
 import 'package:agent_second/localization/trans.dart';
 import 'package:agent_second/models/Items.dart';
@@ -17,8 +18,10 @@ import 'package:agent_second/providers/order_provider.dart';
 import 'package:giffy_dialog/giffy_dialog.dart';
 
 class OrderScreen extends StatefulWidget {
-  const OrderScreen({Key key, this.ben}) : super(key: key);
+  const OrderScreen({Key key, this.ben, this.isORderOrReturn})
+      : super(key: key);
   final Ben ben;
+  final bool isORderOrReturn;
   @override
   _OrderScreenState createState() => _OrderScreenState();
 }
@@ -27,8 +30,9 @@ class _OrderScreenState extends State<OrderScreen> {
   int indexedStackId = 0;
   double totalPrice;
   Ben ben;
-
+  bool isORderOrReturn;
   double animatedHight = 0;
+
   final TextEditingController searchController = TextEditingController();
   Map<String, String> itemsBalances = <String, String>{};
   List<int> prices = <int>[];
@@ -86,6 +90,7 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   void initState() {
     super.initState();
+    isORderOrReturn = widget.isORderOrReturn;
     ben = widget.ben;
     if (getIt<OrderListProvider>().dataLoaded) {
     } else {
@@ -97,13 +102,14 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        backgroundColor: isORderOrReturn ? colors.blue : colors.red,
         title: Text(trans(context, "altriq")),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            //  getIt<OrderListProvider>().clearOrcerList();
             Navigator.pop(context);
           },
         ),
@@ -119,16 +125,7 @@ class _OrderScreenState extends State<OrderScreen> {
               IconButton(
                   icon: Icon(Icons.delete, size: 36),
                   onPressed: () {
-                    showGeneralDialog<dynamic>(
-                        barrierLabel: "Label",
-                        barrierDismissible: true,
-                        barrierColor: Colors.black.withOpacity(0.73),
-                        transitionDuration: const Duration(milliseconds: 350),
-                        context: context,
-                        pageBuilder: (BuildContext context,
-                            Animation<double> anim1, Animation<double> anim2) {
-                          return const TransactionDeleteDialog();
-                        });
+                    cacelTransaction(false);
                   }),
               Container(
                 margin: const EdgeInsets.only(top: 2, right: 6, left: 6),
@@ -421,7 +418,7 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  void showUnitDialog() {
+  void showUnitDialog(SingleItem item) {
     showGeneralDialog<dynamic>(
       barrierLabel: "Label",
       barrierDismissible: true,
@@ -430,7 +427,7 @@ class _OrderScreenState extends State<OrderScreen> {
       context: context,
       pageBuilder: (BuildContext context, Animation<double> anim1,
           Animation<double> anim2) {
-        return const UnitsCooficientsDialog();
+        return UnitsCooficientsDialog(item: item);
       },
       transitionBuilder: (BuildContext context, Animation<double> anim1,
           Animation<double> anim2, Widget child) {
@@ -527,7 +524,8 @@ class _OrderScreenState extends State<OrderScreen> {
                   child: FlatButton(
                     padding: EdgeInsets.zero,
                     onPressed: () {
-                      showUnitDialog();
+                      showUnitDialog(
+                          getIt<OrderListProvider>().getItemForUnit(item.id));
                     },
                     child: Row(
                       children: <Widget>[
@@ -587,7 +585,26 @@ class _OrderScreenState extends State<OrderScreen> {
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     color: Colors.green,
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog<dynamic>(
+                          context: context,
+                          builder: (_) => FlareGiffyDialog(
+                                flarePath: 'assets/images/space_demo.flr',
+                                flareAnimation: 'loading',
+                                title: Text(
+                                  trans(context, "save_transaction"),
+                                  textAlign: TextAlign.center,
+                                  style: styles.underHeadblack,
+                                ),
+                                flareFit: BoxFit.cover,
+                                entryAnimation: EntryAnimation.TOP,
+                                onOkButtonPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                  value.clearOrcerList();
+                                },
+                              ));
+                    },
                     child: Text(trans(context, "draft"),
                         style: styles.mywhitestyle),
                   ),
@@ -601,7 +618,10 @@ class _OrderScreenState extends State<OrderScreen> {
                     ),
                     color: Colors.blue,
                     onPressed: () {
-                      Navigator.pushNamed(context, "/Payment_Screen");
+                      Navigator.pushNamed(context, "/Payment_Screen",
+                          arguments: <String, dynamic>{
+                            "transOrCollection": isORderOrReturn ? 0 : 1
+                          });
                     },
                     child: Text(trans(context, "order"),
                         style: styles.mywhitestyle),
@@ -616,24 +636,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     ),
                     color: Colors.red,
                     onPressed: () {
-                      showDialog<dynamic>(
-                          context: context,
-                          builder: (_) => FlareGiffyDialog(
-                                flarePath: 'assets/images/space_demo.flr',
-                                flareAnimation: 'loading',
-                                title: Text(
-                                  trans(context, "are_u_sure_cancel"),
-                                  textAlign: TextAlign.center,
-                                  style: styles.underHeadblack,
-                                ),
-                                flareFit: BoxFit.cover,
-                                entryAnimation: EntryAnimation.TOP,
-                                onOkButtonPressed: () {
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                  value.clearOrcerList();
-                                },
-                              ));
+                      cacelTransaction(true);
                     },
                     child: Text(trans(context, "cancel"),
                         style: styles.mywhitestyle),
@@ -647,54 +650,52 @@ class _OrderScreenState extends State<OrderScreen> {
     });
   }
 
+  void cacelTransaction(bool downCacel) {
+    showGeneralDialog<dynamic>(
+        barrierLabel: "Label",
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(0.73),
+        transitionDuration: const Duration(milliseconds: 350),
+        context: context,
+        pageBuilder: (BuildContext context, Animation<double> anim1,
+            Animation<double> anim2) {
+          return TransactionDeleteDialog(downCacel: downCacel, c: context);
+        });
+  }
+
   TextEditingController quantityController = TextEditingController();
   Future<dynamic> showQuantityDialog(int itemId) async {
     await showDialog<String>(
       context: context,
-      builder: (_) => _SystemPadding(
-        child: AlertDialog(
-          contentPadding: const EdgeInsets.all(16.0),
-          content: Row(
-            children: <Widget>[
-              Expanded(
-                child: TextField(
-                  autofocus: true,
-                  controller: quantityController,
-                  keyboardType: TextInputType.number,
-                ),
-              )
-            ],
-          ),
-          actions: <Widget>[
-            FlatButton(
-                child: Text(trans(context, "cancel")),
-                onPressed: () {
-                  Navigator.pop(context);
-                }),
-            FlatButton(
-                child: Text(trans(context, "set")),
-                onPressed: () {
-                  getIt<OrderListProvider>()
-                      .setQuantity(itemId, int.parse(quantityController.text));
-                  quantityController.clear();
-                  Navigator.pop(context);
-                })
+      builder: (_) => AlertDialog(
+        contentPadding: const EdgeInsets.all(16.0),
+        content: Row(
+          children: <Widget>[
+            Expanded(
+              child: TextField(
+                autofocus: true,
+                controller: quantityController,
+                keyboardType: TextInputType.emailAddress,
+              ),
+            )
           ],
         ),
+        actions: <Widget>[
+          FlatButton(
+              child: Text(trans(context, "cancel")),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          FlatButton(
+              child: Text(trans(context, "set")),
+              onPressed: () {
+                getIt<OrderListProvider>()
+                    .setQuantity(itemId, int.parse(quantityController.text));
+                quantityController.clear();
+                Navigator.pop(context);
+              })
+        ],
       ),
     );
-  }
-}
-
-class _SystemPadding extends StatelessWidget {
-  const _SystemPadding({Key key, this.child}) : super(key: key);
-  final Widget child;
-  @override
-  Widget build(BuildContext context) {
-    final MediaQueryData mediaQuery = MediaQuery.of(context);
-    return AnimatedContainer(
-        padding: mediaQuery.viewPadding,
-        duration: const Duration(milliseconds: 300),
-        child: child);
   }
 }

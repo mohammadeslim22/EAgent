@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class TransactionDeleteDialog extends StatefulWidget {
-  const TransactionDeleteDialog({Key key}) : super(key: key);
+  const TransactionDeleteDialog({Key key, this.downCacel, this.c}) : super(key: key);
+  final bool downCacel;
+  final BuildContext c;
 
   @override
   _TransactionDeleteDialogState createState() =>
@@ -55,6 +57,9 @@ class _TransactionDeleteDialogState extends State<TransactionDeleteDialog> {
                           onPressed: () {
                             getIt<OrderListProvider>().clearOrcerList();
                             Navigator.pop(context);
+                            if (widget.downCacel) {
+                              Navigator.pop(widget.c);
+                            }
                           },
                           child: Text(trans(context, "ok_delete"),
                               style: styles.underHeadgreen),

@@ -34,7 +34,8 @@ class SingleItem {
       this.notes,
       this.createdAt,
       this.queantity,
-      this.updatedAt});
+      this.updatedAt,
+      this.units});
 
   SingleItem.fromJson(dynamic json) {
     id = json['id'] as int;
@@ -56,6 +57,12 @@ class SingleItem {
     notes = json['notes'].toString();
     createdAt = json['created_at'].toString();
     updatedAt = json['updated_at'].toString();
+    if (json['units'] != null) {
+      units = <Units>[];
+      json['units'].forEach((dynamic v) {
+        units.add(Units.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -80,6 +87,9 @@ class SingleItem {
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     data['quantity'] = queantity;
+    if (units != null) {
+      data['units'] = units.map((Units v) => v.toJson()).toList();
+    }
     return data;
   }
 
@@ -103,6 +113,7 @@ class SingleItem {
   String createdAt;
   String updatedAt;
   int queantity = 1;
+  List<Units> units;
 }
 
 class SingleItemForSend {
@@ -132,13 +143,24 @@ class SingleItemForSend {
   String unitPrice;
   String image;
   String notes;
-
   int queantity = 1;
-  String get getUnit => unit;
+}
 
-  set setUnit(String unit) => this.unit = unit;
+class Units {
+  Units({this.id, this.name});
 
-  //  set setunit(String newunit) {
-  //   unit = newunit;
-  // }
+  Units.fromJson(dynamic json) {
+    id = json['id'] as int;
+    name = json['name'].toString();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['name'] = name;
+    return data;
+  }
+
+  int id;
+  String name;
 }

@@ -14,7 +14,8 @@ BaseOptions options = BaseOptions(
     'authorization':''
   },
   followRedirects: false,
-  validateStatus: (int status) => status < 500,
+  validateStatus: (int status) => status < 501,
+  
 );
 
 Response<dynamic> response;

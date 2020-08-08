@@ -20,7 +20,7 @@ class TransactionProvider with ChangeNotifier {
         .get<dynamic>("btransactions", queryParameters: <String, dynamic>{
       "page": page,
       "beneficiary_id": benId,
-      // "transaction_type": 1,
+       "type":"order ",
     });
     print(response.data);
 
@@ -34,7 +34,7 @@ class TransactionProvider with ChangeNotifier {
         .get<dynamic>("btransactions", queryParameters: <String, dynamic>{
       "page": page,
       "beneficiary_id": benId,
-      //"transaction_type": 2,
+      "type": "return",
     });
     print(response.data);
     benTrans = Transactions.fromJson(response.data);
@@ -47,7 +47,6 @@ class TransactionProvider with ChangeNotifier {
     final Response<dynamic> response =
         await dio.get<dynamic>("collection", queryParameters: <String, dynamic>{
       "page": page,
-      // "beneficiary_id": benId,
     });
     print(response.data);
     collection = Collections.fromJson(response.data);

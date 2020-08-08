@@ -18,8 +18,8 @@ class DailyLog {
     // tBeneficiariryCount = int.parse(json['t_beneficiariry_count'].toString());
     orderCount = json['order_count'] as int;
     returnCount = json['return_count'] as int;
-    totalOrderCount = json['total_order_count'] as int;
-    totalReturnCount = json['total_return_count'] as int;
+    totalOrderCount = json['total_order_count'].toString();
+    totalReturnCount = json['total_return_count'].toString();
     totalCollectionCount = json['total_collection_count'] as int;
     collectionCount = json['collection_count'] as int;
   }
@@ -27,8 +27,8 @@ class DailyLog {
   int tBeneficiariryCount;
   int orderCount;
   int returnCount;
-  int totalOrderCount;
-  int totalReturnCount;
+  String totalOrderCount;
+  String totalReturnCount;
   int totalCollectionCount;
   int collectionCount;
 }

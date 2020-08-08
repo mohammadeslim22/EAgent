@@ -105,6 +105,6 @@ class MyApp extends StatelessWidget {
         },
         theme: mainThemeData(),
         onGenerateRoute: onGenerateRoute,
-        home: const Home());
+        home: const LoginScreen());
   }
 }

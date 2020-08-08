@@ -5,6 +5,7 @@ import 'package:agent_second/util/dio.dart';
 import 'package:agent_second/widgets/custom_toast_widget.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:cron/cron.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +15,8 @@ class Auth with ChangeNotifier {
   Auth();
   Future<dynamic> login(
       String usernametext, String passwordText, BuildContext context) async {
+    SystemChannels.textInput.invokeMethod<String>('TextInput.hide');
+
     await dio.post<dynamic>("login", data: <String, dynamic>{
       "username": usernametext.toString().trim(),
       "password": passwordText
@@ -29,7 +32,7 @@ class Auth with ChangeNotifier {
           await data.setData(
               "authorization", "Bearer ${value.data['api_token']}");
           dio.options.headers['authorization'] =
-              'Bearer ${value.data['results']}';
+              'Bearer ${value.data['api_token']}';
           data.setData(
               "verchil_id", value.data['agent']['vehicle_id'].toString());
           data.setData("agent_id", value.data['id'].toString());
