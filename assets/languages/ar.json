@@ -42,6 +42,7 @@
     "unit": "الوحدة",
     "draft": "حفظ",
     "order": "إرسال طلبية",
+    "make_return":"عملية إرجاع",
     "coefficient_stability": "معامل التغيير للوحدة الرئيسية",
     "ok_unit": "تثبيت",
     "drage_here": "أفلت هنا...",
@@ -73,5 +74,9 @@
     "set":"تثبيت",
     "save_transaction":"حفظ الحركة مؤقتا",
     "altariq":"شركة الطارق",
-    "ben_center":"شاشة المستفيد"
+    "ben_center":"شاشة المستفيد",
+    "stock_transaction":"حركات مخزنية",
+    "beneficiaries":"المستفيدين",
+    "product_name":"اسم الصنف",
+    "unit_price":"سعر الوحدة"
 }

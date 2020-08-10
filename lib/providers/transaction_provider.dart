@@ -16,13 +16,12 @@ class TransactionProvider with ChangeNotifier {
   PagewiseLoadController<dynamic> pagewiseOrderController;
 
   Future<List<Transaction>> getOrdersTransactions(int page, int benId) async {
+    
     final Response<dynamic> response = await dio
         .get<dynamic>("btransactions", queryParameters: <String, dynamic>{
-      "page": page,
       "beneficiary_id": benId,
-       "type":"order ",
+       "type":"order",
     });
-    print(response.data);
 
     benTrans = Transactions.fromJson(response.data);
 
@@ -32,11 +31,10 @@ class TransactionProvider with ChangeNotifier {
   Future<List<Transaction>> getReturnTransactions(int page, int benId) async {
     final Response<dynamic> response = await dio
         .get<dynamic>("btransactions", queryParameters: <String, dynamic>{
-      "page": page,
       "beneficiary_id": benId,
       "type": "return",
     });
-    print(response.data);
+
     benTrans = Transactions.fromJson(response.data);
 
     return benTrans.transactions;
@@ -46,9 +44,7 @@ class TransactionProvider with ChangeNotifier {
       int page, int benId) async {
     final Response<dynamic> response =
         await dio.get<dynamic>("collection", queryParameters: <String, dynamic>{
-      "page": page,
     });
-    print(response.data);
     collection = Collections.fromJson(response.data);
 
     return collection.collectionList;

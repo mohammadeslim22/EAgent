@@ -32,7 +32,6 @@ class _HomeState extends State<Home> {
   Future<BeneficiariesModel> getBenData() async {
     //final GlobalVars globalVarsProv = Provider.of<GlobalVars>(context);
     final Response<dynamic> response = await dio.get<dynamic>("beneficaries");
-    print("wooww?  ${response.data}");
 
     await Future<void>.delayed(const Duration(seconds: 3), () {});
     getIt<GlobalVars>().setBens(BeneficiariesModel.fromJson(response.data));
@@ -43,8 +42,6 @@ class _HomeState extends State<Home> {
   DailyLog daielyLog;
   Future<void> getUserData() async {
     final Response<dynamic> response = await dio.get<dynamic>("day_log");
-
-    print('hello world ${response.data}');
     daielyLog = DailyLog.fromJson(response.data);
     getIt<GlobalVars>().setDailyLog(
         daielyLog.tBeneficiariryCount.toString(),
@@ -201,7 +198,7 @@ class _DashBoardState extends State<DashBoard> {
         child: Scaffold(
             key: _scaffoldKey,
             resizeToAvoidBottomInset: false,
-            appBar: AppBar(title: const Text("Altariq"), centerTitle: true),
+            appBar: AppBar(title:  Text(trans(context, "altariq")), centerTitle: true),
             drawer: GlobalDrawer(sourceContext: context),
             body: Column(
               children: <Widget>[
@@ -366,10 +363,10 @@ class _DashBoardState extends State<DashBoard> {
                                 borderRadius: BorderRadius.circular(6),
                                 onTap: () {},
                                 child: GestureDetector(
-                                  child: Center(
+                                  child:const Center(
                                     child: Icon(
                                       Icons.my_location,
-                                      color: const Color.fromARGB(
+                                      color:  Color.fromARGB(
                                           1023, 150, 150, 150),
                                     ),
                                   ),

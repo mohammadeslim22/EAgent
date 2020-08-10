@@ -11,6 +11,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/src/result/download_progress.dart';
+import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
@@ -72,14 +73,21 @@ class _OrderScreenState extends State<OrderScreen> {
             ),
             const SizedBox(height: 4),
             CachedNetworkImage(
-              imageUrl: item.image ?? "",
+              fit: BoxFit.cover,
+              width: 50,
+              height: 50,
+              imageUrl: "http://edisagents.altariq.ps/public/image/${item.image}" ?? "",
               progressIndicatorBuilder: (BuildContext context, String url,
                       DownloadProgress downloadProgress) =>
                   CircularProgressIndicator(value: downloadProgress.progress),
               errorWidget: (BuildContext context, String url, dynamic error) =>
-                  Icon(Icons.error),
+                  const Icon(Icons.error),
             ),
-            Text(item.name, style: styles.smallbluestyle),
+            Text(
+              item.name,
+              style: styles.smallItembluestyle,
+              textAlign: TextAlign.center,
+            ),
             Text(item.unitPrice.toString(), style: styles.mystyle),
           ],
         ),
@@ -105,17 +113,17 @@ class _OrderScreenState extends State<OrderScreen> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: isORderOrReturn ? colors.blue : colors.red,
-        title: Text(trans(context, "altriq")),
+        title: Text(trans(context, "altariq")),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.refresh, size: 32),
+            icon: const Icon(Icons.refresh, size: 32),
             onPressed: () {
               getIt<OrderListProvider>().getItems();
             },
@@ -123,7 +131,7 @@ class _OrderScreenState extends State<OrderScreen> {
           Row(
             children: <Widget>[
               IconButton(
-                  icon: Icon(Icons.delete, size: 36),
+                  icon: const Icon(Icons.delete, size: 36),
                   onPressed: () {
                     cacelTransaction(false);
                   }),
@@ -170,6 +178,81 @@ class _OrderScreenState extends State<OrderScreen> {
                               animation: "analysis"),
                         ),
                         if (orderProvider.dataLoaded)
+                          // PagewiseGridView<dynamic>.count(
+                          //     padding: const EdgeInsets.symmetric(
+                          //         horizontal: 24, vertical: 12),
+                          //     physics: const ScrollPhysics(),
+                          //     shrinkWrap: true,
+                          //     primary: true,
+                          //     crossAxisSpacing: 3,
+                          //     mainAxisSpacing: 3,
+                          //     crossAxisCount: 5,
+                          //     childAspectRatio: .7,
+                          //     addRepaintBoundaries: true,
+                          //     pageFuture: (int pageIndex) {
+                          //       return getIt<OrderListProvider>().getItems();
+                          //     },
+                          //     itemBuilder:
+                          //         (BuildContext context, entry, int index) {
+
+                          //         },
+                          //     children: orderProvider.itemsList
+                          //         .where((SingleItem element) {
+                          //       return element.name
+                          //           .trim()
+                          //           .toLowerCase()
+                          //           .contains(searchController.text
+                          //               .trim()
+                          //               .toLowerCase());
+                          //     }).map((SingleItem item) {
+                          //       return !getIt<OrderListProvider>()
+                          //               .selectedOptions
+                          //               .contains(item.id)
+                          //           ? Draggable<SingleItem>(
+                          //               childWhenDragging:
+                          //                   childForDragging(item),
+                          //               onDragStarted: () {
+                          //                 setState(() {
+                          //                   indexedStackId = 1;
+                          //                   animatedHight = 160;
+                          //                 });
+                          //               },
+                          //               onDragEnd: (DraggableDetails t) {
+                          //                 setState(() {
+                          //                   indexedStackId = 0;
+                          //                   animatedHight = 0;
+                          //                 });
+                          //               },
+                          //               data: item,
+                          //               feedback: Column(
+                          //                 children: <Widget>[
+                          //                   CachedNetworkImage(
+                          //                     imageUrl: item.image ?? "",
+                          //                     progressIndicatorBuilder:
+                          //                         (BuildContext context,
+                          //                                 String url,
+                          //                                 DownloadProgress
+                          //                                     downloadProgress) =>
+                          //                             CircularProgressIndicator(
+                          //                                 value:
+                          //                                     downloadProgress
+                          //                                         .progress),
+                          //                     errorWidget:
+                          //                         (BuildContext context,
+                          //                                 String url,
+                          //                                 dynamic error) =>
+                          //                             const Icon(Icons.error),
+                          //                   ),
+                          //                   Material(
+                          //                       color: Colors.transparent,
+                          //                       textStyle:
+                          //                           styles.angrywhitestyle,
+                          //                       child: Text(item.name)),
+                          //                 ],
+                          //               ),
+                          //               child: childForDragging(item))
+                          //           : childForDragging(item);
+                          //     }).toList())
                           GridView.count(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 24, vertical: 12),
@@ -226,7 +309,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                   (BuildContext context,
                                                           String url,
                                                           dynamic error) =>
-                                                      Icon(Icons.error),
+                                                      const Icon(Icons.error),
                                             ),
                                             Material(
                                                 color: Colors.transparent,
@@ -320,7 +403,7 @@ class _OrderScreenState extends State<OrderScreen> {
                               height: animatedHight,
                               duration: const Duration(milliseconds: 900),
                               child: DottedBorder(
-                                color: Colors.black,
+                                color: colors.black,
                                 borderType: BorderType.RRect,
                                 strokeWidth: 2,
                                 child: DragTarget<SingleItem>(
@@ -347,7 +430,6 @@ class _OrderScreenState extends State<OrderScreen> {
                                   builder: (BuildContext context,
                                       List<SingleItem> candidateData,
                                       List<dynamic> rejectedData) {
-                                    print(candidateData);
                                     return Container(
                                         width:
                                             MediaQuery.of(context).size.width /
@@ -470,7 +552,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                 value: downloadProgress.progress),
                         errorWidget:
                             (BuildContext context, String url, dynamic error) =>
-                                Icon(Icons.error),
+                                const Icon(Icons.error),
                       )
                     ],
                   ),
@@ -485,7 +567,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         radius: 16,
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          icon: Icon(Icons.add),
+                          icon: const Icon(Icons.add),
                           color: Colors.white,
                           onPressed: () {
                             getIt<OrderListProvider>()
@@ -508,7 +590,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         radius: 16,
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          icon: Icon(Icons.remove),
+                          icon: const Icon(Icons.remove),
                           color: Colors.white,
                           onPressed: () {
                             getIt<OrderListProvider>()
@@ -623,7 +705,10 @@ class _OrderScreenState extends State<OrderScreen> {
                             "transOrCollection": isORderOrReturn ? 0 : 1
                           });
                     },
-                    child: Text(trans(context, "order"),
+                    child: Text(
+                        isORderOrReturn
+                            ? trans(context, "order")
+                            : trans(context, "make_return"),
                         style: styles.mywhitestyle),
                   ),
                 ),

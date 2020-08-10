@@ -4,7 +4,6 @@ import 'package:agent_second/providers/language.dart';
 import 'package:agent_second/providers/global_variables.dart';
 import 'package:agent_second/services/navigationService.dart';
 import 'package:agent_second/ui/auth/login_screen.dart';
-import 'package:agent_second/ui/home.dart';
 import 'package:agent_second/util/data.dart';
 import 'package:agent_second/util/dio.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +13,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'constants/route.dart';
 import 'constants/themes.dart';
 import 'localization/localization_delegate.dart';
+
 import 'util/service_locator.dart';
 import 'package:agent_second/providers/order_provider.dart';
 
@@ -105,6 +105,13 @@ class MyApp extends StatelessWidget {
         },
         theme: mainThemeData(),
         onGenerateRoute: onGenerateRoute,
+  //       routes:  <String, WidgetBuilder> {
+  //   '/Home': (BuildContext context) =>  const Home(),
+  //   '/Beneficiaries' : (BuildContext context) =>  const Beneficiaries(),
+  //   '/Beneficiary_Center' : (BuildContext context) =>   BeneficiaryCenter(ben: getIt<GlobalVars>().getbenInFocus(),),
+  //   '/Order_Screen' : (BuildContext context) =>  OrderScreen( ),
+  //   '/Payment_Screen':(BuildContext context) =>  PaymentScreen()
+  // },
         home: const LoginScreen());
   }
 }

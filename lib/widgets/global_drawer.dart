@@ -1,8 +1,11 @@
 import 'package:agent_second/constants/styles.dart';
 import 'package:agent_second/localization/trans.dart';
+import 'package:agent_second/providers/export.dart';
 import 'package:agent_second/util/data.dart';
+import 'package:agent_second/util/service_locator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class GlobalDrawer extends StatefulWidget {
   const GlobalDrawer({
@@ -39,6 +42,7 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
+
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -48,31 +52,37 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
                   ],
                 ),
                 CircleAvatar(
-                  maxRadius: 50,
+                  maxRadius: 55,
                   minRadius: 40,
-                  child: CachedNetworkImage(
-                    placeholderFadeInDuration:
-                        const Duration(milliseconds: 300),
-                    imageUrl:
-                        "https://celebritypets.net/wp-content/uploads/2016/12/Adriana-Lima.jpg",
-                    imageBuilder:
-                        (BuildContext context, ImageProvider imageProvider) =>
-                            Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
-                            colorFilter: const ColorFilter.mode(
-                                Colors.white, BlendMode.colorBurn)),
+                  child:     SvgPicture.asset(
+                        'assets/images/company_logo.svg',
+                        width: 120.0,
+                        height: 120.0,
                       ),
-                    ),
-                    placeholder: (BuildContext context, String url) =>
-                        const CircularProgressIndicator(),
-                    errorWidget:
-                        (BuildContext context, String url, dynamic error) =>
-                            Icon(Icons.error),
-                  ),
+                  
+                  //  CachedNetworkImage(
+                  //   placeholderFadeInDuration:
+                  //       const Duration(milliseconds: 300),
+                  //   imageUrl:
+                  //       "https://celebritypets.net/wp-content/uploads/2016/12/Adriana-Lima.jpg",
+                  //   imageBuilder:
+                  //       (BuildContext context, ImageProvider imageProvider) =>
+                  //           Container(
+                  //     decoration: BoxDecoration(
+                  //       shape: BoxShape.circle,
+                  //       image: DecorationImage(
+                  //           image: imageProvider,
+                  //           fit: BoxFit.cover,
+                  //           colorFilter: const ColorFilter.mode(
+                  //               Colors.white, BlendMode.colorBurn)),
+                  //     ),
+                  //   ),
+                  //   placeholder: (BuildContext context, String url) =>
+                  //       const CircularProgressIndicator(),
+                  //   errorWidget:
+                  //       (BuildContext context, String url, dynamic error) =>
+                  //           const Icon(Icons.error),
+                  // ),
                 )
               ],
             ),
@@ -80,9 +90,11 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
               color: Colors.blue,
             ),
           ),
-    
+
           ListTile(
             onTap: () {
+              getIt<GlobalVars>().closeBens();
+
               Navigator.pushNamedAndRemoveUntil(
                   widget.sourceContext, "/Home", (_) => false
                   // arguments: <String, List<MemberShip>>{
@@ -92,20 +104,19 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
             },
             title: Text(trans(context, "home")),
           ),
-                ListTile(
+          ListTile(
             onTap: () {
-              Navigator.pushNamed(
-                widget.sourceContext, "/Beneficiaries",
-                // arguments: <String, List<MemberShip>>{
-                //   "membershipsData": MemberShip.membershipsData
-                // }
-              );
+              Navigator.pushNamedAndRemoveUntil(widget.sourceContext,
+                  "/Beneficiaries", (Route<dynamic> r) => r.isFirst);
+
             },
             title: Text(trans(context, "beneficiaries")),
           ),
-                ListTile(
+
+          const Divider(),
+          ListTile(
             onTap: () {
-              Navigator.pushNamed(
+              Navigator.pushReplacementNamed(
                 widget.sourceContext, "/Beneficiaries",
                 // arguments: <String, List<MemberShip>>{
                 //   "membershipsData": MemberShip.membershipsData
@@ -114,7 +125,6 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
             },
             title: Text(trans(context, "stock_transaction")),
           ),
-          const Divider(),
           // ListTile(
           //   onTap: () {},
           //   title: Text(trans(context, "beneficiaries")),

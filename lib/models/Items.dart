@@ -41,7 +41,7 @@ class SingleItem {
     id = json['id'] as int;
     itemCode = json['item_code'].toString();
     name = json['name'].toString();
-    unit = json['unit'].toString();
+    unit = json['unit'] as int;
     unitPrice = json['unit_price'].toString();
     price1 = json['price1'].toString();
     price2 = json['price2'].toString();
@@ -96,7 +96,7 @@ class SingleItem {
   int id;
   String itemCode;
   String name;
-  String unit;
+  int unit;
   String unitPrice;
   String price1;
   String price2;
@@ -121,6 +121,7 @@ class SingleItemForSend {
       {this.id,
       this.name,
       this.unit,
+      this.unitId,
       this.unitPrice,
       this.notes,
       this.queantity,
@@ -140,6 +141,7 @@ class SingleItemForSend {
   int id;
   String name;
   String unit;
+  int unitId;
   String unitPrice;
   String image;
   String notes;

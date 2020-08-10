@@ -35,7 +35,8 @@ class Ben {
       this.lastTransDate,
       this.transTotal,
       this.transCount,
-      this.itemsCap});
+      this.itemsCap,
+      this.visited});
 
   Ben.fromJson(dynamic json) {
     id = json['id'] as int;
@@ -75,6 +76,7 @@ class Ben {
     itemsCap.forEach((ItemsCap element) {
       itemsBalances[element.itemId.toString()] = element.balanceCap.toString();
     });
+    visited = false;
   }
   int id;
   String name;
@@ -99,6 +101,7 @@ class Ben {
   int transCount;
   Map<String, String> itemsBalances;
   List<ItemsCap> itemsCap;
+  bool visited;
 }
 
 class City {

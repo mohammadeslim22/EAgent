@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:agent_second/constants/colors.dart';
 import 'package:agent_second/constants/styles.dart';
 import 'package:agent_second/localization/trans.dart';
@@ -18,6 +16,21 @@ class UnitsCooficientsDialog extends StatefulWidget {
 class _UnitsCooficientsDialogState extends State<UnitsCooficientsDialog> {
   int groupValue = 0;
   String selected = "";
+  List<int> grouplist = <int>[];
+  int selectedId;
+  @override
+  void initState() {
+    super.initState();
+    for (int i = 1; i <= widget.item.units.length; i++) {
+      if (i == widget.item.unit) {
+        grouplist.add(0);
+      } else {
+        grouplist.add(1);
+      }
+    }
+    print(grouplist);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -50,15 +63,17 @@ class _UnitsCooficientsDialogState extends State<UnitsCooficientsDialog> {
                       return FlatButton(
                           onPressed: () {
                             setState(() {
-                              widget.item.units.where((Units element) {
-                                return element.id != u.id;
-                              }).forEach((Units element) {
-                                print(element.name);
-                                element.id = 1;
-                              });
+                              for (int i = 0; i < grouplist.length; i++) {
+                                if (i == u.id - 1) {
+                                  widget.item.unit = u.id;
+                                  selectedId = u.id;
+                                  grouplist[i] = 0;
+                                } else {
+                                  grouplist[i] = 1;
+                                }
+                              }
+
                               selected = u.name;
-                              u.id = 0;
-                              //  groupValue = 0;
                             });
                           },
                           child: Row(
@@ -69,20 +84,23 @@ class _UnitsCooficientsDialogState extends State<UnitsCooficientsDialog> {
                                 child: Row(
                                   children: <Widget>[
                                     Radio<int>(
-                                      value: u.id,
+                                      value: grouplist[u.id - 1],
                                       groupValue: groupValue,
                                       onChanged: (int t) {
                                         setState(() {
-                                          widget.item.units
-                                              .where((Units element) {
-                                            return element.id != u.id;
-                                          }).forEach((Units element) {
-                                            print(element.name);
-                                            element.id = 1;
-                                          });
+                                          for (int i = 0;
+                                              i < grouplist.length;
+                                              i++) {
+                                            if (i == u.id - 1) {
+                                              grouplist[i] = 0;
+                                              selectedId = u.id;
+                                              widget.item.unit = u.id;
+                                            } else {
+                                              grouplist[i] = 1;
+                                            }
+                                          }
+
                                           selected = u.name;
-                                          u.id = 0;
-                                          //  groupValue = 0;
                                         });
                                       },
                                     ),
@@ -111,12 +129,10 @@ class _UnitsCooficientsDialogState extends State<UnitsCooficientsDialog> {
                         child: FlatButton(
                           autofocus: true,
                           onPressed: () {
-                            // final String unit =
-                            //     widget.item.units.firstWhere((Units element) {
-                            //   return element.id == selected;
-                            // }).name;
-                            getIt<OrderListProvider>()
-                                .changeUnit(widget.item.id, selected);
+                            getIt<OrderListProvider>().changeUnit(
+                              widget.item.id,
+                              selected,selectedId
+                            );
                             Navigator.pop(context);
                           },
                           child: Text(trans(context, "ok_unit"),

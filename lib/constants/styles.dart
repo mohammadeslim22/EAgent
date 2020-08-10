@@ -15,6 +15,11 @@ class Styles {
       fontSize: 20,
       height: 1.7
       );
+        TextStyle smallItembluestyle = const TextStyle(
+    fontWeight: FontWeight.w100,
+    color: Colors.blue,
+    fontSize: 18,height: 1.5
+  );
         TextStyle mybluestyle = const TextStyle(
       fontWeight: FontWeight.w100,
       color: Colors.blue,

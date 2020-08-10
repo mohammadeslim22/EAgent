@@ -5,6 +5,7 @@ import 'package:agent_second/localization/trans.dart';
 import 'package:agent_second/models/ben.dart';
 import 'package:agent_second/models/collection.dart';
 import 'package:agent_second/models/transactions.dart';
+import 'package:agent_second/providers/export.dart';
 import 'package:agent_second/providers/transaction_provider.dart';
 import 'package:agent_second/util/service_locator.dart';
 import 'package:animated_card/animated_card.dart';
@@ -108,9 +109,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
   bool billIsOn = true;
   @override
   Widget build(BuildContext context) {
-    //final MyCounter bolc = Provider.of<MyCounter>(context);
     return Scaffold(
-      
       appBar: AppBar(
         title: Text(trans(context, "altariq")),
         centerTitle: true,
@@ -212,6 +211,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           ),
                           color: colors.blue,
                           onPressed: () {
+                            // getIt<OrderListProvider>().setScreensToPop(4);
+                            getIt<OrderListProvider>().clearOrcerList();
                             Navigator.pushNamed(context, "/Order_Screen",
                                 arguments: <String, dynamic>{
                                   "ben": ben,
@@ -231,6 +232,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           ),
                           color: colors.red,
                           onPressed: () {
+                            getIt<OrderListProvider>().clearOrcerList();
                             Navigator.pushNamed(context, "/Order_Screen",
                                 arguments: <String, dynamic>{
                                   "ben": ben,
@@ -252,9 +254,11 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           ),
                           color: colors.green,
                           onPressed: () {
-                            Navigator.pushNamed(context, "/Payment_Screen",arguments: <String,dynamic>{
-                              "transOrCollection":2
-                            });
+                            getIt<OrderListProvider>().setScreensToPop(2);
+                            Navigator.pushNamed(context, "/Payment_Screen",
+                                arguments: <String, dynamic>{
+                                  "transOrCollection": 2
+                                });
                           },
                           child: Text(trans(context, "collection"),
                               style: styles.mywhitestyle),
@@ -321,7 +325,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           ),
                         ),
                       ),
-                      Text(trans(context, "total" "    ${ben.transTotal}"), style: styles.mystyle)
+                      Text(trans(context, "total" "    ${ben.transTotal}"),
+                          style: styles.mystyle)
                     ],
                   ),
                   Container(
@@ -387,6 +392,12 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             ),
                             controller: _refreshController,
                             onRefresh: () async {
+                              if (mounted) {
+                                getIt<TransactionProvider>()
+                                    .pagewiseOrderController
+                                    .reset();
+                                _refreshController.refreshCompleted();
+                              }
                               getIt<TransactionProvider>()
                                   .pagewiseOrderController
                                   .reset();
@@ -403,6 +414,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             child: PagewiseListView<dynamic>(
                               physics: const ScrollPhysics(),
                               shrinkWrap: true,
+                              pageLoadController: getIt<TransactionProvider>()
+                                  .pagewiseOrderController,
                               loadingBuilder: (BuildContext context) {
                                 return Container(
                                   width: 400,
@@ -414,7 +427,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                       animation: "play"),
                                 );
                               },
-                              pageSize: 15,
+                              //  pageSize: 15,
                               padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
                               itemBuilder: (BuildContext context, dynamic entry,
                                   int index) {
@@ -430,10 +443,10 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                               noItemsFoundBuilder: (BuildContext context) {
                                 return noItemFound;
                               },
-                              pageFuture: (int pageIndex) {
-                                return getIt<TransactionProvider>()
-                                    .getOrdersTransactions(pageIndex, ben.id);
-                              },
+                              // pageFuture: (int pageIndex) {
+                              //   return getIt<TransactionProvider>()
+                              //       .getOrdersTransactions(pageIndex, ben.id);
+                              // },
                             )),
                         SmartRefresher(
                             enablePullDown: true,
@@ -457,17 +470,17 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                   body = const Text("No more Data");
                                 }
                                 return Container(
-                                  height: 55.0,
-                                  child: Center(child: body),
-                                );
+                                    height: 55.0, child: Center(child: body));
                               },
                             ),
                             controller: _refreshController,
                             onRefresh: () async {
-                              getIt<TransactionProvider>()
-                                  .pagewiseReturnController
-                                  .reset();
-                              _refreshController.refreshCompleted();
+                              if (mounted) {
+                                getIt<TransactionProvider>()
+                                    .pagewiseReturnController
+                                    .reset();
+                                _refreshController.refreshCompleted();
+                              }
                             },
                             onLoading: () async {
                               await Future<void>.delayed(
@@ -480,6 +493,9 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             child: PagewiseListView<dynamic>(
                               physics: const ScrollPhysics(),
                               shrinkWrap: true,
+                              pageLoadController: getIt<TransactionProvider>()
+                                  .pagewiseReturnController,
+
                               loadingBuilder: (BuildContext context) {
                                 return Container(
                                   width: 400,
@@ -491,7 +507,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                       animation: "play"),
                                 );
                               },
-                              pageSize: 15,
+                              // pageSize: 15,
                               padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
                               itemBuilder: (BuildContext context, dynamic entry,
                                   int index) {
@@ -507,10 +523,10 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                               noItemsFoundBuilder: (BuildContext context) {
                                 return noItemFound;
                               },
-                              pageFuture: (int pageIndex) {
-                                return getIt<TransactionProvider>()
-                                    .getReturnTransactions(pageIndex, ben.id);
-                              },
+                              // pageFuture: (int pageIndex) {
+                              //   return getIt<TransactionProvider>()
+                              //       .getReturnTransactions(pageIndex, ben.id);
+                              // },
                             )),
                         SmartRefresher(
                             enablePullDown: true,
@@ -541,10 +557,12 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             ),
                             controller: _refreshController,
                             onRefresh: () async {
-                              getIt<TransactionProvider>()
-                                  .pagewiseCollectionController
-                                  .reset();
-                              _refreshController.refreshCompleted();
+                              if (mounted) {
+                                getIt<TransactionProvider>()
+                                    .pagewiseCollectionController
+                                    .reset();
+                                _refreshController.refreshCompleted();
+                              }
                             },
                             onLoading: () async {
                               await Future<void>.delayed(
@@ -626,11 +644,10 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                               borderRadius: BorderRadius.circular(6),
                               onTap: () {},
                               child: GestureDetector(
-                                child: Center(
+                                child: const Center(
                                   child: Icon(
                                     Icons.my_location,
-                                    color: const Color.fromARGB(
-                                        1023, 150, 150, 150),
+                                    color: Color.fromARGB(1023, 150, 150, 150),
                                   ),
                                 ),
                                 onTap: () async {
@@ -667,7 +684,6 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                         //  _animateToUser();
                                       }
                                     } else {
-                                      print("iam fucked up");
                                       //   _animateToUser();
                                     }
                                   }
@@ -886,7 +902,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                 rows: items.map((MiniItems e) {
                   return DataRow(cells: <DataCell>[
                     DataCell(Text(e.id.toString())),
-                    DataCell(Text("e.name")),
+                    DataCell(Text(e.item)),
                     DataCell(Text(e.quantity.toString())),
                     DataCell(Text(e.unit.toString())),
                     DataCell(Text(e.itemPrice.toString())),
@@ -907,10 +923,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
                       Text(trans(context, "share"), style: styles.mybluestyle),
-                      Icon(
-                        Icons.share,
-                        size: 20,
-                      )
+                      const Icon(Icons.share, size: 20)
                     ],
                   ),
                 )

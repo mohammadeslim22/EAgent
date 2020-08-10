@@ -10,6 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({Key key, this.transOrCollection}) : super(key: key);
   final int transOrCollection;
+
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
 }
@@ -28,6 +29,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   Ben ben;
   String type;
   String deptValue = "00.00";
+
   @override
   void initState() {
     super.initState();
@@ -177,7 +179,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ),
                                 contentPadding:
                                     const EdgeInsets.symmetric(vertical: 16),
-                                prefixIcon: Icon(Icons.attach_money),
+                                prefixIcon: const Icon(Icons.attach_money),
                                 prefix: Text(
                                   trans(context, 'cash_recieved'),
                                 )),
@@ -221,7 +223,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ),
                                 contentPadding:
                                     const EdgeInsets.symmetric(vertical: 16),
-                                prefixIcon: Icon(
+                                prefixIcon: const Icon(
                                   Icons.attach_money,
                                 ),
                                 prefix: Text(
@@ -266,7 +268,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ),
                                 contentPadding:
                                     const EdgeInsets.symmetric(vertical: 16),
-                                prefixIcon: Icon(Icons.money_off),
+                                prefixIcon: const Icon(Icons.money_off),
                                 prefix: Text(
                                   trans(context, 'debt'),
                                 )),
@@ -345,30 +347,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         color: Colors.green,
                         onPressed: () {
                           if (widget.transOrCollection == 2) {
-                    
-                            print("iam sem=nding collection");
                             if (getIt<OrderListProvider>().sendCollection(
                                 context,
                                 ben.id,
                                 int.parse(paymentCashController.text),
                                 "confirmed")) {}
+                          } else {
+                            if (getIt<OrderListProvider>().sendOrder(
+                                context,
+                                ben.id,
+                                getIt<OrderListProvider>().sumTotal.round(),
+                                double.parse(deptValue).round(),
+                                type,
+                                "confirmed")) {
+                            } else {}
                           }
-                          if (getIt<OrderListProvider>().sendOrder(
-                              context,
-                              ben.id,
-                              getIt<OrderListProvider>().sumTotal.round(),
-                              double.parse(deptValue).round(),
-                              "return",
-                              "confirmed")) {
-                          } else {}
 
-                                  setState(() {
-                              paymentAmountController.text = "00.00";
+                          setState(() {
+                            paymentAmountController.text = "00.00";
 
-                              paymentCashController.text = "00.00";
+                            paymentCashController.text = "00.00";
 
-                              paymentDeptController.text = "00.00";
-                            });
+                            paymentDeptController.text = "00.00";
+                          });
                         },
                         child: Text(trans(context, "confirm"),
                             style: styles.mywhitestyle),

@@ -10,7 +10,6 @@ class DailyLog {
       this.collectionCount});
 
   DailyLog.fromJson(dynamic json) {
-    print("from json : ${json['transactions_count']}");
     // transactionsCount = json['transactions_count'] as int;
 
     tBeneficiariryCount = json['t_beneficiariry_count'] as int;

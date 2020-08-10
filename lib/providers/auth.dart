@@ -21,13 +21,11 @@ class Auth with ChangeNotifier {
       "username": usernametext.toString().trim(),
       "password": passwordText
     }).then<dynamic>((Response<dynamic> value) async {
-      print("status code: ${value.statusCode}");
       if (value.statusCode == 422) {
         return value.data['errors'];
       }
 
       if (value.statusCode == 200) {
-        print("in login auth method ${value.data}");
         if (value.data != "fail") {
           await data.setData(
               "authorization", "Bearer ${value.data['api_token']}");
@@ -41,10 +39,9 @@ class Auth with ChangeNotifier {
           final GlobalVars globalVarsProv =
               Provider.of<GlobalVars>(context, listen: false);
           cron.schedule(Schedule.parse('*/1 * * * *'), () async {
-            print("wahat time is it ? ");
             globalVarsProv.incrementTimeSinceLogin();
           });
-          Navigator.pushNamed(context, '/Home', arguments: <String, dynamic>{});
+          Navigator.popAndPushNamed(context, '/Home', arguments: <String, dynamic>{});
         } else {
           showToastWidget(
               IconToastWidget.fail(msg: trans(context, 'invalid_credentals')),

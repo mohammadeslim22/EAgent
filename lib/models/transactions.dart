@@ -51,8 +51,8 @@ class Transaction {
     notes = json['notes'].toString();
     amount = json['amount'] as int;
     shortage = json['shortage'] as int;
-    latitude = json['latitude'] as double;
-    longitude = json['longitude'] as double;
+    latitude = json['latitude'] as int;
+    longitude = json['longitude'] as int;
     createdAt = json['created_at'].toString();
     if (json['details'] != null) {
       details = <MiniItems>[];
@@ -95,8 +95,8 @@ class Transaction {
   String notes;
   int amount;
   int shortage;
-  double latitude;
-  double longitude;
+  int latitude;
+  int longitude;
   String createdAt;
   List<MiniItems> details;
 }
@@ -104,36 +104,40 @@ class Transaction {
 class MiniItems {
   MiniItems(
       {this.id,
-      this.itemId,
+      this.item,
       this.unit,
       this.itemPrice,
       this.quantity,
+      this.total,
       this.notes});
 
   MiniItems.fromJson(dynamic json) {
     id = json['id'] as int;
-    itemId = json['item_id'] as int;
-    unit = json['unit'] as int;
+    item= json['item'].toString();
+    unit = json['unit'].toString();
     itemPrice = json['item_price'] as int;
     quantity = json['quantity'] as int;
+    total = json['total'] as int; 
     notes = json['notes'].toString();
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
-    data['item_id'] = itemId;
+    data['item'] = item;
     data['unit'] = unit;
     data['item_price'] = itemPrice;
     data['quantity'] = quantity;
+    data['total'] = total;
     data['notes'] = notes;
     return data;
   }
 
   int id;
-  int itemId;
-  int unit;
+  String item;
+  String unit;
   int itemPrice;
   int quantity;
+  int total;
   String notes;
 }

@@ -2,7 +2,9 @@ import 'package:agent_second/constants/colors.dart';
 import 'package:agent_second/constants/styles.dart';
 import 'package:agent_second/localization/trans.dart';
 import 'package:agent_second/models/ben.dart';
+import 'package:agent_second/providers/export.dart';
 import 'package:agent_second/providers/global_variables.dart';
+import 'package:agent_second/util/service_locator.dart';
 import 'package:agent_second/widgets/global_drawer.dart';
 import 'package:agent_second/widgets/text_form_input.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +35,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
     final GlobalVars globalVarsProv = Provider.of<GlobalVars>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(trans(context, "altriq")),
+        title: Text(trans(context, "altariq")),
         centerTitle: true,
         actions: <Widget>[
           Container(
@@ -66,7 +68,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
           crossAxisCount: 3,
           childAspectRatio: 2,
           addRepaintBoundaries: true,
-          children: beneficiaries.data.where((Ben element) {
+          children:globalVarsProv.beneficiaries.data.where((Ben element) {
             return element.name
                 .trim()
                 .toLowerCase()
@@ -100,7 +102,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                 height: 32,
                               ),
                               IconButton(
-                                icon: Icon(Icons.phone_forwarded),
+                                icon: const Icon(Icons.phone_forwarded),
                                 color: Colors.green,
                                 onPressed: () {},
                               )
@@ -138,7 +140,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                               ],
                             ),
                           ),
-                          SvgPicture.asset("assets/images/visitedsign.svg"),
+                          if (item.visited) SvgPicture.asset("assets/images/visitedsign.svg") else SvgPicture.asset("assets/images/unvisitedBen.svg"),
                         ],
                       ),
                       const Divider(),
@@ -153,6 +155,9 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                     splashColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
                                     onTap: () {
+                                      getIt<OrderListProvider>()
+                                          .setScreensToPop(3);
+
                                       globalVarsProv.setBenInFocus(item);
                                       Navigator.pushNamed(
                                           context, "/Order_Screen",
@@ -169,6 +174,8 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                     splashColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
                                     onTap: () {
+                                      getIt<OrderListProvider>()
+                                          .setScreensToPop(3);
                                       globalVarsProv.setBenInFocus(item);
                                       Navigator.pushNamed(
                                           context, "/Order_Screen",
@@ -185,11 +192,15 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                     splashColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
                                     onTap: () {
+                                      getIt<OrderListProvider>()
+                                          .setScreensToPop(3);
+
                                       globalVarsProv.setBenInFocus(item);
                                       Navigator.pushNamed(
-                                          context, "/Payment_Screen",arguments: <String,dynamic>{
-                              "transOrCollection":2
-                            });
+                                          context, "/Payment_Screen",
+                                          arguments: <String, dynamic>{
+                                            "transOrCollection": 2
+                                          });
                                     },
                                     child: SvgPicture.asset(
                                         "assets/images/collectionButton.svg",
@@ -207,6 +218,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                 borderRadius: BorderRadius.circular(18.0),
                                 side: const BorderSide(color: Colors.blue)),
                             onPressed: () async {
+                              getIt<OrderListProvider>().setScreensToPop(3);
                               globalVarsProv.setBenInFocus(item);
                               Navigator.pushNamed(
                                   context, "/Beneficiary_Center",
