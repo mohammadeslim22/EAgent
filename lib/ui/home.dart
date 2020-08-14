@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:convert' as convert;
 import 'dart:typed_data';
 import 'dart:ui';
+import 'package:agent_second/constants/colors.dart';
 import 'package:agent_second/constants/config.dart';
-import 'package:agent_second/models/daily_log.dart';
 import 'package:agent_second/providers/global_variables.dart';
+import 'package:agent_second/util/functions.dart';
 import 'package:agent_second/util/service_locator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
@@ -21,16 +21,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:agent_second/models/ben.dart';
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   const Home({Key key}) : super(key: key);
-
-  @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
   Future<BeneficiariesModel> getBenData() async {
-    //final GlobalVars globalVarsProv = Provider.of<GlobalVars>(context);
     final Response<dynamic> response = await dio.get<dynamic>("beneficaries");
 
     await Future<void>.delayed(const Duration(seconds: 3), () {});
@@ -39,18 +32,9 @@ class _HomeState extends State<Home> {
     return getIt<GlobalVars>().beneficiaries;
   }
 
-  DailyLog daielyLog;
   Future<void> getUserData() async {
     final Response<dynamic> response = await dio.get<dynamic>("day_log");
-    daielyLog = DailyLog.fromJson(response.data);
-    getIt<GlobalVars>().setDailyLog(
-        daielyLog.tBeneficiariryCount.toString(),
-        daielyLog.orderCount.toString(),
-        daielyLog.totalOrderCount.toString(),
-        daielyLog.returnCount.toString(),
-        daielyLog.totalReturnCount.toString(),
-        daielyLog.collectionCount.toString(),
-        daielyLog.totalCollectionCount.toString());
+    setDayLog(response);
   }
 
   @override
@@ -106,9 +90,6 @@ class _DashBoardState extends State<DashBoard> {
     super.initState();
     lat = widget.lat ?? 25.063054;
     long = widget.long ?? 55.170010;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // getUserData();
-    });
   }
 
   @override
@@ -191,6 +172,7 @@ class _DashBoardState extends State<DashBoard> {
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -198,7 +180,8 @@ class _DashBoardState extends State<DashBoard> {
         child: Scaffold(
             key: _scaffoldKey,
             resizeToAvoidBottomInset: false,
-            appBar: AppBar(title:  Text(trans(context, "altariq")), centerTitle: true),
+            appBar: AppBar(
+                title: Text(trans(context, "altariq")), centerTitle: true),
             drawer: GlobalDrawer(sourceContext: context),
             body: Column(
               children: <Widget>[
@@ -215,7 +198,7 @@ class _DashBoardState extends State<DashBoard> {
                                   const EdgeInsets.symmetric(horizontal: 8),
                               decoration: BoxDecoration(
                                   border: Border.all(
-                                color: Colors.orange,
+                                color: colors.orange,
                               )),
                               child: Text(golbalValues.benRemaining,
                                   style: styles.redstyle))),
@@ -260,7 +243,7 @@ class _DashBoardState extends State<DashBoard> {
                                     const EdgeInsets.symmetric(horizontal: 8),
                                 decoration: BoxDecoration(
                                     border: Border.all(
-                                  color: Colors.purple,
+                                  color: colors.purple,
                                 )),
                                 child: Text(golbalValues.returnscount,
                                     style: styles.purplestyle)),
@@ -270,7 +253,7 @@ class _DashBoardState extends State<DashBoard> {
                                     const EdgeInsets.symmetric(horizontal: 8),
                                 decoration: BoxDecoration(
                                     border: Border.all(
-                                  color: Colors.purple,
+                                  color: colors.purple,
                                 )),
                                 child: Text(golbalValues.returnTotal,
                                     style: styles.purplestyle))
@@ -288,7 +271,7 @@ class _DashBoardState extends State<DashBoard> {
                                       const EdgeInsets.symmetric(horizontal: 8),
                                   decoration: BoxDecoration(
                                       border: Border.all(
-                                    color: Colors.blue,
+                                    color: colors.blue,
                                   )),
                                   child: Text(golbalValues.collectionscount,
                                       style: styles.darkbluestyle)),
@@ -298,7 +281,7 @@ class _DashBoardState extends State<DashBoard> {
                                       const EdgeInsets.symmetric(horizontal: 8),
                                   decoration: BoxDecoration(
                                       border: Border.all(
-                                    color: Colors.blue,
+                                    color: colors.blue,
                                   )),
                                   child: Text(golbalValues.collectionTotal,
                                       style: styles.darkbluestyle))
@@ -312,7 +295,7 @@ class _DashBoardState extends State<DashBoard> {
                                   const EdgeInsets.symmetric(horizontal: 8),
                               decoration: BoxDecoration(
                                   border: Border.all(
-                                color: Colors.green,
+                                color: colors.green,
                               )),
                               child: Text(golbalValues.timeSinceLogin,
                                   style: styles.darkgreenstyle))),
@@ -357,17 +340,17 @@ class _DashBoardState extends State<DashBoard> {
                             width: 40,
                             height: 40,
                             child: Material(
-                              color: Colors.white,
+                              color: colors.white,
                               borderRadius: BorderRadius.circular(6),
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(6),
                                 onTap: () {},
                                 child: GestureDetector(
-                                  child:const Center(
+                                  child: const Center(
                                     child: Icon(
                                       Icons.my_location,
-                                      color:  Color.fromARGB(
-                                          1023, 150, 150, 150),
+                                      color:
+                                          Color.fromARGB(1023, 150, 150, 150),
                                     ),
                                   ),
                                   onTap: () async {
@@ -475,13 +458,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  // static Future<T> pushReplacement<T extends Object, TO extends Object>(
-  //     BuildContext context, Route<T> newRoute,
-  //     {TO result}) {
-  //   return Navigator.of(context)
-  //       .pushReplacement<T, TO>(newRoute, result: result);
-  // }
-
   double width = 200;
   double hihg = 200;
   @override
@@ -499,7 +475,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: colors.black,
       extendBody: true,
       body: Stack(
         children: const <Widget>[

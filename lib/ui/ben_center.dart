@@ -12,11 +12,11 @@ import 'package:animated_card/animated_card.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mailer/flutter_mailer.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-// import 'package:intl/intl.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -40,6 +40,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
   Widget noItemFound;
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
+  int orderTransColorIndecator = 0;
+  int returnTransColorIndecator = 0;
   Future<void> _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
 
@@ -77,13 +79,13 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
       child: const FlareActor("assets/images/empty.flr",
           alignment: Alignment.center, fit: BoxFit.fill, animation: "default"),
     );
-    getIt<TransactionProvider>().pagewiseCollectionController =
-        PagewiseLoadController<dynamic>(
-            pageSize: 15,
-            pageFuture: (int pageIndex) async {
-              return getIt<TransactionProvider>()
-                  .getCollectionTransactions(pageIndex, ben.id);
-            });
+    // getIt<TransactionProvider>().pagewiseCollectionController =
+    //     PagewiseLoadController<dynamic>(
+    //         pageSize: 15,
+    //         pageFuture: (int pageIndex) async {
+    //           return getIt<TransactionProvider>()
+    //               .getCollectionTransactions(pageIndex, ben.id);
+    //         });
     getIt<TransactionProvider>().pagewiseOrderController =
         PagewiseLoadController<dynamic>(
             pageSize: 15,
@@ -200,81 +202,86 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                     ],
                   ),
                   const SizedBox(height: 32),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        width: 160,
-                        child: RaisedButton(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          color: colors.blue,
-                          onPressed: () {
-                            // getIt<OrderListProvider>().setScreensToPop(4);
-                            getIt<OrderListProvider>().clearOrcerList();
-                            Navigator.pushNamed(context, "/Order_Screen",
-                                arguments: <String, dynamic>{
-                                  "ben": ben,
-                                  "isORderOrReturn": true
-                                });
-                          },
-                          child: Text(trans(context, "order"),
-                              style: styles.mywhitestyle),
-                        ),
-                      ),
-                      const SizedBox(width: 32),
-                      Container(
-                        width: 160,
-                        child: RaisedButton(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          color: colors.red,
-                          onPressed: () {
-                            getIt<OrderListProvider>().clearOrcerList();
-                            Navigator.pushNamed(context, "/Order_Screen",
-                                arguments: <String, dynamic>{
-                                  "ben": ben,
-                                  "isORderOrReturn": false
-                                });
-                          },
-                          child: Text(
-                            trans(context, "return"),
-                            style: styles.mywhitestyle,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          width: 160,
+                          child: RaisedButton(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            color: colors.blue,
+                            onPressed: () {
+                              getIt<OrderListProvider>().clearOrcerList();
+                              Navigator.pushNamed(context, "/Order_Screen",
+                                  arguments: <String, dynamic>{
+                                    "ben": ben,
+                                    "isORderOrReturn": true
+                                  });
+                            },
+                            child: Text(trans(context, "order"),
+                                style: styles.mywhitestyle),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 32),
-                      Container(
-                        width: 160,
-                        child: RaisedButton(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
+                        const SizedBox(width: 32),
+                        Container(
+                          width: 160,
+                          child: RaisedButton(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            color: colors.red,
+                            onPressed: () {
+                              getIt<OrderListProvider>().clearOrcerList();
+                              Navigator.pushNamed(context, "/Order_Screen",
+                                  arguments: <String, dynamic>{
+                                    "ben": ben,
+                                    "isORderOrReturn": false
+                                  });
+                            },
+                            child: Text(
+                              trans(context, "return"),
+                              style: styles.mywhitestyle,
+                            ),
                           ),
-                          color: colors.green,
-                          onPressed: () {
-                            getIt<OrderListProvider>().setScreensToPop(2);
-                            Navigator.pushNamed(context, "/Payment_Screen",
-                                arguments: <String, dynamic>{
-                                  "transOrCollection": 2
-                                });
-                          },
-                          child: Text(trans(context, "collection"),
-                              style: styles.mywhitestyle),
                         ),
-                      )
-                    ],
+                        const SizedBox(width: 32),
+                        Container(
+                          width: 160,
+                          child: RaisedButton(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            color: colors.green,
+                            onPressed: () {
+                              getIt<OrderListProvider>().setScreensToPop(2);
+                              Navigator.pushNamed(context, "/Payment_Screen",
+                                  arguments: <String, dynamic>{
+                                    "transOrCollection": 2
+                                  });
+                            },
+                            child: Text(trans(context, "collection"),
+                                style: styles.mywhitestyle),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      Text(trans(context, "count") + "   ${ben.transCount}",
+                      Text(trans(context, "show_chices"),
                           style: styles.mystyle),
                       Container(
                         margin: const EdgeInsets.all(15.0),
                         decoration: BoxDecoration(
-                            border: Border.all(color: colors.green),
+                            border: Border.all(
+                                color: indexedStack == 0
+                                    ? colors.green
+                                    : colors.trans),
                             color: indexedStack == 0
                                 ? Colors.green[100]
                                 : Colors.transparent),
@@ -291,7 +298,10 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       Container(
                         margin: const EdgeInsets.all(15.0),
                         decoration: BoxDecoration(
-                            border: Border.all(color: colors.red),
+                            border: Border.all(
+                                color: indexedStack == 1
+                                    ? colors.red
+                                    : colors.trans),
                             color: indexedStack == 1
                                 ? Colors.red[100]
                                 : Colors.transparent),
@@ -308,7 +318,10 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       Container(
                         margin: const EdgeInsets.all(15.0),
                         decoration: BoxDecoration(
-                            border: Border.all(color: colors.yellow),
+                            border: Border.all(
+                                color: indexedStack == 2
+                                    ? colors.yellow
+                                    : colors.trans),
                             color: indexedStack == 2
                                 ? Colors.yellow[100]
                                 : Colors.transparent),
@@ -320,38 +333,51 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             });
                           },
                           child: SvgPicture.asset(
-                            "assets/images/collection_icon.svg",
-                            width: 40,
-                          ),
+                              "assets/images/collection_icon.svg",
+                              width: 40),
                         ),
                       ),
-                      Text(trans(context, "total" "    ${ben.transTotal}"),
-                          style: styles.mystyle)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Text(trans(context, "total" "    ${ben.transTotal}"),
+                              style: styles.mystyle),
+                          const SizedBox(height: 6),
+                          Text(trans(context, "count") + "   ${ben.transCount}",
+                              style: styles.mystyle),
+                        ],
+                      ),
                     ],
                   ),
                   Container(
                       decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey),
-                          color: Colors.blue[100]),
+                          color: Colors.blue[400]),
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 0, 12),
+                        padding: const EdgeInsets.fromLTRB(16, 0, 4, 12),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Expanded(
-                                child: Text(trans(context, "id"),
+                                child: Text(trans(context, "#"),
                                     style: styles.mystyle,
                                     textAlign: TextAlign.start)),
                             Expanded(
+                              flex: 2,
                               child: Text(trans(context, "agent"),
-                                  style: styles.mystyle),
+                                  style: styles.mystyle,
+                                  textAlign: TextAlign.start),
                             ),
                             Expanded(
                                 flex: 2,
                                 child: Text(trans(context, "date"),
                                     style: styles.mystyle,
                                     textAlign: TextAlign.center)),
+                            Expanded(
+                              flex: 1,
+                              child: Container(),
+                            ),
                             Expanded(
                                 child: Text(trans(context, "total"),
                                     style: styles.mystyle,
@@ -624,10 +650,6 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                         zoom: 13,
                       ),
                       onCameraMove: (CameraPosition pos) {
-                        setState(() {
-                          lat = pos.target.latitude;
-                          long = pos.target.longitude;
-                        });
                       },
                     ),
                     Padding(
@@ -699,7 +721,6 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
               )
             else
               Expanded(child: bill(items)),
-            //    Expanded(child: Container()),
           ],
         ),
       ),
@@ -710,6 +731,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
     BuildContext context,
     Transaction entry,
   ) {
+    orderTransColorIndecator++;
     return Slidable(
         actionPane: const SlidableDrawerActionPane(),
         actionExtentRatio: 0.25,
@@ -720,16 +742,68 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
             icon: Icons.share,
             onTap: () {},
           ),
-          IconSlideAction(
-            caption: 'Delete',
-            color: colors.red,
-            icon: Icons.delete,
-            onTap: () {},
-          ),
+          if (entry.status == 'draft')
+            IconSlideAction(
+              caption: 'Edit',
+              color: colors.yellow,
+              icon: Icons.edit,
+              onTap: () {
+                getIt<OrderListProvider>().setScreensToPop(2);
+
+                getIt<OrderListProvider>().bringOrderToOrderScreen(entry);
+                Navigator.pushNamed(context, "/Order_Screen",
+                    arguments: <String, dynamic>{
+                      "ben": ben,
+                      "isORderOrReturn": entry.type == "order"
+                    });
+              },
+            )
+          else
+            IconSlideAction(
+              caption: 'Reuse',
+              color: colors.yellow,
+              icon: Icons.refresh,
+              onTap: () {
+                getIt<OrderListProvider>().setScreensToPop(2);
+
+                getIt<OrderListProvider>().bringOrderToOrderScreen(entry);
+                Navigator.pushNamed(context, "/Order_Screen",
+                    arguments: <String, dynamic>{
+                      "ben": ben,
+                      "isORderOrReturn": entry.type == "order"
+                    });
+              },
+            ),
+          if (entry.status == 'draft')
+            IconSlideAction(
+              caption: 'Delete',
+              color: colors.red,
+              icon: Icons.delete,
+              onTap: () {
+                // TODO(Mohammad): dio dlete request
+              },
+            )
+          else
+            IconSlideAction(
+              caption: 'Return',
+              color: colors.red,
+              icon: Icons.keyboard_return,
+              onTap: () {
+                getIt<OrderListProvider>().setScreensToPop(3);
+                getIt<OrderListProvider>().bringOrderToOrderScreen(entry);
+                Navigator.pushNamed(context, "/Order_Screen",
+                    arguments: <String, dynamic>{
+                      "ben": ben,
+                      "isORderOrReturn": entry.type == "return"
+                    });
+              },
+            ),
         ],
         child: FlatButton(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          color: entry.id % 2 == 1 ? Colors.blue[400] : Colors.transparent,
+          color: orderTransColorIndecator % 2 == 0
+              ? Colors.blue[100]
+              : Colors.transparent,
           onPressed: () {
             setState(() {
               items = entry.details;
@@ -747,7 +821,15 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
               Expanded(
                   flex: 2, child: Text(entry.agent, style: styles.mystyle)),
               Expanded(
-                  flex: 2, child: Text(entry.transDate, style: styles.mystyle)),
+                  flex: 3,
+                  child: Text(entry.transDate,
+                      style: styles.mystyle, textAlign: TextAlign.center)),
+              Expanded(
+                flex: 1,
+                child: (entry.status == 'draft')
+                    ? Icon(Icons.edit, color: Colors.amber)
+                    : Container(),
+              ),
               Expanded(
                   child: Text(entry.amount.toString() + ".00",
                       style: styles.mystyle, textAlign: TextAlign.end))
@@ -776,7 +858,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
         ],
         child: FlatButton(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          color: collection.id % 2 == 0 ? Colors.blue[200] : Colors.transparent,
+          color: collection.id % 2 == 0 ? Colors.blue[100] : Colors.transparent,
           onPressed: () {},
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -875,7 +957,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
               child: DataTable(
                 columns: <DataColumn>[
                   DataColumn(
-                    label: Text(trans(context, 'id'),
+                    label: Text(trans(context, 'item_id'),
                         style: const TextStyle(fontStyle: FontStyle.italic)),
                   ),
                   DataColumn(
@@ -905,8 +987,9 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                     DataCell(Text(e.item)),
                     DataCell(Text(e.quantity.toString())),
                     DataCell(Text(e.unit.toString())),
-                    DataCell(Text(e.itemPrice.toString())),
-                    DataCell(Text((e.itemPrice * e.quantity).toString()))
+                    DataCell(Text(e.itemPrice.toString() + ".00")),
+                    DataCell(
+                        Text((e.itemPrice * e.quantity).toString() + ".00"))
                   ]);
                 }).toList(),
               )),
@@ -918,7 +1001,9 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
             Row(
               children: <Widget>[
                 FlatButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    sendMail(transaction);
+                  },
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
@@ -942,5 +1027,14 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
         )
       ],
     );
+  }
+
+  Future<void> sendMail(Transaction t) async {
+    final MailOptions mailOptions = MailOptions(
+        subject: 'Transaction for ben ${ben.name}',
+        recipients: <String>[ben.email],
+        isHTML: true,
+        body: t.toString());
+    await FlutterMailer.send(mailOptions);
   }
 }

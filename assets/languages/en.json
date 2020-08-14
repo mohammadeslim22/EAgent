@@ -135,7 +135,9 @@
     "consruction_date":"Construction Date",
     "affiliation_date":"Affiliation Date",
     "membership_status":"Status",
-    "associate_members_count":"The number of associate members"
+    "associate_members_count":"The number of associate members",
+    "altariq":"Destribution company Name"
+
 
 
 }

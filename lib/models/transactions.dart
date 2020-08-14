@@ -25,6 +25,7 @@ class Transaction {
   Transaction(
       {this.id,
       this.beneficiary,
+      this.beneficiaryId,
       this.agent,
       this.transDate,
       this.address,
@@ -42,6 +43,7 @@ class Transaction {
   Transaction.fromJson(dynamic json) {
     id = json['id'] as int;
     beneficiary = json['beneficiary'].toString();
+    beneficiaryId = json['beneficiary_id'] as int;
     agent = json['agent'].toString();
     transDate = json['trans_date'].toString();
     address = json['address'].toString();
@@ -86,6 +88,7 @@ class Transaction {
 
   int id;
   String beneficiary;
+  int beneficiaryId;
   String agent;
   String transDate;
   String address;
@@ -104,6 +107,7 @@ class Transaction {
 class MiniItems {
   MiniItems(
       {this.id,
+      this.itemId,
       this.item,
       this.unit,
       this.itemPrice,
@@ -113,11 +117,12 @@ class MiniItems {
 
   MiniItems.fromJson(dynamic json) {
     id = json['id'] as int;
-    item= json['item'].toString();
+    itemId = json['item_id'] as int;
+    item = json['item'].toString();
     unit = json['unit'].toString();
     itemPrice = json['item_price'] as int;
     quantity = json['quantity'] as int;
-    total = json['total'] as int; 
+    total = json['total'] as int;
     notes = json['notes'].toString();
   }
 
@@ -134,6 +139,7 @@ class MiniItems {
   }
 
   int id;
+  int itemId;
   String item;
   String unit;
   int itemPrice;

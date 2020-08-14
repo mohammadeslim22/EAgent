@@ -1,9 +1,12 @@
 import 'package:agent_second/models/ben.dart';
+import 'package:agent_second/ui/agent_orders.dart';
+import 'package:agent_second/ui/auth/login_screen.dart';
 import 'package:agent_second/ui/ben_center.dart';
 import 'package:agent_second/ui/beneficiaries.dart';
 import 'package:agent_second/ui/home.dart';
 import 'package:agent_second/ui/oder_screen.dart';
 import 'package:agent_second/ui/payment_screen.dart';
+import 'package:agent_second/ui/show_items.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -42,7 +45,28 @@ Route<PageController> onGenerateRoute(RouteSettings settings) {
       break;
     case "/Payment_Screen":
       page = PageTransition<PageController>(
-        child:  PaymentScreen(transOrCollection: args['transOrCollection'] as int,),
+        child:
+            PaymentScreen(transOrCollection: args['transOrCollection'] as int),
+        type: PageTransitionType.rightToLeftWithFade,
+      );
+      break;
+
+    case "/login":
+      page = PageTransition<PageController>(
+        child: const LoginScreen(),
+        type: PageTransitionType.rightToLeftWithFade,
+      );
+      break;
+      
+    case "/items":
+      page = PageTransition<PageController>(
+        child: const ShowItems(),
+        type: PageTransitionType.rightToLeftWithFade,
+      );
+      break;
+          case "/Agent_Orders":
+      page = PageTransition<PageController>(
+        child: const AgentOrders(),
         type: PageTransitionType.rightToLeftWithFade,
       );
       break;

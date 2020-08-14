@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:agent_second/models/daily_log.dart';
+import 'package:agent_second/providers/export.dart';
+import 'package:dio/dio.dart';
 import '../constants/config.dart';
-import '../util/dio.dart';
 import 'package:location/location.dart';
-import 'package:geocoder/geocoder.dart';
+
+
+import 'service_locator.dart';
 
 Future<List<String>> getLocation() async {
   bool serviceEnabled;
@@ -49,72 +51,16 @@ Future<bool> get updateLocation async {
   }
   return res;
 }
-// class MyObject{
-//    MyObject(this.location2);
-//   final List<String> location2;
-//   final
 
-// }
-Future<void> getLocationName() async {
-  try {
-    config.coordinates = Coordinates(config.lat, config.long);
-    config.addresses =
-        await Geocoder.local.findAddressesFromCoordinates(config.coordinates);
-    config.first = config.addresses.first;
-
-    config.first = config.addresses.first;
-    config.locationController.text = (config.first == null)
-        ? "loading"
-        : config.first.addressLine ?? "loading";
-  } catch (e) {
-    config.locationController.text =
-        "Unkown latitude: ${config.lat.round().toString()} , longitud: ${config.long.round().toString()}";
-  }
-}
-
-SnackBar snackBar = SnackBar(
-  content: const Text("Location Service was not aloowed  !"),
-  action: SnackBarAction(
-    label: 'Ok !',
-    onPressed: () {},
-  ),
-);
-SpinKitRing spinkit = const SpinKitRing(
-  color: Colors.orange,
-  size: 30.0,
-  lineWidth: 3,
-);
-
-Future<bool> likeFunction(String model, int likeId) async {
-  bool res;
- await dio.post<dynamic>("likes", data: <String, dynamic>{
-    'likable_type': model,
-    'likable_id': likeId
-  }).then((dynamic value) {
-    if (value.transactions == "true") {
-      res = true;
-    } else {
-    
-      res = false;
-    }
-  });
-
-  return res;
-}
-
-Future<bool> favFunction(String model, int favoriteId) async {
-  bool res;
-  await dio.post<dynamic>("favorites", data: <String, dynamic>{
-    'favoritable_type': model,
-    'favoritable_id': favoriteId
-  }).then((dynamic value) {
-    if (value.transactions == "true") {
-      res = true;
-      
-    } else {
-      res = false;
-    }
-  });
-
-  return res;
+Future<void> setDayLog(Response<dynamic> response) async {
+ // final Response<dynamic> response = await dio.get<dynamic>("day_log");
+     final DailyLog daielyLog = DailyLog.fromJson(response.data);
+    getIt<GlobalVars>().setDailyLog(
+        daielyLog.tBeneficiariryCount.toString(),
+        daielyLog.orderCount.toString(),
+        daielyLog.totalOrderCount.toString(),
+        daielyLog.returnCount.toString(),
+        daielyLog.totalReturnCount.toString(),
+        daielyLog.collectionCount.toString(),
+        daielyLog.totalCollectionCount.toString());
 }

@@ -10,7 +10,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
- const LoginScreen({Key key}) : super(key: key);
+  const LoginScreen({Key key}) : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -131,95 +131,108 @@ class _LoginScreenState extends State<LoginScreen>
           onTap: () {
             FocusScope.of(context).requestFocus(FocusNode());
           },
-          child: Padding(
-            padding: const EdgeInsets.all(64.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Expanded(
-                  child: Card(
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    child: ListView(
-                      padding: const EdgeInsets.all(16.0),
-                      children: <Widget>[
-                        SvgPicture.asset(
-                          'assets/images/welcomeback.svg',
-                          width: 120.0,
-                          height: 120.0,
+          child: Stack(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(64.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Expanded(
+                      child: Card(
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
                         ),
-                        const SizedBox(height: 32),
-                        Text(trans(context, 'welcome_back'),
-                            textAlign: TextAlign.center,
-                            style: styles.mystyle2),
-                        customcard(context),
-                        const SizedBox(height: 48),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-                          child: RaisedButton(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.0),
-                                  side: BorderSide(color: colors.myBlue)),
-                              onPressed: () async {
-                                if (_isButtonEnabled) {
-                                  if (_formKey.currentState.validate()) {
-                                    bolc.togelf(true);
-                                    setState(() {
-                                      _isButtonEnabled = false;
-                                    });
-                                    await auth
-                                        .login(usernameController.text,
-                                            passwordController.text, context)
-                                        .then((dynamic value) {
-                                      if (value != null) {
-                                        value.forEach((String k, dynamic vv) {
-                                          setState(() {
-                                            validationMap[k] = vv[0].toString();
-                                          });
+                        child: ListView(
+                          padding: const EdgeInsets.all(16.0),
+                          children: <Widget>[
+                            SvgPicture.asset(
+                              'assets/images/welcomeback.svg',
+                              width: 120.0,
+                              height: 120.0,
+                            ),
+                            const SizedBox(height: 32),
+                            Text(trans(context, 'welcome_back'),
+                                textAlign: TextAlign.center,
+                                style: styles.mystyle2),
+                            customcard(context),
+                            const SizedBox(height: 48),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                              child: RaisedButton(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18.0),
+                                      side: BorderSide(color: colors.myBlue)),
+                                  onPressed: () async {
+                                    if (_isButtonEnabled) {
+                                      if (_formKey.currentState.validate()) {
+                                        bolc.togelf(true);
+                                        setState(() {
+                                          _isButtonEnabled = false;
                                         });
-                                        _formKey.currentState.validate();
-                                        validationMap.updateAll(
-                                            (String key, String value) {
-                                          return null;
+                                        await auth
+                                            .login(
+                                                usernameController.text,
+                                                passwordController.text,
+                                                context)
+                                            .then((dynamic value) {
+                                          if (value != null) {
+                                            value.forEach(
+                                                (String k, dynamic vv) {
+                                              setState(() {
+                                                validationMap[k] =
+                                                    vv[0].toString();
+                                              });
+                                            });
+                                            _formKey.currentState.validate();
+                                            validationMap.updateAll(
+                                                (String key, String value) {
+                                              return null;
+                                            });
+                                          }
                                         });
+                                        setState(() {
+                                          _isButtonEnabled = true;
+                                        });
+                                        bolc.togelf(false);
                                       }
-                                    });
-                                    setState(() {
-                                      _isButtonEnabled = true;
-                                    });
-                                    bolc.togelf(false);
-                                  }
-                                }
-                              },
-                              color: colors.blue,
-                              textColor: Colors.white,
-                              child: bolc.returnchild(trans(context, 'login'))),
+                                    }
+                                  },
+                                  color: colors.blue,
+                                  textColor: Colors.white,
+                                  child: bolc
+                                      .returnchild(trans(context, 'login'))),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                Expanded(
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: <Widget>[
-                      SvgPicture.asset(
-                        'assets/images/company_logo.svg',
-                        width: 120.0,
-                        height: 120.0,
+                    Expanded(
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: <Widget>[
+                          SvgPicture.asset(
+                            'assets/images/company_logo.svg',
+                            width: 120.0,
+                            height: 120.0,
+                          ),
+                          const SizedBox(height: 96),
+                          SvgPicture.asset(
+                            'assets/images/mainLogo.svg',
+                            width: 320.0,
+                            height: 320.0,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 96),
-                      SvgPicture.asset(
-                        'assets/images/mainLogo.svg',
-                        width: 320.0,
-                        height: 320.0,
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Text("ALTARIQ Systems & Projects",
+                        style: styles.underHeadwhite)),
+            ],
           ),
         ));
   }

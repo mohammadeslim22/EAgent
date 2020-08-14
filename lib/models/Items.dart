@@ -39,6 +39,7 @@ class SingleItem {
 
   SingleItem.fromJson(dynamic json) {
     id = json['id'] as int;
+    print("id for m fromjson $id");
     itemCode = json['item_code'].toString();
     name = json['name'].toString();
     unit = json['unit'] as int;
@@ -50,7 +51,7 @@ class SingleItem {
     price5 = json['price5'].toString();
     balanceInventory = json['balance_inventory'] as int;
     wholesalePrice = json['wholesale_price'] as int;
-    barcode = json['barcode'] as int;
+    barcode = json['barcode'].toString();
     image = json['image'].toString();
     vat = json['vat'].toString();
     link = json['link'].toString();
@@ -105,7 +106,7 @@ class SingleItem {
   String price5;
   int balanceInventory;
   int wholesalePrice;
-  int barcode;
+  String barcode;
   String image;
   String vat;
   String link;
@@ -149,11 +150,12 @@ class SingleItemForSend {
 }
 
 class Units {
-  Units({this.id, this.name});
+  Units({this.id, this.name, this.conversionFactor});
 
   Units.fromJson(dynamic json) {
     id = json['id'] as int;
     name = json['name'].toString();
+    conversionFactor = json['conversion_factor'].toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -165,4 +167,5 @@ class Units {
 
   int id;
   String name;
+  String conversionFactor;
 }

@@ -11,7 +11,6 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/src/result/download_progress.dart';
-import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
@@ -38,7 +37,9 @@ class _OrderScreenState extends State<OrderScreen> {
   Map<String, String> itemsBalances = <String, String>{};
   List<int> prices = <int>[];
 
-  Widget childForDragging(SingleItem item) {
+  Widget childForDragging(
+      SingleItem item, OrderListProvider orsderListProvider) {
+    print("single item in order screen ${item.id}");
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(width: 1, color: Colors.green),
@@ -48,11 +49,17 @@ class _OrderScreenState extends State<OrderScreen> {
           : Colors.white,
       child: InkWell(
         onTap: () {
-          !getIt<OrderListProvider>().selectedOptions.contains(item.id)
+          !orsderListProvider.selectedOptions.contains(item.id)
               ? setState(() {
-                  getIt<OrderListProvider>().addItemToList(item.id, item.name,
-                      item.notes, item.queantity, item.unit, item.unitPrice);
-                  getIt<OrderListProvider>().selectedOptions.add(item.id);
+                  getIt<OrderListProvider>().addItemToList(
+                      item.id,
+                      item.name,
+                      item.notes,
+                      item.queantity,
+                      item.unit,
+                      item.unitPrice,
+                      item.image);
+                  orsderListProvider.selectedOptions.add(item.id);
                 })
               // ignore: unnecessary_statements
               : () {};
@@ -76,7 +83,9 @@ class _OrderScreenState extends State<OrderScreen> {
               fit: BoxFit.cover,
               width: 50,
               height: 50,
-              imageUrl: "http://edisagents.altariq.ps/public/image/${item.image}" ?? "",
+              imageUrl: (item.image != "null")
+                  ? "http://edisagents.altariq.ps/public/image/${item.image}"
+                  : "",
               progressIndicatorBuilder: (BuildContext context, String url,
                       DownloadProgress downloadProgress) =>
                   CircularProgressIndicator(value: downloadProgress.progress),
@@ -178,81 +187,6 @@ class _OrderScreenState extends State<OrderScreen> {
                               animation: "analysis"),
                         ),
                         if (orderProvider.dataLoaded)
-                          // PagewiseGridView<dynamic>.count(
-                          //     padding: const EdgeInsets.symmetric(
-                          //         horizontal: 24, vertical: 12),
-                          //     physics: const ScrollPhysics(),
-                          //     shrinkWrap: true,
-                          //     primary: true,
-                          //     crossAxisSpacing: 3,
-                          //     mainAxisSpacing: 3,
-                          //     crossAxisCount: 5,
-                          //     childAspectRatio: .7,
-                          //     addRepaintBoundaries: true,
-                          //     pageFuture: (int pageIndex) {
-                          //       return getIt<OrderListProvider>().getItems();
-                          //     },
-                          //     itemBuilder:
-                          //         (BuildContext context, entry, int index) {
-
-                          //         },
-                          //     children: orderProvider.itemsList
-                          //         .where((SingleItem element) {
-                          //       return element.name
-                          //           .trim()
-                          //           .toLowerCase()
-                          //           .contains(searchController.text
-                          //               .trim()
-                          //               .toLowerCase());
-                          //     }).map((SingleItem item) {
-                          //       return !getIt<OrderListProvider>()
-                          //               .selectedOptions
-                          //               .contains(item.id)
-                          //           ? Draggable<SingleItem>(
-                          //               childWhenDragging:
-                          //                   childForDragging(item),
-                          //               onDragStarted: () {
-                          //                 setState(() {
-                          //                   indexedStackId = 1;
-                          //                   animatedHight = 160;
-                          //                 });
-                          //               },
-                          //               onDragEnd: (DraggableDetails t) {
-                          //                 setState(() {
-                          //                   indexedStackId = 0;
-                          //                   animatedHight = 0;
-                          //                 });
-                          //               },
-                          //               data: item,
-                          //               feedback: Column(
-                          //                 children: <Widget>[
-                          //                   CachedNetworkImage(
-                          //                     imageUrl: item.image ?? "",
-                          //                     progressIndicatorBuilder:
-                          //                         (BuildContext context,
-                          //                                 String url,
-                          //                                 DownloadProgress
-                          //                                     downloadProgress) =>
-                          //                             CircularProgressIndicator(
-                          //                                 value:
-                          //                                     downloadProgress
-                          //                                         .progress),
-                          //                     errorWidget:
-                          //                         (BuildContext context,
-                          //                                 String url,
-                          //                                 dynamic error) =>
-                          //                             const Icon(Icons.error),
-                          //                   ),
-                          //                   Material(
-                          //                       color: Colors.transparent,
-                          //                       textStyle:
-                          //                           styles.angrywhitestyle,
-                          //                       child: Text(item.name)),
-                          //                 ],
-                          //               ),
-                          //               child: childForDragging(item))
-                          //           : childForDragging(item);
-                          //     }).toList())
                           GridView.count(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 24, vertical: 12),
@@ -277,8 +211,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                         .selectedOptions
                                         .contains(item.id)
                                     ? Draggable<SingleItem>(
-                                        childWhenDragging:
-                                            childForDragging(item),
+                                        childWhenDragging: childForDragging(
+                                            item, orderProvider),
                                         onDragStarted: () {
                                           setState(() {
                                             indexedStackId = 1;
@@ -295,7 +229,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                         feedback: Column(
                                           children: <Widget>[
                                             CachedNetworkImage(
-                                              imageUrl: item.image ?? "",
+                                              imageUrl: (item.image != "null")
+                                                  ? "http://edisagents.altariq.ps/public/image/${item.image}"
+                                                  : "",
                                               progressIndicatorBuilder:
                                                   (BuildContext context,
                                                           String url,
@@ -318,8 +254,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 child: Text(item.name)),
                                           ],
                                         ),
-                                        child: childForDragging(item))
-                                    : childForDragging(item);
+                                        child: childForDragging(
+                                            item, orderProvider))
+                                    : childForDragging(item, orderProvider);
                               }).toList())
                         else
                           Container()
@@ -377,120 +314,115 @@ class _OrderScreenState extends State<OrderScreen> {
                     ],
                   ),
                 ),
-                Expanded(
-                    child: ListView(
-                  children: <Widget>[
-                    if (indexedStackId == 1)
-                      Container(
-                        margin: const EdgeInsets.only(left: 16),
-                        color: Colors.grey[300],
-                        child: Stack(
+                if (indexedStackId == 1)
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    color: Colors.grey[300],
+                    child: Stack(
+                      children: <Widget>[
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                const SizedBox(height: 50),
-                                Center(
-                                  child: Text(
-                                    trans(context, 'drage_here'),
-                                    style: styles.angrywhitestyle,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            AnimatedContainer(
-                              height: animatedHight,
-                              duration: const Duration(milliseconds: 900),
-                              child: DottedBorder(
-                                color: colors.black,
-                                borderType: BorderType.RRect,
-                                strokeWidth: 2,
-                                child: DragTarget<SingleItem>(
-                                  onWillAccept: (SingleItem data) {
-                                    return true;
-                                  },
-                                  onAccept: (SingleItem value) {
-                                    setState(() {
-                                      getIt<OrderListProvider>().addItemToList(
-                                          value.id,
-                                          value.name,
-                                          value.notes,
-                                          value.queantity,
-                                          value.unit,
-                                          value.unitPrice);
-                                      getIt<OrderListProvider>()
-                                          .selectedOptions
-                                          .add(value.id);
-                                      indexedStackId = 0;
-                                      animatedHight = 0;
-                                    });
-                                  },
-                                  onLeave: (dynamic value) {},
-                                  builder: (BuildContext context,
-                                      List<SingleItem> candidateData,
-                                      List<dynamic> rejectedData) {
-                                    return Container(
-                                        width:
-                                            MediaQuery.of(context).size.width /
-                                                2,
-                                        height:
-                                            MediaQuery.of(context).size.width /
-                                                2,
-                                        color: Colors.transparent);
-                                  },
-                                ),
+                            const SizedBox(height: 50),
+                            Center(
+                              child: Text(
+                                trans(context, 'drage_here'),
+                                style: styles.angrywhitestyle,
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ],
                         ),
-                      )
-                    else
-                      Container(),
-                    if (getIt<OrderListProvider>().selectedOptions.isNotEmpty)
-                      Consumer<OrderListProvider>(
-                        builder: (BuildContext context, OrderListProvider value,
-                            Widget child) {
-                          return GridView.count(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 12),
-                              physics: const ScrollPhysics(),
-                              shrinkWrap: true,
-                              primary: true,
-                              crossAxisSpacing: 3,
-                              mainAxisSpacing: 3,
-                              crossAxisCount: 1,
-                              childAspectRatio: 6,
-                              addRepaintBoundaries: true,
-                              children: value.ordersList
-                                  .map((SingleItemForSend item) {
-                                return Slidable(
-                                    actionPane:
-                                        const SlidableDrawerActionPane(),
-                                    actionExtentRatio: 0.25,
-                                    secondaryActions: <Widget>[
-                                      IconSlideAction(
-                                        caption: 'Delete',
-                                        color: Colors.red,
-                                        icon: Icons.delete,
-                                        onTap: () {
-                                          setState(() {
-                                            value.removeItemFromList(item.id);
-                                            getIt<OrderListProvider>()
-                                                .selectedOptions
-                                                .remove(item.id);
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                    child: cartItem(item));
-                              }).toList());
-                        },
-                      )
-                    else
-                      Container(),
-                  ],
-                )),
+                        AnimatedContainer(
+                          height: animatedHight,
+                          duration: const Duration(milliseconds: 900),
+                          child: DottedBorder(
+                            color: colors.black,
+                            borderType: BorderType.RRect,
+                            strokeWidth: 2,
+                            child: DragTarget<SingleItem>(
+                              onWillAccept: (SingleItem data) {
+                                return true;
+                              },
+                              onAccept: (SingleItem value) {
+                                setState(() {
+                                  getIt<OrderListProvider>().addItemToList(
+                                      value.id,
+                                      value.name,
+                                      value.notes,
+                                      value.queantity,
+                                      value.unit,
+                                      value.unitPrice,
+                                      value.image);
+                                  getIt<OrderListProvider>()
+                                      .selectedOptions
+                                      .add(value.id);
+                                  indexedStackId = 0;
+                                  animatedHight = 0;
+                                });
+                              },
+                              onLeave: (dynamic value) {},
+                              builder: (BuildContext context,
+                                  List<SingleItem> candidateData,
+                                  List<dynamic> rejectedData) {
+                                return Container(
+                                    width:
+                                        MediaQuery.of(context).size.width / 2,
+                                    height:
+                                        MediaQuery.of(context).size.width / 2,
+                                    color: Colors.transparent);
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  Container(),
+                Expanded(
+                  child: (getIt<OrderListProvider>().selectedOptions.isNotEmpty)
+                      ? Consumer<OrderListProvider>(
+                          builder: (BuildContext context,
+                              OrderListProvider value, Widget child) {
+                            return GridView.count(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 12),
+                                physics: const ScrollPhysics(),
+                                shrinkWrap: true,
+                                primary: true,
+                                crossAxisSpacing: 3,
+                                mainAxisSpacing: 3,
+                                crossAxisCount: 1,
+                                childAspectRatio: 6,
+                                addRepaintBoundaries: true,
+                                children: value.ordersList
+                                    .map((SingleItemForSend item) {
+                                  return Slidable(
+                                      actionPane:
+                                          const SlidableDrawerActionPane(),
+                                      actionExtentRatio: 0.25,
+                                      secondaryActions: <Widget>[
+                                        IconSlideAction(
+                                          caption: 'Delete',
+                                          color: Colors.red,
+                                          icon: Icons.delete,
+                                          onTap: () {
+                                            setState(() {
+                                              value.removeItemFromList(item.id);
+                                              getIt<OrderListProvider>()
+                                                  .selectedOptions
+                                                  .remove(item.id);
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                      child: cartItem(item));
+                                }).toList());
+                          },
+                        )
+                      : Container(),
+                ),
                 bottomTotal()
               ],
             ),
@@ -543,17 +475,20 @@ class _OrderScreenState extends State<OrderScreen> {
                 Expanded(
                   child: Row(
                     children: <Widget>[
-                      CachedNetworkImage(
-                        imageUrl: item.image ?? "",
-                        progressIndicatorBuilder: (BuildContext context,
-                                String url,
-                                DownloadProgress downloadProgress) =>
-                            CircularProgressIndicator(
-                                value: downloadProgress.progress),
-                        errorWidget:
-                            (BuildContext context, String url, dynamic error) =>
-                                const Icon(Icons.error),
-                      )
+                      Container(
+                        height: 40,
+                        width: 40,
+                        clipBehavior: Clip.hardEdge,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(120)),
+                        ),
+                        child: CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          imageUrl: (item.image != "null")
+                              ? "http://edisagents.altariq.ps/public/image/${item.image}"
+                              : "",
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -680,10 +615,23 @@ class _OrderScreenState extends State<OrderScreen> {
                                 ),
                                 flareFit: BoxFit.cover,
                                 entryAnimation: EntryAnimation.TOP,
-                                onOkButtonPressed: () {
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                  value.clearOrcerList();
+                                onOkButtonPressed: ()async {
+                                  if (await getIt<OrderListProvider>().sendOrder(
+                                      context,
+                                      ben.id,
+                                      getIt<OrderListProvider>()
+                                          .sumTotal
+                                          .round(),
+                                      0,
+                                      isORderOrReturn ? "order" : "return",
+                                      "draft") != null) {
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                    value.clearOrcerList();
+                                  } else {
+                                    
+                                  }
+                          
                                 },
                               ));
                     },

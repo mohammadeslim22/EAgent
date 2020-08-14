@@ -12,7 +12,7 @@ class DailyLog {
   DailyLog.fromJson(dynamic json) {
     // transactionsCount = json['transactions_count'] as int;
 
-    tBeneficiariryCount = json['t_beneficiariry_count'] as int;
+    tBeneficiariryCount = json['t_beneficiary_count'] as int;
     transactionsCount = json['transactions_count'] as int;
     // tBeneficiariryCount = int.parse(json['t_beneficiariry_count'].toString());
     orderCount = json['order_count'] as int;

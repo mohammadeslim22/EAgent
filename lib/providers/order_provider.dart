@@ -1,6 +1,8 @@
 import 'package:agent_second/models/ben.dart';
+import 'package:agent_second/models/transactions.dart';
 import 'package:agent_second/providers/export.dart';
 import 'package:agent_second/util/dio.dart';
+import 'package:agent_second/util/functions.dart';
 import 'package:agent_second/util/service_locator.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -34,10 +36,11 @@ class OrderListProvider with ChangeNotifier {
 
   void setScreensToPop(int x) {
     howManyscreensToPop = x;
+    notifyListeners();
   }
 
   void addItemToList(int id, String name, String note, int queantity, int unit,
-      String unitPrice) {
+      String unitPrice, String image) {
     if (selectedOptions.contains(id)) {
     } else {
       ordersList.add(SingleItemForSend(
@@ -47,7 +50,8 @@ class OrderListProvider with ChangeNotifier {
           queantity: queantity,
           unit: getUnitNme(id, unit),
           unitId: unit,
-          unitPrice: unitPrice));
+          unitPrice: unitPrice,
+          image: image));
       sumTotal += double.parse(unitPrice);
       notifyListeners();
     }
@@ -63,7 +67,9 @@ class OrderListProvider with ChangeNotifier {
   void changeUnit(int itemId, String unit, int unitId) {
     ordersList.firstWhere((SingleItemForSend element) {
       return element.id == itemId;
-    }).unitId = unitId;
+    })
+      ..unitId = unitId
+      ..unit = unit;
 
     notifyListeners();
   }
@@ -147,98 +153,146 @@ class OrderListProvider with ChangeNotifier {
     return sumTotal;
   }
 
-  bool sendCollection(BuildContext c, int benId, int amount, String status) {
-    bool res = false;
-    dio.post<dynamic>("collection", data: <String, dynamic>{
+  void picksForbringOrderToOrderScreen() {
+    if (ordersList.isEmpty) {
+    } else {
+      ordersList.forEach((SingleItemForSend element) {
+        element.image = itemsList.firstWhere((SingleItem e) {
+          return e.id == element.id;
+        }).image;
+      });
+    }
+  }
+
+  void bringOrderToOrderScreen(Transaction transaction) {
+    clearOrcerList();
+    sumTotal = transaction.amount.toDouble();
+    transaction.details.forEach((MiniItems element) {
+      print(element.itemId);
+      selectedOptions.add(element.itemId);
+
+      ordersList.add(SingleItemForSend(
+          id: element.itemId,
+          // image: itemsList.firstWhere((SingleItem e) {
+          //   return e.id == element.id;
+          // }).image,
+          name: element.item,
+          queantity: element.quantity,
+          unit: element.unit,
+          unitPrice: element.itemPrice.toString()));
+    });
+    notifyListeners();
+  }
+
+  Future<bool> sendCollection(
+      BuildContext c, int benId, int amount, String status) async {
+    final Response<dynamic> response =
+        await dio.post<dynamic>("collection", data: <String, dynamic>{
       "beneficiary_id": benId,
       "amount": amount,
       "status": status,
-      // "vehicle_id": 1
-    }).then((Response<dynamic> value) {
-      print("hhooooooooollllllllllllaaaaaaaaaaaaa collection   ${value.data}");
-      if (value.statusCode == 200) {
-        res = true;
-      } else {
-        res = false;
-      }
     });
-    getIt<GlobalVars>().setBenVisted(benId);
-    getIt<TransactionProvider>().pagewiseCollectionController.reset();
-    Navigator.pop(c);
-    notifyListeners();
-    return res;
+    if (response.statusCode == 200) {
+      setDayLog(response);
+
+      getIt<GlobalVars>().setBenVisted(benId);
+      getIt<TransactionProvider>().pagewiseCollectionController.reset();
+      Navigator.pop(c);
+      notifyListeners();
+      return true;
+    } else {
+      notifyListeners();
+      return false;
+    }
   }
 
-  bool sendOrder(BuildContext c, int benId, int ammoutn, int shortage,
-      String type, String status) {
+  Future<bool> sendOrder(BuildContext c, int benId, int ammoutn, int shortage,
+      String type, String status) async {
     final List<int> itemsId = <int>[];
     final List<int> itemsQuantity = <int>[];
     final List<int> itemsPrice = <int>[];
     final List<int> itemsUnit = <int>[];
     final List<String> itemsNote = <String>[];
-    bool res = false;
     for (int i = 0; i < ordersList.length; i++) {
       itemsId.add(ordersList[i].id);
       itemsQuantity.add(ordersList[i].queantity);
       itemsPrice.add(double.parse(ordersList[i].unitPrice).round());
       itemsUnit.add(ordersList[i].unitId);
       itemsNote.add(ordersList[i].notes);
-      //'item_id[]': ordersList[i].toJson(),
     }
 
-    dio.post<dynamic>("btransactions", data: <String, dynamic>{
+    final Response<dynamic> response =
+        await dio.post<dynamic>("btransactions", data: <String, dynamic>{
       "beneficiary_id": benId,
       "status": status,
       "type": type,
       "notes": "",
       "amount": ammoutn,
       "shortage": shortage,
-
-      // "item_id":[1],
-      // "quantity":[19],
-      // "item_price":[100],
-      // "unit":[1]
-      // for (int i = 0; i < ordersList.length; i++)
-      // "item_id[]": ordersList[i].id,
-
-      // for (int i = 0; i < ordersList.length; i++)
-      // "quantity[]": ordersList[i].queantity,
-
-      // for (int i = 0; i < ordersList.length; i++)
-      // "item_price[]": double.parse(ordersList[i].unitPrice).round(),
-
-      // for (int i = 0; i < ordersList.length; i++)
-      // "unit[]": 1,
-
       "item_id": itemsId,
       "item_price": itemsPrice,
       "quantity": itemsQuantity,
       "unit": itemsUnit,
-      // "notes": itemsNote
-    }).then((Response<dynamic> value) {
-      print("hhooooooooollllllllllllaaaaaaaaaaaaa    ${value.data}");
-      if (value.statusCode == 200) {
-        clearOrcerList();
-        res = true;
+    });
+    if (response.statusCode == 200) {
+      clearOrcerList();
+      setDayLog(response);
+      getIt<GlobalVars>().setBenVisted(benId);
+      clearOrcerList();
+      if (howManyscreensToPop >= 2) {
+        getIt<TransactionProvider>().pagewiseOrderController.reset();
+        getIt<TransactionProvider>().pagewiseReturnController.reset();
       } else {
-        res = false;
+        getIt<TransactionProvider>().pagewiseCollectionController.reset();
       }
-    });
-    getIt<GlobalVars>().setBenVisted(benId);
-    clearOrcerList();
-    if (howManyscreensToPop >= 3) {
-      getIt<TransactionProvider>().pagewiseOrderController.reset();
-      getIt<TransactionProvider>().pagewiseReturnController.reset();
+      // getIt<TransactionProvider>().setLastTransaction(
+      //     Transaction(beneficiaryId: benId, amount: ammoutn, type: type));
+      Navigator.of(c).pushNamedAndRemoveUntil("/Beneficiary_Center",
+          (Route<dynamic> route) {
+        return howManyscreensToPop-- == 0;
+      }, arguments: <String, dynamic>{
+        "ben": getIt<GlobalVars>().getbenInFocus()
+      });
+      notifyListeners();
+      return true;
+    } else {
+      notifyListeners();
+      return false;
     }
-    Navigator.of(c).pushNamedAndRemoveUntil("/Beneficiary_Center",
-        (Route<dynamic> route) {
-      howManyscreensToPop--;
-      return howManyscreensToPop == 0;
-    }, arguments: <String, dynamic>{
-      "ben": getIt<GlobalVars>().getbenInFocus()
+  }
+
+  Future<bool> sendAgentOrder(BuildContext c, int benId, int ammoutn,
+      int shortage, String type, String status) async {
+    final List<int> itemsId = <int>[];
+    final List<int> itemsQuantity = <int>[];
+    final List<int> itemsPrice = <int>[];
+    final List<int> itemsUnit = <int>[];
+    final List<String> itemsNote = <String>[];
+    for (int i = 0; i < ordersList.length; i++) {
+      itemsId.add(ordersList[i].id);
+      itemsQuantity.add(ordersList[i].queantity);
+      itemsPrice.add(double.parse(ordersList[i].unitPrice).round());
+      itemsUnit.add(ordersList[i].unitId);
+      itemsNote.add(ordersList[i].notes);
+    }
+
+    await dio.post<dynamic>("btransactions", data: <String, dynamic>{
+      "beneficiary_id": benId,
+      "status": status,
+      "type": type,
+      "notes": "",
+      "amount": ammoutn,
+      "shortage": shortage,
+      "item_id": itemsId,
+      "item_price": itemsPrice,
+      "quantity": itemsQuantity,
+      "unit": itemsUnit,
     });
-    notifyListeners();
-    return res;
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<void> getItems() async {
@@ -249,6 +303,7 @@ class OrderListProvider with ChangeNotifier {
       itemsList = Items.fromJson(value.data).itemsList;
       dataLoaded = true;
       indexedStack = 1;
+      picksForbringOrderToOrderScreen();
       notifyListeners();
       return null;
     });

@@ -36,7 +36,13 @@ class Ben {
       this.transTotal,
       this.transCount,
       this.itemsCap,
-      this.visited});
+      this.visited,
+      this.orderTransTotal,
+      this.collectionTransCount,
+      this.collectionTransTotal,
+      this.orderTransCount,
+      this.returnTransCount,
+      this.returnTransTotal});
 
   Ben.fromJson(dynamic json) {
     id = json['id'] as int;
@@ -77,6 +83,12 @@ class Ben {
       itemsBalances[element.itemId.toString()] = element.balanceCap.toString();
     });
     visited = false;
+    orderTransTotal = json['order_trans_total'].toString();
+    collectionTransCount = json['collection_trans_count'].toString();
+    collectionTransTotal = json['collection_trans_total'].toString();
+    orderTransCount = json['order_trans_count'].toString();
+    returnTransCount = json['return_trans_count'].toString();
+    returnTransTotal = json['return_trans_total'].toString();
   }
   int id;
   String name;
@@ -102,6 +114,12 @@ class Ben {
   Map<String, String> itemsBalances;
   List<ItemsCap> itemsCap;
   bool visited;
+  String orderTransTotal;
+  String orderTransCount;
+  String returnTransTotal;
+  String returnTransCount;
+  String collectionTransTotal;
+  String collectionTransCount;
 }
 
 class City {

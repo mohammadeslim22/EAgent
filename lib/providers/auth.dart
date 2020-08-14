@@ -27,6 +27,7 @@ class Auth with ChangeNotifier {
 
       if (value.statusCode == 200) {
         if (value.data != "fail") {
+          print("am the token value : ${value.data['api_token']}");
           await data.setData(
               "authorization", "Bearer ${value.data['api_token']}");
           dio.options.headers['authorization'] =

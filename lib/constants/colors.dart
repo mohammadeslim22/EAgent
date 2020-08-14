@@ -15,12 +15,13 @@ class MyColors {
   Color yellow = const Color(0xffFFC000);
   Color green = const Color(0xff007C40);
   Color red = const Color(0xffFC531C);
-    Color blue=  Colors.blue;
-    Color myBlue=const Color(0xFF0085C7);
+  Color blue = Colors.blue;
+  Color myBlue = const Color(0xFF0085C7);
   Color redOpacity = const Color(0xffFC531C);
-  Color orange =  Colors.orange;
-  Color trans =  Colors.transparent ;
-  Color ggrey =  Colors.grey ;
+  Color orange = Colors.orange;
+  Color trans = Colors.transparent;
+  Color ggrey = Colors.grey;
+  Color purple = Colors.purple;
 }
 
 final MyColors colors = MyColors();

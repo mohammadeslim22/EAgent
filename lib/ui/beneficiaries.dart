@@ -156,7 +156,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                     highlightColor: Colors.transparent,
                                     onTap: () {
                                       getIt<OrderListProvider>()
-                                          .setScreensToPop(3);
+                                          .setScreensToPop(2);
 
                                       globalVarsProv.setBenInFocus(item);
                                       Navigator.pushNamed(
@@ -175,7 +175,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                     highlightColor: Colors.transparent,
                                     onTap: () {
                                       getIt<OrderListProvider>()
-                                          .setScreensToPop(3);
+                                          .setScreensToPop(2);
                                       globalVarsProv.setBenInFocus(item);
                                       Navigator.pushNamed(
                                           context, "/Order_Screen",
@@ -193,7 +193,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                     highlightColor: Colors.transparent,
                                     onTap: () {
                                       getIt<OrderListProvider>()
-                                          .setScreensToPop(3);
+                                          .setScreensToPop(2);
 
                                       globalVarsProv.setBenInFocus(item);
                                       Navigator.pushNamed(

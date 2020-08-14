@@ -52,7 +52,7 @@ Future<void> main() async {
 
   dioDefaults();
   await data.getData('authorization').then<dynamic>((dynamic auth) {
-    print(auth);
+    
     if (auth == null) {}
     dio.options.headers['authorization'] = '$auth';
   });
