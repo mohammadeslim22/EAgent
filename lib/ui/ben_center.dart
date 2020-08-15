@@ -32,7 +32,6 @@ class BeneficiaryCenter extends StatefulWidget {
 
 class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
   Ben ben;
-  Transactions benTrans;
   List<MiniItems> items;
   Transaction transaction;
   Collections collection;
@@ -79,13 +78,13 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
       child: const FlareActor("assets/images/empty.flr",
           alignment: Alignment.center, fit: BoxFit.fill, animation: "default"),
     );
-    // getIt<TransactionProvider>().pagewiseCollectionController =
-    //     PagewiseLoadController<dynamic>(
-    //         pageSize: 15,
-    //         pageFuture: (int pageIndex) async {
-    //           return getIt<TransactionProvider>()
-    //               .getCollectionTransactions(pageIndex, ben.id);
-    //         });
+    getIt<TransactionProvider>().pagewiseCollectionController =
+        PagewiseLoadController<dynamic>(
+            pageSize: 15,
+            pageFuture: (int pageIndex) async {
+              return getIt<TransactionProvider>()
+                  .getCollectionTransactions(pageIndex, ben.id);
+            });
     getIt<TransactionProvider>().pagewiseOrderController =
         PagewiseLoadController<dynamic>(
             pageSize: 15,

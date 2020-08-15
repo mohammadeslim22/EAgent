@@ -8,7 +8,10 @@ import 'package:flutter_pagewise/flutter_pagewise.dart';
 
 class TransactionProvider with ChangeNotifier {
   Ben ben;
-  Transactions benTrans;
+  Transactions benOrderTrans;
+  Transactions benReturnTrans;
+    Transactions agentTrans;
+
   Transaction transaction;
   Collections collection;
   PagewiseLoadController<dynamic> pagewiseCollectionController;
@@ -25,9 +28,9 @@ class TransactionProvider with ChangeNotifier {
       "type": "order",
     });
 
-    benTrans = Transactions.fromJson(response.data);
+    benOrderTrans = Transactions.fromJson(response.data);
 
-    return benTrans.transactions;
+    return benOrderTrans.transactions;
   }
 
   // void setLastTransaction(Transaction x) {
@@ -43,9 +46,9 @@ class TransactionProvider with ChangeNotifier {
       "type": "return",
     });
 
-    benTrans = Transactions.fromJson(response.data);
+    benReturnTrans = Transactions.fromJson(response.data);
 
-    return benTrans.transactions;
+    return benReturnTrans.transactions;
   }
 
   Future<List<SingleCollection>> getCollectionTransactions(
@@ -59,16 +62,16 @@ class TransactionProvider with ChangeNotifier {
 
     return collection.collectionList;
   }
-    Future<List<SingleCollection>> getAgentOrderTransactions(
+    Future<List<Transaction>> getAgentOrderTransactions(
       int page, int benId) async {
     final Response<dynamic> response =
         await dio.get<dynamic>("stocktransactions", queryParameters: <String, dynamic>{
       "page": page+1,
       "agent_id": benId,
     });
-    collection = Collections.fromJson(response.data);
+    agentTrans = Transactions.fromJson(response.data);
 
-    return collection.collectionList;
+    return agentTrans.transactions;
   }
   
 }

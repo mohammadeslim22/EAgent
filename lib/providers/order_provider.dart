@@ -239,11 +239,12 @@ class OrderListProvider with ChangeNotifier {
       setDayLog(response);
       getIt<GlobalVars>().setBenVisted(benId);
       clearOrcerList();
-      if (howManyscreensToPop >= 2) {
+      if (howManyscreensToPop > 2) {
         getIt<TransactionProvider>().pagewiseOrderController.reset();
         getIt<TransactionProvider>().pagewiseReturnController.reset();
-      } else {
         getIt<TransactionProvider>().pagewiseCollectionController.reset();
+      } else {
+        //  getIt<TransactionProvider>().pagewiseCollectionController.reset();
       }
       // getIt<TransactionProvider>().setLastTransaction(
       //     Transaction(beneficiaryId: benId, amount: ammoutn, type: type));
@@ -253,6 +254,7 @@ class OrderListProvider with ChangeNotifier {
       }, arguments: <String, dynamic>{
         "ben": getIt<GlobalVars>().getbenInFocus()
       });
+      howManyscreensToPop = 2;
       notifyListeners();
       return true;
     } else {
