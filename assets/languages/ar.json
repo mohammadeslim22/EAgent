@@ -84,5 +84,6 @@
     "show_chices":"خيارات العرض",
     "cash_given":"المبلغ المرجع",
     "return_value":"قيمة المرجع",
-    "items":"شاشة الأصناف"
+    "items":"شاشة الأصناف",
+    "agent_transaction":"عمل طلبية"
 }

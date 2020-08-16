@@ -26,51 +26,31 @@ class _OrderScreenState extends State<ShowItems> {
   Map<String, String> itemsBalances = <String, String>{};
   List<int> prices = <int>[];
 
-  Widget childForDragging(
-      SingleItem item, OrderListProvider orsderListProvider) {
-    print("single item in order screen ${item.id}");
+  Widget childForDragging(SingleItem item) {
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(width: 1, color: Colors.green),
           borderRadius: BorderRadius.circular(8.0)),
-      color: getIt<OrderListProvider>().selectedOptions.contains(item.id)
-          ? Colors.grey
-          : Colors.white,
+      color: item.id % 2 == 1 ? colors.white : colors.grey,
       child: InkWell(
-        child: Column(
-          children: <Widget>[
-            const SizedBox(height: 4),
-            CachedNetworkImage(
-              fit: BoxFit.cover,
-              width: 50,
-              height: 50,
-              imageUrl: (item.image != "null")
-                  ? "http://edisagents.altariq.ps/public/image/${item.image}"
-                  : "",
-              progressIndicatorBuilder: (BuildContext context, String url,
-                      DownloadProgress downloadProgress) =>
-                  CircularProgressIndicator(value: downloadProgress.progress),
-              errorWidget: (BuildContext context, String url, dynamic error) =>
-                  const Icon(Icons.error),
-            ),
-            Text(
-              item.name,
-              style: styles.smallItembluestyle,
-              textAlign: TextAlign.center,
-            ),
-            Text(item.unitPrice.toString(), style: styles.mystyle),
-            const Spacer(),
-            Text(item.balanceInventory.toString(), style: styles.balanceInventory),
-          ],
-        ),
-      ),
+          child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          const SizedBox(width: 320),
+          Text(item.name, style: styles.bluestyle, textAlign: TextAlign.start),
+          const Spacer(),
+          Text(item.balanceInventory.toString(),
+              style: styles.bluestyle, textAlign: TextAlign.start),
+          const SizedBox(width: 320)
+        ],
+      )),
     );
   }
 
   @override
   void initState() {
     super.initState();
-    if (getIt<OrderListProvider>().dataLoaded) {
+    if (getIt<OrderListProvider>().itemsDataLoaded) {
     } else {
       getIt<OrderListProvider>().indexedStack = 0;
       getIt<OrderListProvider>().getItems();
@@ -128,43 +108,24 @@ class _OrderScreenState extends State<ShowItems> {
               builder: (BuildContext context, OrderListProvider orderProvider,
                   Widget child) {
                 return Container(
-                  alignment: Alignment.topCenter,
-                  width: MediaQuery.of(context).size.width / 2,
                   child: IndexedStack(
                       index: orderProvider.indexedStack,
                       children: <Widget>[
                         Container(
-                          width: 600,
-                          height: 450,
                           child: FlareActor("assets/images/analysis_new.flr",
                               alignment: Alignment.center,
                               fit: BoxFit.cover,
-                              isPaused: orderProvider.dataLoaded,
+                              isPaused: orderProvider.itemsDataLoaded,
                               animation: "analysis"),
                         ),
-                        if (orderProvider.dataLoaded)
-                          GridView.count(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 12),
-                              physics: const ScrollPhysics(),
+                        if (orderProvider.itemsDataLoaded)
+                          ListView.builder(
                               shrinkWrap: true,
-                              primary: true,
-                              crossAxisSpacing: 3,
-                              mainAxisSpacing: 3,
-                              crossAxisCount: 10,
-                              childAspectRatio: .7,
-                              addRepaintBoundaries: true,
-                              children: orderProvider.itemsList
-                                  .where((SingleItem element) {
-                                return element.name
-                                    .trim()
-                                    .toLowerCase()
-                                    .contains(searchController.text
-                                        .trim()
-                                        .toLowerCase());
-                              }).map((SingleItem item) {
-                                return childForDragging(item, orderProvider);
-                              }).toList())
+                              itemCount: orderProvider.itemsList.length,
+                              itemBuilder: (BuildContext ctxt, int index) {
+                                return childForDragging(
+                                    orderProvider.itemsList[index]);
+                              })
                         else
                           Container()
                       ]),

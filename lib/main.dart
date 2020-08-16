@@ -56,13 +56,6 @@ Future<void> main() async {
     if (auth == null) {}
     dio.options.headers['authorization'] = '$auth';
   });
-
-  // data.getData("lat").then((String value) {
-  //   config.lat = double.parse(value);
-  // });
-  // data.getData("long").then((String value) {
-  //   config.long = double.parse(value);
-  // });
 }
 
 class MyApp extends StatelessWidget {
@@ -70,7 +63,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Language lang = Provider.of<Language>(context);
-
     return MaterialApp(
         navigatorKey: getIt<NavigationService>().navigatorKey,
         debugShowCheckedModeBanner: false,

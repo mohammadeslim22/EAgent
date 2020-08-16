@@ -39,7 +39,6 @@ class SingleItem {
 
   SingleItem.fromJson(dynamic json) {
     id = json['id'] as int;
-    print("id for m fromjson $id");
     itemCode = json['item_code'].toString();
     name = json['name'].toString();
     unit = json['unit'] as int;

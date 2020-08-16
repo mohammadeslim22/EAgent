@@ -18,10 +18,12 @@ import 'package:agent_second/providers/order_provider.dart';
 import 'package:giffy_dialog/giffy_dialog.dart';
 
 class OrderScreen extends StatefulWidget {
-  const OrderScreen({Key key, this.ben, this.isORderOrReturn})
+  const OrderScreen(
+      {Key key, this.ben, this.isORderOrReturn, this.isAgentOrder})
       : super(key: key);
   final Ben ben;
   final bool isORderOrReturn;
+  final bool isAgentOrder;
   @override
   _OrderScreenState createState() => _OrderScreenState();
 }
@@ -39,7 +41,6 @@ class _OrderScreenState extends State<OrderScreen> {
 
   Widget childForDragging(
       SingleItem item, OrderListProvider orsderListProvider) {
-    print("single item in order screen ${item.id}");
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(width: 1, color: Colors.green),
@@ -73,7 +74,10 @@ class _OrderScreenState extends State<OrderScreen> {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8.0),
                       border: Border.all(width: 1.0, color: Colors.green)),
-                  child: Text(ben.itemsBalances[item.id.toString()] ?? "",
+                  child: Text(
+                      (ben != null)
+                          ? ben.itemsBalances[item.id.toString()] ?? ""
+                          : "",
                       style: styles.smallButton),
                 )
               ],
@@ -81,8 +85,8 @@ class _OrderScreenState extends State<OrderScreen> {
             const SizedBox(height: 4),
             CachedNetworkImage(
               fit: BoxFit.cover,
-              width: 50,
-              height: 50,
+              width: 70,
+              height: 40,
               imageUrl: (item.image != "null")
                   ? "http://edisagents.altariq.ps/public/image/${item.image}"
                   : "",
@@ -92,10 +96,12 @@ class _OrderScreenState extends State<OrderScreen> {
               errorWidget: (BuildContext context, String url, dynamic error) =>
                   const Icon(Icons.error),
             ),
-            Text(
-              item.name,
-              style: styles.smallItembluestyle,
-              textAlign: TextAlign.center,
+            Flexible(
+              child: Text(
+                item.name,
+                style: styles.smallItembluestyle,
+                textAlign: TextAlign.center,
+              ),
             ),
             Text(item.unitPrice.toString(), style: styles.mystyle),
           ],
@@ -109,7 +115,7 @@ class _OrderScreenState extends State<OrderScreen> {
     super.initState();
     isORderOrReturn = widget.isORderOrReturn;
     ben = widget.ben;
-    if (getIt<OrderListProvider>().dataLoaded) {
+    if (getIt<OrderListProvider>().itemsDataLoaded) {
     } else {
       getIt<OrderListProvider>().indexedStack = 0;
       getIt<OrderListProvider>().getItems();
@@ -121,7 +127,9 @@ class _OrderScreenState extends State<OrderScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: isORderOrReturn ? colors.blue : colors.red,
+        backgroundColor: !widget.isAgentOrder
+            ? isORderOrReturn ? colors.blue : colors.red
+            : colors.blue,
         title: Text(trans(context, "altariq")),
         centerTitle: true,
         leading: IconButton(
@@ -183,10 +191,10 @@ class _OrderScreenState extends State<OrderScreen> {
                           child: FlareActor("assets/images/analysis_new.flr",
                               alignment: Alignment.center,
                               fit: BoxFit.cover,
-                              isPaused: orderProvider.dataLoaded,
+                              isPaused: orderProvider.itemsDataLoaded,
                               animation: "analysis"),
                         ),
-                        if (orderProvider.dataLoaded)
+                        if (orderProvider.itemsDataLoaded)
                           GridView.count(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 24, vertical: 12),
@@ -615,23 +623,43 @@ class _OrderScreenState extends State<OrderScreen> {
                                 ),
                                 flareFit: BoxFit.cover,
                                 entryAnimation: EntryAnimation.TOP,
-                                onOkButtonPressed: ()async {
-                                  if (await getIt<OrderListProvider>().sendOrder(
-                                      context,
-                                      ben.id,
-                                      getIt<OrderListProvider>()
-                                          .sumTotal
-                                          .round(),
-                                      0,
-                                      isORderOrReturn ? "order" : "return",
-                                      "draft") != null) {
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                    value.clearOrcerList();
-                                  } else {
-                                    
-                                  }
-                          
+                                onOkButtonPressed: () async {
+                                  sendTransFunction(
+                                      widget.isAgentOrder, "draft");
+                                  value.clearOrcerList();
+                                  // if (widget.isAgentOrder) {
+                                  //   if (await getIt<OrderListProvider>()
+                                  //           .sendAgentOrder(
+                                  //               context,
+                                  //               getIt<OrderListProvider>()
+                                  //                   .sumTotal
+                                  //                   .round(),
+                                  //               0,
+                                  //               "preorder",
+                                  //               "draft") !=
+                                  //       null) {
+                                  //     Navigator.pop(context);
+                                  //     Navigator.pop(context);
+                                  //     value.clearOrcerList();
+                                  //   } else {}
+                                  // } else {
+                                  //   if (await getIt<OrderListProvider>()
+                                  //       .sendOrder(
+                                  //           context,
+                                  //           ben.id,
+                                  //           getIt<OrderListProvider>()
+                                  //               .sumTotal
+                                  //               .round(),
+                                  //           0,
+                                  //           isORderOrReturn
+                                  //               ? "order"
+                                  //               : "return",
+                                  //           "draft")) {
+                                  //     Navigator.pop(context);
+                                  //     Navigator.pop(context);
+                                  //     value.clearOrcerList();
+                                  //   } else {}
+                                  // }
                                 },
                               ));
                     },
@@ -646,17 +674,35 @@ class _OrderScreenState extends State<OrderScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
                     ),
-                    color: Colors.blue,
-                    onPressed: () {
-                      Navigator.pushNamed(context, "/Payment_Screen",
-                          arguments: <String, dynamic>{
-                            "transOrCollection": isORderOrReturn ? 0 : 1
-                          });
+                    color: colors.blue,
+                    onPressed: () async {
+                      sendTransFunction(widget.isAgentOrder, "confirm");
+                      value.clearOrcerList();
+                      // if (widget.isAgentOrder) {
+                      //   if (await getIt<OrderListProvider>().sendAgentOrder(
+                      //           context,
+                      //           getIt<OrderListProvider>().sumTotal.round(),
+                      //           0,
+                      //           "preorder",
+                      //           "confirmed") !=
+                      //       null) {
+                      //     Navigator.pop(context);
+                      //     Navigator.pop(context);
+                      //     value.clearOrcerList();
+                      //   } else {}
+                      // } else {
+                      //   Navigator.pushNamed(context, "/Payment_Screen",
+                      //       arguments: <String, dynamic>{
+                      //         "transOrCollection": isORderOrReturn ? 0 : 1
+                      //       });
+                      // }
                     },
                     child: Text(
-                        isORderOrReturn
-                            ? trans(context, "order")
-                            : trans(context, "make_return"),
+                        widget.isAgentOrder
+                            ? trans(context, "agent_transaction")
+                            : isORderOrReturn
+                                ? trans(context, "order")
+                                : trans(context, "make_return"),
                         style: styles.mywhitestyle),
                   ),
                 ),
@@ -681,6 +727,33 @@ class _OrderScreenState extends State<OrderScreen> {
         ],
       );
     });
+  }
+
+  Future<void> sendTransFunction(bool agentOrBen, String status) async {
+    if (agentOrBen) {
+      if (await getIt<OrderListProvider>().sendAgentOrder(
+              context,
+              getIt<OrderListProvider>().sumTotal.round(),
+              0,
+              "preorder",
+              status) !=
+          null) {
+        Navigator.pop(context);
+        Navigator.pop(context);
+      } else {}
+    } else {
+      if (await getIt<OrderListProvider>().sendOrder(
+              context,
+              ben.id,
+              getIt<OrderListProvider>().sumTotal.round(),
+              0,
+              isORderOrReturn ? "order" : "return",
+              status) !=
+          null) {
+        Navigator.pop(context);
+        Navigator.pop(context);
+      } else {}
+    }
   }
 
   void cacelTransaction(bool downCacel) {

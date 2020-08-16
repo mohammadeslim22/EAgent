@@ -39,12 +39,12 @@ void dioDefaults() {
     // you can return a `DioError` object or return `dio.reject(errMsg)`
   }, onResponse: (Response<dynamic> response) async {
     print("status code: ${response.statusCode}");
-    // print("error : ${response.realUri.toString()}");
     if (response.statusCode == 200) {
-   //   Fluttertoast.showToast(msg: "response.statusCode ${response.statusCode}  ${response.data}",toastLength: Toast.LENGTH_SHORT);
-    }else if (response.statusCode == 401) {
-      Fluttertoast.showToast(msg:"Login please");
-      getIt<NavigationService>().navigateTo('/login',null);
+      print("response : ${response.data}");
+      //  Fluttertoast.showToast(msg: "response.statusCode ${response.statusCode}  ${response.data}",toastLength: Toast.LENGTH_SHORT);
+    } else if (response.statusCode == 401) {
+      Fluttertoast.showToast(msg: "Login please");
+      getIt<NavigationService>().navigateTo('/login', null);
     }
     return response; // continue
   }, onError: (DioError e) async {

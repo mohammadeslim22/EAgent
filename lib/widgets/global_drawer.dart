@@ -83,8 +83,10 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
           const Divider(),
           ListTile(
             onTap: () {
+              final double x = MediaQuery.of(context).size.width;
               Navigator.pushNamedAndRemoveUntil(widget.sourceContext,
-                  "/Agent_Orders", (Route<dynamic> r) => r.isFirst);
+                  "/Agent_Orders", (Route<dynamic> r) => r.isFirst,
+                  arguments: <String, dynamic>{"expand": true,"width":x });
             },
             title: Text(trans(context, "stock_transaction")),
           ),

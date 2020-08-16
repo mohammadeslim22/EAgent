@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:agent_second/constants/colors.dart';
 import 'package:agent_second/constants/config.dart';
 import 'package:agent_second/providers/global_variables.dart';
+import 'package:agent_second/util/data.dart';
 import 'package:agent_second/util/functions.dart';
 import 'package:agent_second/util/service_locator.dart';
 import 'package:flutter/cupertino.dart';
@@ -25,10 +26,11 @@ class Home extends StatelessWidget {
   const Home({Key key}) : super(key: key);
   Future<BeneficiariesModel> getBenData() async {
     final Response<dynamic> response = await dio.get<dynamic>("beneficaries");
-
-    await Future<void>.delayed(const Duration(seconds: 3), () {});
     getIt<GlobalVars>().setBens(BeneficiariesModel.fromJson(response.data));
+    await Future<void>.delayed(const Duration(seconds: 3), () {});
+
     getUserData();
+    config.agentId = int.parse(await data.getData("agent_id"));
     return getIt<GlobalVars>().beneficiaries;
   }
 

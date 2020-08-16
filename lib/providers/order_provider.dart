@@ -12,7 +12,9 @@ import 'package:vibration/vibration.dart';
 class OrderListProvider with ChangeNotifier {
   List<SingleItemForSend> ordersList = <SingleItemForSend>[];
   List<SingleItem> itemsList;
-  bool dataLoaded = false;
+  bool itemsDataLoaded = false;
+
+
   int indexedStack = 0;
   Set<int> selectedOptions = <int>{};
   double sumTotal = 0;
@@ -168,14 +170,9 @@ class OrderListProvider with ChangeNotifier {
     clearOrcerList();
     sumTotal = transaction.amount.toDouble();
     transaction.details.forEach((MiniItems element) {
-      print(element.itemId);
       selectedOptions.add(element.itemId);
-
       ordersList.add(SingleItemForSend(
           id: element.itemId,
-          // image: itemsList.firstWhere((SingleItem e) {
-          //   return e.id == element.id;
-          // }).image,
           name: element.item,
           queantity: element.quantity,
           unit: element.unit,
@@ -205,7 +202,6 @@ class OrderListProvider with ChangeNotifier {
       return false;
     }
   }
-
   Future<bool> sendOrder(BuildContext c, int benId, int ammoutn, int shortage,
       String type, String status) async {
     final List<int> itemsId = <int>[];
@@ -222,8 +218,7 @@ class OrderListProvider with ChangeNotifier {
     }
 
     final Response<dynamic> response =
-        await dio.post<dynamic>("btransactions", data: <String, dynamic>{
-      "beneficiary_id": benId,
+        await dio.post<dynamic>("stocktransactions", data: <String, dynamic>{
       "status": status,
       "type": type,
       "notes": "",
@@ -240,9 +235,9 @@ class OrderListProvider with ChangeNotifier {
       getIt<GlobalVars>().setBenVisted(benId);
       clearOrcerList();
       if (howManyscreensToPop > 2) {
-        getIt<TransactionProvider>().pagewiseOrderController.reset();
-        getIt<TransactionProvider>().pagewiseReturnController.reset();
-        getIt<TransactionProvider>().pagewiseCollectionController.reset();
+        // getIt<TransactionProvider>().pagewiseOrderController.reset();
+        // getIt<TransactionProvider>().pagewiseReturnController.reset();
+        // getIt<TransactionProvider>().pagewiseCollectionController.reset();
       } else {
         //  getIt<TransactionProvider>().pagewiseCollectionController.reset();
       }
@@ -262,8 +257,7 @@ class OrderListProvider with ChangeNotifier {
       return false;
     }
   }
-
-  Future<bool> sendAgentOrder(BuildContext c, int benId, int ammoutn,
+  Future<bool> sendAgentOrder(BuildContext c, int ammoutn,
       int shortage, String type, String status) async {
     final List<int> itemsId = <int>[];
     final List<int> itemsQuantity = <int>[];
@@ -279,7 +273,6 @@ class OrderListProvider with ChangeNotifier {
     }
 
     await dio.post<dynamic>("btransactions", data: <String, dynamic>{
-      "beneficiary_id": benId,
       "status": status,
       "type": type,
       "notes": "",
@@ -298,12 +291,12 @@ class OrderListProvider with ChangeNotifier {
   }
 
   Future<void> getItems() async {
-    dataLoaded = false;
+    itemsDataLoaded = false;
     indexedStack = 0;
     notifyListeners();
     await dio.get<dynamic>("items").then((Response<dynamic> value) {
       itemsList = Items.fromJson(value.data).itemsList;
-      dataLoaded = true;
+      itemsDataLoaded = true;
       indexedStack = 1;
       picksForbringOrderToOrderScreen();
       notifyListeners();

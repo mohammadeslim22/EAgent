@@ -34,6 +34,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
   Ben ben;
   List<MiniItems> items;
   Transaction transaction;
+  bool billIsOn = true;
   Collections collection;
   int indexedStack;
   Widget noItemFound;
@@ -107,7 +108,6 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
     getPositionSubscription?.cancel();
   }
 
-  bool billIsOn = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -197,6 +197,16 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             ],
                           ),
                         ],
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: Icon(Icons.my_location,
+                            color: colors.blue, size: 40),
+                        onPressed: () {
+                          location.getLocation().then((LocationData value) {
+                            // TODO(MOHAMAMD): send location data to back end
+                          });
+                        },
                       )
                     ],
                   ),
@@ -218,7 +228,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                               Navigator.pushNamed(context, "/Order_Screen",
                                   arguments: <String, dynamic>{
                                     "ben": ben,
-                                    "isORderOrReturn": true
+                                    "isORderOrReturn": true,
+                                    "isAgentOrder": false
                                   });
                             },
                             child: Text(trans(context, "order"),
@@ -238,7 +249,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                               Navigator.pushNamed(context, "/Order_Screen",
                                   arguments: <String, dynamic>{
                                     "ben": ben,
-                                    "isORderOrReturn": false
+                                    "isORderOrReturn": false,
+                                    "isAgentOrder": false
                                   });
                             },
                             child: Text(
@@ -385,251 +397,140 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                         ),
                       )),
                   Expanded(
-                    child: IndexedStack(
-                      index: indexedStack,
-                      children: <Widget>[
-                        SmartRefresher(
-                            enablePullDown: true,
-                            enablePullUp: true,
-                            header: WaterDropHeader(
-                              complete: Container(),
-                              waterDropColor: Colors.blue,
-                            ),
-                            footer: CustomFooter(
-                              builder: (BuildContext context, LoadStatus mode) {
-                                Widget body;
-                                if (mode == LoadStatus.idle) {
-                                  body = const Text("pull up load");
-                                } else if (mode == LoadStatus.loading) {
-                                  body = const CupertinoActivityIndicator();
-                                } else if (mode == LoadStatus.failed) {
-                                  body = const Text("Load Failed!Click retry!");
-                                } else if (mode == LoadStatus.canLoading) {
-                                  body = const Text("release to load more");
-                                } else {
-                                  body = const Text("No more Data");
-                                }
-                                return Container(
-                                  height: 55.0,
-                                  child: Center(child: body),
-                                );
-                              },
-                            ),
-                            controller: _refreshController,
-                            onRefresh: () async {
-                              if (mounted) {
-                                getIt<TransactionProvider>()
-                                    .pagewiseOrderController
-                                    .reset();
-                                _refreshController.refreshCompleted();
-                              }
-                              getIt<TransactionProvider>()
-                                  .pagewiseOrderController
-                                  .reset();
-                              _refreshController.refreshCompleted();
+                    child: SmartRefresher(
+                      enablePullDown: true,
+                      enablePullUp: true,
+                      header: WaterDropHeader(
+                          complete: Container(), waterDropColor: colors.blue),
+                      controller: _refreshController,
+                      onRefresh: () async {
+                        if (mounted) {
+                          if (indexedStack == 0) {
+                          } else if (indexedStack == 1) {
+                          } else {
+                            getIt<TransactionProvider>()
+                                .pagewiseOrderController
+                                .reset();
+                          }
+                          _refreshController.refreshCompleted();
+                        }
+                        getIt<TransactionProvider>()
+                            .pagewiseOrderController
+                            .reset();
+                        _refreshController.refreshCompleted();
+                      },
+                      onLoading: () async {
+                        await Future<void>.delayed(
+                            const Duration(milliseconds: 1000));
+                        if (mounted) {
+                          setState(() {});
+                          _refreshController.loadComplete();
+                        }
+                      },
+                      child: IndexedStack(
+                        index: indexedStack,
+                        children: <Widget>[
+                          PagewiseListView<dynamic>(
+                            physics: const ScrollPhysics(),
+                            shrinkWrap: true,
+                            pageLoadController: getIt<TransactionProvider>()
+                                .pagewiseOrderController,
+                            loadingBuilder: (BuildContext context) {
+                              return Container(
+                                width: 400,
+                                height: 400,
+                                child: FlareActor("assets/images/counter.flr",
+                                    alignment: Alignment.center,
+                                    fit: BoxFit.cover,
+                                    isPaused: getIt<TransactionProvider>()
+                                        .transactionsDataLoaded,
+                                    animation: "play"),
+                              );
                             },
-                            onLoading: () async {
-                              await Future<void>.delayed(
-                                  const Duration(milliseconds: 1000));
-                              if (mounted) {
-                                setState(() {});
-                                _refreshController.loadComplete();
-                              }
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+                            itemBuilder: (BuildContext context, dynamic entry,
+                                int index) {
+                              return AnimatedCard(
+                                direction: AnimatedCardDirection.left,
+                                initDelay: const Duration(milliseconds: 0),
+                                duration: const Duration(seconds: 1),
+                                curve: Curves.ease,
+                                child: _transactionBuilder(
+                                    context, entry as Transaction),
+                              );
                             },
-                            child: PagewiseListView<dynamic>(
-                              physics: const ScrollPhysics(),
-                              shrinkWrap: true,
-                              pageLoadController: getIt<TransactionProvider>()
-                                  .pagewiseOrderController,
-                              loadingBuilder: (BuildContext context) {
-                                return Container(
-                                  width: 400,
-                                  height: 400,
-                                  child: const FlareActor(
-                                      "assets/images/counter.flr",
-                                      alignment: Alignment.center,
-                                      fit: BoxFit.cover,
-                                      animation: "play"),
-                                );
-                              },
-                              //  pageSize: 15,
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-                              itemBuilder: (BuildContext context, dynamic entry,
-                                  int index) {
-                                return AnimatedCard(
-                                  direction: AnimatedCardDirection.left,
-                                  initDelay: const Duration(milliseconds: 0),
-                                  duration: const Duration(seconds: 1),
-                                  curve: Curves.ease,
-                                  child: _transactionBuilder(
-                                      context, entry as Transaction),
-                                );
-                              },
-                              noItemsFoundBuilder: (BuildContext context) {
-                                return noItemFound;
-                              },
-                              // pageFuture: (int pageIndex) {
-                              //   return getIt<TransactionProvider>()
-                              //       .getOrdersTransactions(pageIndex, ben.id);
-                              // },
-                            )),
-                        SmartRefresher(
-                            enablePullDown: true,
-                            enablePullUp: true,
-                            header: WaterDropHeader(
-                              complete: Container(),
-                              waterDropColor: Colors.blue,
-                            ),
-                            footer: CustomFooter(
-                              builder: (BuildContext context, LoadStatus mode) {
-                                Widget body;
-                                if (mode == LoadStatus.idle) {
-                                  body = const Text("pull up load");
-                                } else if (mode == LoadStatus.loading) {
-                                  body = const CupertinoActivityIndicator();
-                                } else if (mode == LoadStatus.failed) {
-                                  body = const Text("Load Failed!Click retry!");
-                                } else if (mode == LoadStatus.canLoading) {
-                                  body = const Text("release to load more");
-                                } else {
-                                  body = const Text("No more Data");
-                                }
-                                return Container(
-                                    height: 55.0, child: Center(child: body));
-                              },
-                            ),
-                            controller: _refreshController,
-                            onRefresh: () async {
-                              if (mounted) {
-                                getIt<TransactionProvider>()
-                                    .pagewiseReturnController
-                                    .reset();
-                                _refreshController.refreshCompleted();
-                              }
+                            noItemsFoundBuilder: (BuildContext context) {
+                              return noItemFound;
                             },
-                            onLoading: () async {
-                              await Future<void>.delayed(
-                                  const Duration(milliseconds: 1000));
-                              if (mounted) {
-                                setState(() {});
-                                _refreshController.loadComplete();
-                              }
+                          ),
+                          PagewiseListView<dynamic>(
+                            physics: const ScrollPhysics(),
+                            shrinkWrap: true,
+                            pageLoadController: getIt<TransactionProvider>()
+                                .pagewiseReturnController,
+                            loadingBuilder: (BuildContext context) {
+                              return Container(
+                                width: 400,
+                                height: 400,
+                                child: FlareActor("assets/images/counter.flr",
+                                    alignment: Alignment.center,
+                                    fit: BoxFit.cover,
+                                    isPaused: getIt<TransactionProvider>()
+                                        .transactionsDataLoaded,
+                                    animation: "play"),
+                              );
                             },
-                            child: PagewiseListView<dynamic>(
-                              physics: const ScrollPhysics(),
-                              shrinkWrap: true,
-                              pageLoadController: getIt<TransactionProvider>()
-                                  .pagewiseReturnController,
-
-                              loadingBuilder: (BuildContext context) {
-                                return Container(
-                                  width: 400,
-                                  height: 400,
-                                  child: const FlareActor(
-                                      "assets/images/counter.flr",
-                                      alignment: Alignment.center,
-                                      fit: BoxFit.cover,
-                                      animation: "play"),
-                                );
-                              },
-                              // pageSize: 15,
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-                              itemBuilder: (BuildContext context, dynamic entry,
-                                  int index) {
-                                return AnimatedCard(
-                                  direction: AnimatedCardDirection.left,
-                                  initDelay: const Duration(milliseconds: 0),
-                                  duration: const Duration(seconds: 1),
-                                  curve: Curves.ease,
-                                  child: _transactionBuilder(
-                                      context, entry as Transaction),
-                                );
-                              },
-                              noItemsFoundBuilder: (BuildContext context) {
-                                return noItemFound;
-                              },
-                              // pageFuture: (int pageIndex) {
-                              //   return getIt<TransactionProvider>()
-                              //       .getReturnTransactions(pageIndex, ben.id);
-                              // },
-                            )),
-                        SmartRefresher(
-                            enablePullDown: true,
-                            enablePullUp: true,
-                            header: WaterDropHeader(
-                              complete: Container(),
-                              waterDropColor: Colors.blue,
-                            ),
-                            footer: CustomFooter(
-                              builder: (BuildContext context, LoadStatus mode) {
-                                Widget body;
-                                if (mode == LoadStatus.idle) {
-                                  body = const Text("pull up load");
-                                } else if (mode == LoadStatus.loading) {
-                                  body = const CupertinoActivityIndicator();
-                                } else if (mode == LoadStatus.failed) {
-                                  body = const Text("Load Failed!Click retry!");
-                                } else if (mode == LoadStatus.canLoading) {
-                                  body = const Text("release to load more");
-                                } else {
-                                  body = const Text("No more Data");
-                                }
-                                return Container(
-                                  height: 55.0,
-                                  child: Center(child: body),
-                                );
-                              },
-                            ),
-                            controller: _refreshController,
-                            onRefresh: () async {
-                              if (mounted) {
-                                getIt<TransactionProvider>()
-                                    .pagewiseCollectionController
-                                    .reset();
-                                _refreshController.refreshCompleted();
-                              }
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+                            itemBuilder: (BuildContext context, dynamic entry,
+                                int index) {
+                              return AnimatedCard(
+                                direction: AnimatedCardDirection.left,
+                                initDelay: const Duration(milliseconds: 0),
+                                duration: const Duration(seconds: 1),
+                                curve: Curves.ease,
+                                child: _transactionBuilder(
+                                    context, entry as Transaction),
+                              );
                             },
-                            onLoading: () async {
-                              await Future<void>.delayed(
-                                  const Duration(milliseconds: 1000));
-                              if (mounted) {
-                                setState(() {});
-                                _refreshController.loadComplete();
-                              }
+                            noItemsFoundBuilder: (BuildContext context) {
+                              return noItemFound;
                             },
-                            child: PagewiseListView<dynamic>(
-                              physics: const ScrollPhysics(),
-                              shrinkWrap: true,
-                              loadingBuilder: (BuildContext context) {
-                                return Container(
-                                  width: 400,
-                                  height: 400,
-                                  child: const FlareActor(
-                                      "assets/images/counter.flr",
-                                      alignment: Alignment.center,
-                                      fit: BoxFit.cover,
-                                      animation: "play"),
-                                );
-                              },
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-                              itemBuilder: (BuildContext context, dynamic entry,
-                                  int index) {
-                                return AnimatedCard(
-                                  direction: AnimatedCardDirection.left,
-                                  initDelay: const Duration(milliseconds: 0),
-                                  duration: const Duration(seconds: 1),
-                                  curve: Curves.ease,
-                                  child: collectionBuilder(
-                                      entry as SingleCollection),
-                                );
-                              },
-                              pageLoadController: getIt<TransactionProvider>()
-                                  .pagewiseCollectionController,
-                              noItemsFoundBuilder: (BuildContext context) {
-                                return noItemFound;
-                              },
-                            )),
-                      ],
+                          ),
+                          PagewiseListView<dynamic>(
+                            physics: const ScrollPhysics(),
+                            shrinkWrap: true,
+                            loadingBuilder: (BuildContext context) {
+                              return Container(
+                                width: 400,
+                                height: 400,
+                                child: FlareActor("assets/images/counter.flr",
+                                    alignment: Alignment.center,
+                                    fit: BoxFit.cover,
+                                    isPaused: getIt<TransactionProvider>()
+                                        .transactionsDataLoaded,
+                                    animation: "play"),
+                              );
+                            },
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+                            itemBuilder: (BuildContext context, dynamic entry,
+                                int index) {
+                              return AnimatedCard(
+                                direction: AnimatedCardDirection.left,
+                                initDelay: const Duration(milliseconds: 0),
+                                duration: const Duration(seconds: 1),
+                                curve: Curves.ease,
+                                child: collectionBuilder(
+                                    entry as SingleCollection),
+                              );
+                            },
+                            pageLoadController: getIt<TransactionProvider>()
+                                .pagewiseCollectionController,
+                            noItemsFoundBuilder: (BuildContext context) {
+                              return noItemFound;
+                            },
+                          )
+                        ],
+                      ),
                     ),
                   )
                 ],
@@ -648,8 +549,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                         target: LatLng(lat, long),
                         zoom: 13,
                       ),
-                      onCameraMove: (CameraPosition pos) {
-                      },
+                      onCameraMove: (CameraPosition pos) {},
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0, bottom: 69),
@@ -997,21 +897,17 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                FlatButton(
-                  onPressed: () async {
-                    sendMail(transaction);
-                  },
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: <Widget>[
-                      Text(trans(context, "share"), style: styles.mybluestyle),
-                      const Icon(Icons.share, size: 20)
-                    ],
-                  ),
-                )
-              ],
+            FlatButton(
+              onPressed: () async {
+                sendMail(transaction);
+              },
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Text(trans(context, "share"), style: styles.mybluestyle),
+                  const Icon(Icons.share, size: 20)
+                ],
+              ),
             ),
             Row(
               children: <Widget>[

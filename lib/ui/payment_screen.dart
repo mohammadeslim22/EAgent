@@ -40,22 +40,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ? widget.transOrCollection == 0 ? "order" : "return"
         : "";
     _ben = getIt<GlobalVars>().getbenInFocus();
-    //  _transaction = getIt<TransactionProvider>().lastTransaction;
     final String temp = getIt<OrderListProvider>().sumTotal.toString();
     paymentAmountController.text = "$temp  ";
     paymentCashController.text = "$temp  ";
     paymentCashController.selection =
         TextSelection(baseOffset: 0, extentOffset: temp.length);
-    // if (_transaction != null) {
-    //   if (_transaction.beneficiaryId == _ben.id &&
-    //       _transaction.type == "return" &&
-    //       _type == "order") {
-    //     paymentDeptController.text = widget.returnValue;
-    //   }
-    // } else {
+ 
     paymentDeptController.text =
         _type == "order" ? _deptValue : widget.returnValue;
-    //  }
+ 
   }
 
   @override
@@ -66,67 +59,69 @@ class _PaymentScreenState extends State<PaymentScreen> {
         title: Text(trans(context, 'altariq')),
         centerTitle: true,
       ),
-      body: Column(
+      body: ListView(
         children: <Widget>[
           const Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Card(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Container(
-                  padding:
+              Expanded(
+                child: Card(
+                  margin:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  width: MediaQuery.of(context).size.width / 2.25,
-                  height: MediaQuery.of(context).size.height / 1.5,
-                  child: Column(
-                    children: <Widget>[
-                      SvgPicture.asset("assets/images/payment.svg"),
-                      Text(trans(context, 'choose_payment_method'),
-                          style: styles.underHeadblack),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          RadioListTile<int>(
-                            secondary: SvgPicture.asset(
-                                "assets/images/cash_Icon.svg",
-                                height: 100),
-                            value: 0,
-                            activeColor: Colors.green,
-                            groupValue: groupValue,
-                            onChanged: (int t) {
-                              setState(() {
-                                patmentTypeCash = true;
-                                groupValue = t;
-                              });
-                            },
-                            title: Text(
-                              trans(context, 'cash_payment'),
-                              style: styles.smallButtonactivated,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    width: MediaQuery.of(context).size.width / 2.25,
+                    height: MediaQuery.of(context).size.height / 1.5,
+                    child: Column(
+                      children: <Widget>[
+                        SvgPicture.asset("assets/images/payment.svg"),
+                        Text(trans(context, 'choose_payment_method'),
+                            style: styles.underHeadblack),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            RadioListTile<int>(
+                              secondary: SvgPicture.asset(
+                                  "assets/images/cash_Icon.svg",
+                                  height: 100),
+                              value: 0,
+                              activeColor: Colors.green,
+                              groupValue: groupValue,
+                              onChanged: (int t) {
+                                setState(() {
+                                  patmentTypeCash = true;
+                                  groupValue = t;
+                                });
+                              },
+                              title: Text(
+                                trans(context, 'cash_payment'),
+                                style: styles.smallButtonactivated,
+                              ),
                             ),
-                          ),
-                          RadioListTile<int>(
-                            secondary: SvgPicture.asset(
-                                "assets/images/card_Icon.svg",
-                                height: 90),
-                            value: 1,
-                            activeColor: Colors.green,
-                            groupValue: groupValue,
-                            onChanged: (int t) {
-                              setState(() {
-                                patmentTypeCash = false;
-                                groupValue = t;
-                              });
-                            },
-                            title: Text(
-                              trans(context, 'card_payment'),
-                              style: styles.smallButtonactivated,
+                            RadioListTile<int>(
+                              secondary: SvgPicture.asset(
+                                  "assets/images/card_Icon.svg",
+                                  height: 90),
+                              value: 1,
+                              activeColor: Colors.green,
+                              groupValue: groupValue,
+                              onChanged: (int t) {
+                                setState(() {
+                                  patmentTypeCash = false;
+                                  groupValue = t;
+                                });
+                              },
+                              title: Text(
+                                trans(context, 'card_payment'),
+                                style: styles.smallButtonactivated,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -200,7 +195,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               return "";
                             },
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                           TextFormField(
                               readOnly: true,
                               keyboardType: TextInputType.number,
@@ -236,7 +231,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   prefixIcon: const Icon(Icons.attach_money),
                                   prefix:
                                       Text(trans(context, 'cash_rquired')))),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                           TextFormField(
                             readOnly: true,
                             keyboardType: TextInputType.number,
@@ -344,8 +339,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ),
                         color: Colors.green,
                         onPressed: () async {
-                          //  showAWAITINGSENDOrderTruck();
+                          showAWAITINGSENDOrderTruck();
                           if (widget.transOrCollection == 2) {
+                            print("يا رب ساعدني ");
                             if (await getIt<OrderListProvider>().sendCollection(
                                 context,
                                 _ben.id,
@@ -361,6 +357,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               //  Navigator.pop(context);
                             }
                           } else {
+                            print("يا رب ساعدني طب اوردر ؟");
                             if (await getIt<OrderListProvider>().sendOrder(
                                 context,
                                 _ben.id,
@@ -368,6 +365,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 double.parse(_deptValue).round(),
                                 _type,
                                 "confirmed")) {
+                              print("طب اشتغل الاوردر ؟");
                               setState(() {
                                 paymentAmountController.text = "00.00";
 
@@ -375,9 +373,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
                                 paymentDeptController.text = "00.00";
                               });
-                              //    Navigator.pop(context);
+                              Navigator.pop(context);
                             } else {
-                              //  Navigator.pop(context);
+                              Navigator.pop(context);
                             }
                           }
                         },

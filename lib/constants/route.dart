@@ -39,7 +39,7 @@ Route<PageController> onGenerateRoute(RouteSettings settings) {
       page = PageTransition<PageController>(
         child: OrderScreen(
             ben: args['ben'] as Ben,
-            isORderOrReturn: args['isORderOrReturn'] as bool),
+            isORderOrReturn: args['isORderOrReturn'] as bool,isAgentOrder:  args['isAgentOrder']as bool),
         type: PageTransitionType.rightToLeftWithFade,
       );
       break;
@@ -66,7 +66,7 @@ Route<PageController> onGenerateRoute(RouteSettings settings) {
       break;
           case "/Agent_Orders":
       page = PageTransition<PageController>(
-        child: const AgentOrders(),
+        child:  AgentOrders(expand: args['expand']as bool,width: args['width'] as double),
         type: PageTransitionType.rightToLeftWithFade,
       );
       break;

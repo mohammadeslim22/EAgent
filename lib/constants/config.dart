@@ -10,14 +10,10 @@ class Config {
 
   static final Config _config = Config._internal();
 
-   String baseUrl = "http://edisagents.altariq.ps/public/api/";
-  // String baseUrl = "http://space.co.ps/joker/api/ar/v1/customer/";
-
-  String onesignal = "bc4208c6-1-48c0-b4d5-390029a340dc"; // ca9a
-
-  String countryCode = '+970';
-
-  bool looded=false;
+    String baseUrl = "http://edisagents.altariq.ps/public/api/";
+ // String baseUrl = "http://192.168.0.25:8000/api/";
+  int agentId;
+  bool looded = false;
   final TextEditingController locationController = TextEditingController();
   Address first;
   Coordinates coordinates;
