@@ -10,7 +10,7 @@ class Config {
 
   static final Config _config = Config._internal();
 
-    String baseUrl = "http://edisagents.altariq.ps/public/api/";
+    String baseUrl = "http://edisagents2.altariq.ps/public/api/";
  // String baseUrl = "http://192.168.0.25:8000/api/";
   int agentId;
   bool looded = false;

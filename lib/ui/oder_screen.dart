@@ -3,6 +3,7 @@ import 'package:agent_second/constants/styles.dart';
 import 'package:agent_second/localization/trans.dart';
 import 'package:agent_second/models/Items.dart';
 import 'package:agent_second/models/ben.dart';
+import 'package:agent_second/providers/export.dart';
 import 'package:agent_second/util/service_locator.dart';
 import 'package:agent_second/widgets/delete_tarnsaction_dialog.dart';
 import 'package:agent_second/widgets/text_form_input.dart';
@@ -30,7 +31,6 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   int indexedStackId = 0;
-  double totalPrice;
   Ben ben;
   bool isORderOrReturn;
   double animatedHight = 0;
@@ -70,7 +70,7 @@ class _OrderScreenState extends State<OrderScreen> {
             Row(
               children: <Widget>[
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8.0),
                       border: Border.all(width: 1.0, color: Colors.green)),
@@ -82,11 +82,11 @@ class _OrderScreenState extends State<OrderScreen> {
                 )
               ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             CachedNetworkImage(
               fit: BoxFit.cover,
-              width: 70,
-              height: 40,
+              width: 60,
+              height: 25,
               imageUrl: (item.image != "null")
                   ? "http://edisagents.altariq.ps/public/image/${item.image}"
                   : "",
@@ -96,13 +96,15 @@ class _OrderScreenState extends State<OrderScreen> {
               errorWidget: (BuildContext context, String url, dynamic error) =>
                   const Icon(Icons.error),
             ),
-            Flexible(
+            const SizedBox(height: 2),
+            Expanded(
               child: Text(
                 item.name,
                 style: styles.smallItembluestyle,
                 textAlign: TextAlign.center,
               ),
             ),
+            //const Spacer(),
             Text(item.unitPrice.toString(), style: styles.mystyle),
           ],
         ),
@@ -120,8 +122,10 @@ class _OrderScreenState extends State<OrderScreen> {
       getIt<OrderListProvider>().indexedStack = 0;
       getIt<OrderListProvider>().getItems();
     }
+    //   c = context;
   }
 
+//  BuildContext c;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,17 +134,17 @@ class _OrderScreenState extends State<OrderScreen> {
         backgroundColor: !widget.isAgentOrder
             ? isORderOrReturn ? colors.blue : colors.red
             : colors.blue,
-        title: Text(trans(context, "altariq")),
+        title: Text(trans(context, "altariq"), style: styles.appBar),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        // ),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.refresh, size: 32),
+            icon: const Icon(Icons.refresh, size: 16),
             onPressed: () {
               getIt<OrderListProvider>().getItems();
             },
@@ -148,13 +152,13 @@ class _OrderScreenState extends State<OrderScreen> {
           Row(
             children: <Widget>[
               IconButton(
-                  icon: const Icon(Icons.delete, size: 36),
+                  icon: const Icon(Icons.delete, size: 16),
                   onPressed: () {
                     cacelTransaction(false);
                   }),
               Container(
                 margin: const EdgeInsets.only(top: 2, right: 6, left: 6),
-                width: 300,
+                width: 200,
                 child: TextFormInput(
                   text: trans(context, 'type'),
                   cController: searchController,
@@ -197,13 +201,13 @@ class _OrderScreenState extends State<OrderScreen> {
                         if (orderProvider.itemsDataLoaded)
                           GridView.count(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 12),
+                                  horizontal: 6, vertical: 12),
                               physics: const ScrollPhysics(),
                               shrinkWrap: true,
                               primary: true,
-                              crossAxisSpacing: 3,
-                              mainAxisSpacing: 3,
-                              crossAxisCount: 5,
+                              crossAxisSpacing: 4,
+                              mainAxisSpacing: 1,
+                              crossAxisCount: 6,
                               childAspectRatio: .7,
                               addRepaintBoundaries: true,
                               children: orderProvider.itemsList
@@ -240,6 +244,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                               imageUrl: (item.image != "null")
                                                   ? "http://edisagents.altariq.ps/public/image/${item.image}"
                                                   : "",
+                                              height: 30,
+                                              width: 50,
                                               progressIndicatorBuilder:
                                                   (BuildContext context,
                                                           String url,
@@ -258,7 +264,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                             Material(
                                                 color: Colors.transparent,
                                                 textStyle:
-                                                    styles.angrywhitestyle,
+                                                    styles.smallItembluestyle,
                                                 child: Text(item.name)),
                                           ],
                                         ),
@@ -279,9 +285,9 @@ class _OrderScreenState extends State<OrderScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
                   margin:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                   decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       color: Colors.grey[300]),
@@ -329,13 +335,13 @@ class _OrderScreenState extends State<OrderScreen> {
                     child: Stack(
                       children: <Widget>[
                         Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            const SizedBox(height: 50),
+                            const SizedBox(height: 36),
                             Center(
                               child: Text(
                                 trans(context, 'drage_here'),
-                                style: styles.angrywhitestyle,
+                                style: styles.dargHereStyle,
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -395,7 +401,7 @@ class _OrderScreenState extends State<OrderScreen> {
                               OrderListProvider value, Widget child) {
                             return GridView.count(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 12),
+                                    horizontal: 6, vertical: 2),
                                 physics: const ScrollPhysics(),
                                 shrinkWrap: true,
                                 primary: true,
@@ -440,28 +446,28 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  void showUnitDialog(SingleItem item) {
-    showGeneralDialog<dynamic>(
-      barrierLabel: "Label",
-      barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(0.73),
-      transitionDuration: const Duration(milliseconds: 350),
-      context: context,
-      pageBuilder: (BuildContext context, Animation<double> anim1,
-          Animation<double> anim2) {
-        return UnitsCooficientsDialog(item: item);
-      },
-      transitionBuilder: (BuildContext context, Animation<double> anim1,
-          Animation<double> anim2, Widget child) {
-        return SlideTransition(
-          position:
-              Tween<Offset>(begin: const Offset(0, 1), end: const Offset(0, 0))
-                  .animate(anim1),
-          child: child,
-        );
-      },
-    );
-  }
+  // void showUnitDialog(SingleItem item) {
+  //   showGeneralDialog<dynamic>(
+  //     barrierLabel: "Label",
+  //     barrierDismissible: true,
+  //     barrierColor: Colors.black.withOpacity(0.73),
+  //     transitionDuration: const Duration(milliseconds: 350),
+  //     context: context,
+  //     pageBuilder: (BuildContext context, Animation<double> anim1,
+  //         Animation<double> anim2) {
+  //       return UnitsCooficientsDialog(item: item);
+  //     },
+  //     transitionBuilder: (BuildContext context, Animation<double> anim1,
+  //         Animation<double> anim2, Widget child) {
+  //       return SlideTransition(
+  //         position:
+  //             Tween<Offset>(begin: const Offset(0, 1), end: const Offset(0, 0))
+  //                 .animate(anim1),
+  //         child: child,
+  //       );
+  //     },
+  //   );
+  // }
 
   Widget cartItem(SingleItemForSend item) {
     return Card(
@@ -470,12 +476,14 @@ class _OrderScreenState extends State<OrderScreen> {
           borderRadius: BorderRadius.circular(8.0)),
       color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            // const SizedBox(height: 2),
             Text(item.name, style: styles.typeNameinOrderScreen),
-            const SizedBox(height: 12),
+            const Spacer(),
+            //   const SizedBox(height: 2),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -484,8 +492,8 @@ class _OrderScreenState extends State<OrderScreen> {
                   child: Row(
                     children: <Widget>[
                       Container(
-                        height: 40,
-                        width: 40,
+                        height: 25,
+                        width: 25,
                         clipBehavior: Clip.hardEdge,
                         decoration: const BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(120)),
@@ -507,7 +515,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     children: <Widget>[
                       CircleAvatar(
                         backgroundColor: Colors.blue[700],
-                        radius: 16,
+                        radius: 12,
                         child: IconButton(
                           padding: EdgeInsets.zero,
                           icon: const Icon(Icons.add),
@@ -520,7 +528,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       ),
                       InkWell(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: Text(item.queantity.toString(),
                               style: styles.mystyle),
                         ),
@@ -530,7 +538,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       ),
                       CircleAvatar(
                         backgroundColor: Colors.blue[700],
-                        radius: 16,
+                        radius: 12,
                         child: IconButton(
                           padding: EdgeInsets.zero,
                           icon: const Icon(Icons.remove),
@@ -545,21 +553,27 @@ class _OrderScreenState extends State<OrderScreen> {
                   ),
                 ),
                 Expanded(
-                  flex: 1,
-                  child: FlatButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () {
-                      showUnitDialog(
-                          getIt<OrderListProvider>().getItemForUnit(item.id));
-                    },
+                    flex: 1,
                     child: Row(
                       children: <Widget>[
                         Text(item.unit,
                             style: styles.mystyle, textAlign: TextAlign.start),
                       ],
+                    )
+                    // child: FlatButton(
+                    //   padding: EdgeInsets.zero,
+                    //   onPressed: () {
+                    //     showUnitDialog(
+                    //         getIt<OrderListProvider>().getItemForUnit(item.id));
+                    //   },
+                    //   child: Row(
+                    //     children: <Widget>[
+                    //       Text(item.unit,
+                    //           style: styles.mystyle, textAlign: TextAlign.start),
+                    //     ],
+                    //   ),
+                    // ),
                     ),
-                  ),
-                ),
                 Expanded(
                   child: Text(item.unitPrice,
                       style: styles.mystyle, textAlign: TextAlign.center),
@@ -587,7 +601,7 @@ class _OrderScreenState extends State<OrderScreen> {
           Card(
             color: Colors.grey,
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -599,12 +613,12 @@ class _OrderScreenState extends State<OrderScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 Container(
-                  width: 160,
+                  width: 110,
                   child: RaisedButton(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
@@ -624,42 +638,30 @@ class _OrderScreenState extends State<OrderScreen> {
                                 flareFit: BoxFit.cover,
                                 entryAnimation: EntryAnimation.TOP,
                                 onOkButtonPressed: () async {
-                                  sendTransFunction(
-                                      widget.isAgentOrder, "draft");
-                                  value.clearOrcerList();
-                                  // if (widget.isAgentOrder) {
-                                  //   if (await getIt<OrderListProvider>()
-                                  //           .sendAgentOrder(
-                                  //               context,
-                                  //               getIt<OrderListProvider>()
-                                  //                   .sumTotal
-                                  //                   .round(),
-                                  //               0,
-                                  //               "preorder",
-                                  //               "draft") !=
-                                  //       null) {
-                                  //     Navigator.pop(context);
-                                  //     Navigator.pop(context);
-                                  //     value.clearOrcerList();
-                                  //   } else {}
-                                  // } else {
-                                  //   if (await getIt<OrderListProvider>()
-                                  //       .sendOrder(
-                                  //           context,
-                                  //           ben.id,
-                                  //           getIt<OrderListProvider>()
-                                  //               .sumTotal
-                                  //               .round(),
-                                  //           0,
-                                  //           isORderOrReturn
-                                  //               ? "order"
-                                  //               : "return",
-                                  //           "draft")) {
-                                  //     Navigator.pop(context);
-                                  //     Navigator.pop(context);
-                                  //     value.clearOrcerList();
-                                  //   } else {}
-                                  // }
+                                  Navigator.pop(context);
+                                  awaitTransaction();
+                                  if (await sendTransFunction(
+                                      context, widget.isAgentOrder, "draft")) {
+                                    Navigator.pop(context);
+                                  } else {
+                                    final SnackBar snackBar = SnackBar(
+                                      content: Text(
+                                          trans(context,
+                                              "some_items_quantities are more than_u_have"),
+                                          style: styles.angrywhitestyle),
+                                      duration:
+                                          const Duration(milliseconds: 700),
+                                      action: SnackBarAction(
+                                          label: trans(context, 'ok'),
+                                          onPressed: () {
+                                            Scaffold.of(context)
+                                                .hideCurrentSnackBar();
+                                          }),
+                                      backgroundColor: const Color(0xFF3B3B3B),
+                                    );
+                                    Scaffold.of(context).showSnackBar(snackBar);
+                                  }
+                                  Navigator.pop(context);
                                 },
                               ));
                     },
@@ -669,33 +671,141 @@ class _OrderScreenState extends State<OrderScreen> {
                 ),
                 const SizedBox(width: 32),
                 Container(
-                  width: 160,
+                  width: 110,
                   child: RaisedButton(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     color: colors.blue,
                     onPressed: () async {
-                      sendTransFunction(widget.isAgentOrder, "confirm");
-                      value.clearOrcerList();
-                      // if (widget.isAgentOrder) {
-                      //   if (await getIt<OrderListProvider>().sendAgentOrder(
-                      //           context,
-                      //           getIt<OrderListProvider>().sumTotal.round(),
-                      //           0,
-                      //           "preorder",
-                      //           "confirmed") !=
-                      //       null) {
-                      //     Navigator.pop(context);
-                      //     Navigator.pop(context);
-                      //     value.clearOrcerList();
-                      //   } else {}
-                      // } else {
-                      //   Navigator.pushNamed(context, "/Payment_Screen",
-                      //       arguments: <String, dynamic>{
-                      //         "transOrCollection": isORderOrReturn ? 0 : 1
-                      //       });
-                      // }
+                      !widget.isAgentOrder
+                          ? showDialog<dynamic>(
+                              context: context,
+                              builder: (BuildContext contex) => AlertDialog(
+                                titlePadding: EdgeInsets.zero,
+                                contentPadding: EdgeInsets.zero,
+                                actionsPadding: EdgeInsets.zero,
+                                buttonPadding: EdgeInsets.zero,
+                                insetPadding: EdgeInsets.zero,
+                                title: Image.asset(
+                                    "assets/images/movingcloud.gif",
+                                    height: 200.0,
+                                    width: 400.0,
+                                    fit: BoxFit.cover),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    const SizedBox(height: 8),
+                                    Text(trans(context, 'confirm_or_pay'),
+                                        style: styles.typeOrderScreen,
+                                        textAlign: TextAlign.center),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: <Widget>[
+                                        FlatButton(
+                                          color: Colors.pink,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(18.0),
+                                          ),
+                                          onPressed: () async {
+                                            Navigator.pop(context);
+                                            //  awaitTransaction();
+                                            if (await sendTransFunction(
+                                                context,
+                                                widget.isAgentOrder,
+                                                "confirmed")) {
+                                              Navigator.pop(context);
+                                            } else {
+                                              final SnackBar snackBar =
+                                                  SnackBar(
+                                                content: Text(
+                                                    trans(context,
+                                                        "some_items_quantities are more than_u_have"),
+                                                    style:
+                                                        styles.angrywhitestyle),
+                                                backgroundColor:
+                                                    const Color(0xFF3B3B3B),
+                                              );
+                                              Scaffold.of(context)
+                                                  .showSnackBar(snackBar);
+                                            }
+                                          },
+                                          child: Text(
+                                              trans(context, 'other_confirm'),
+                                              style: styles.screenOrderDialoge),
+                                        ),
+                                        FlatButton(
+                                          color: Colors.grey,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(18.0),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            Navigator.pushNamed(
+                                                context, "/Payment_Screen",
+                                                arguments: <String, dynamic>{
+                                                  "orderTotal": isORderOrReturn
+                                                      ? getIt<OrderListProvider>()
+                                                          .sumTotal
+                                                      : 0.0,
+                                                  "returnTotal": isORderOrReturn
+                                                      ? 0.0
+                                                      : getIt<OrderListProvider>()
+                                                          .sumTotal,
+                                                  "orderOrRetunOrCollection": 0
+                                                });
+                                          },
+                                          child: Text(
+                                              trans(context, 'confirm&pay'),
+                                              style: styles.screenOrderDialoge),
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
+                                // titleTextStyle: styles.darkbluestyle,
+                              ),
+                              //     FancyDialog(
+                              //   title: trans(context, 'confirm_or_pay'),
+                              //   cancel: trans(context, 'confirm&pay'),
+                              //   ok: trans(context, 'other_confirm'),
+
+                              //   cancelFun: () {
+                              //     print("ok what ? $isORderOrReturn");
+                              //     Navigator.pop(context);
+                              //     print("ok what ? 1");
+                              //     Navigator.pushNamed(
+                              //         context, "/Payment_Screen",
+                              //         arguments: <String, dynamic>{
+                              //           "orderTotal": ben.totalOrders,
+                              //           "returnTotal": ben.totalReturns,
+                              //           "orderOrRetunOrCollection": 0
+                              //         });
+                              //     print("ok what ? 2");
+                              //   },
+                              //   okFun: () async {
+                              //  //   awaitTransaction();
+                              //     await sendTransFunction(
+                              //         widget.isAgentOrder, "confirmed");
+                              //   //  Navigator.pop(context);
+                              //     value.clearOrcerList();
+                              //   },
+                              //   gifPath: FancyGif.MOVE_FORWARD,
+                              //   descreption: trans(context, 'confirm_or_pay'),
+                              // ),
+                            )
+                          : () async {
+                              // Navigator.pop(context);
+                              awaitTransaction();
+                              await sendTransFunction(
+                                  context, widget.isAgentOrder, "confirmed");
+                              // Navigator.pop(context);
+                              value.clearOrcerList();
+                            };
                     },
                     child: Text(
                         widget.isAgentOrder
@@ -708,7 +818,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 ),
                 const SizedBox(width: 32),
                 Container(
-                  width: 160,
+                  width: 110,
                   child: RaisedButton(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
@@ -729,30 +839,23 @@ class _OrderScreenState extends State<OrderScreen> {
     });
   }
 
-  Future<void> sendTransFunction(bool agentOrBen, String status) async {
+  Future<bool> sendTransFunction(
+      BuildContext c, bool agentOrBen, String status) async {
     if (agentOrBen) {
-      if (await getIt<OrderListProvider>().sendAgentOrder(
-              context,
-              getIt<OrderListProvider>().sumTotal.round(),
-              0,
-              "preorder",
-              status) !=
-          null) {
-        Navigator.pop(context);
-        Navigator.pop(context);
-      } else {}
+      bool res;
+      res = await getIt<OrderListProvider>().sendAgentOrder(context,
+          getIt<OrderListProvider>().sumTotal.round(), 0, "preorder", status);
+      Navigator.pop(context);
+      Navigator.pop(context);
+      return res;
     } else {
-      if (await getIt<OrderListProvider>().sendOrder(
-              context,
-              ben.id,
-              getIt<OrderListProvider>().sumTotal.round(),
-              0,
-              isORderOrReturn ? "order" : "return",
-              status) !=
-          null) {
-        Navigator.pop(context);
-        Navigator.pop(context);
-      } else {}
+      return await getIt<OrderListProvider>().sendOrder(
+          context,
+          ben.id,
+          getIt<OrderListProvider>().sumTotal.round(),
+          0,
+          isORderOrReturn ? "order" : "return",
+          status);
     }
   }
 
@@ -766,6 +869,26 @@ class _OrderScreenState extends State<OrderScreen> {
         pageBuilder: (BuildContext context, Animation<double> anim1,
             Animation<double> anim2) {
           return TransactionDeleteDialog(downCacel: downCacel, c: context);
+        });
+  }
+
+  void awaitTransaction() {
+    showGeneralDialog<dynamic>(
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(0.73),
+        transitionDuration: const Duration(milliseconds: 350),
+        context: context,
+        pageBuilder: (BuildContext context, Animation<double> anim1,
+            Animation<double> anim2) {
+          return Container(
+            height: 600,
+            width: 600,
+            child: const FlareActor("assets/images/Animatedorb.flr",
+                alignment: Alignment.center,
+                fit: BoxFit.cover,
+                isPaused: false,
+                animation: "Aura"),
+          );
         });
   }
 

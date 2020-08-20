@@ -20,10 +20,7 @@ class _LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
   bool _isButtonEnabled = true;
   static List<String> validators = <String>[null, null];
-  static List<String> keys = <String>[
-    'username',
-    'password',
-  ];
+  static List<String> keys = <String>['username', 'password'];
   Map<String, String> validationMap =
       Map<String, String>.fromIterables(keys, validators);
 
@@ -83,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen>
                   }
                   return validationMap['username'];
                 }),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
             TextFormInput(
                 text: trans(context, 'pin_code'),
                 cController: passwordController,
@@ -134,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen>
           child: Stack(
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.all(64.0),
+                padding: const EdgeInsets.all(32.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -148,15 +145,15 @@ class _LoginScreenState extends State<LoginScreen>
                           children: <Widget>[
                             SvgPicture.asset(
                               'assets/images/welcomeback.svg',
-                              width: 120.0,
-                              height: 120.0,
+                              width: 80.0,
+                              height: 80.0,
                             ),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 24),
                             Text(trans(context, 'welcome_back'),
                                 textAlign: TextAlign.center,
                                 style: styles.mystyle2),
                             customcard(context),
-                            const SizedBox(height: 48),
+                            const SizedBox(height: 16),
                             Padding(
                               padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
                               child: RaisedButton(
@@ -213,14 +210,14 @@ class _LoginScreenState extends State<LoginScreen>
                         children: <Widget>[
                           SvgPicture.asset(
                             'assets/images/company_logo.svg',
-                            width: 120.0,
-                            height: 120.0,
+                            width: 80.0,
+                            height: 80.0,
                           ),
-                          const SizedBox(height: 96),
+                          const SizedBox(height: 64),
                           SvgPicture.asset(
                             'assets/images/mainLogo.svg',
-                            width: 320.0,
-                            height: 320.0,
+                            width: 240.0,
+                            height: 240.0,
                           ),
                         ],
                       ),
@@ -228,10 +225,10 @@ class _LoginScreenState extends State<LoginScreen>
                   ],
                 ),
               ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Text("ALTARIQ Systems & Projects",
-                        style: styles.underHeadwhite)),
+              Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Text("ALTARIQ Systems & Projects",
+                      style: styles.underHeadwhite)),
             ],
           ),
         ));

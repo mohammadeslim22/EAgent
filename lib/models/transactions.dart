@@ -1,3 +1,5 @@
+
+
 class Transactions {
   Transactions({this.transactions});
 
@@ -45,7 +47,7 @@ class Transaction {
     beneficiary = json['beneficiary'].toString();
     beneficiaryId = json['beneficiary_id'] as int;
     agent = json['agent'].toString();
-    transDate = json['trans_date'].toString();
+    transDate = json['transaction_date'].toString();
     address = json['address'].toString();
     vehicleId = json['vehicle_id'] as int;
     status = json['status'].toString();
@@ -62,6 +64,7 @@ class Transaction {
         details.add(MiniItems.fromJson(v));
       });
     }
+ 
   }
 
   dynamic toJson() {

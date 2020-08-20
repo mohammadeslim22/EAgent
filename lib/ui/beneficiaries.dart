@@ -35,12 +35,12 @@ class _BeneficiariesState extends State<Beneficiaries> {
     final GlobalVars globalVarsProv = Provider.of<GlobalVars>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(trans(context, "altariq")),
+        title: Text(trans(context, "altariq"), style: styles.appBar),
         centerTitle: true,
         actions: <Widget>[
           Container(
             margin: const EdgeInsets.fromLTRB(0, 2, 0, 0),
-            width: 300,
+            width: 240,
             child: TextFormInput(
               text: trans(context, 'ben_name'),
               cController: searchController,
@@ -59,7 +59,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
       ),
       drawer: GlobalDrawer(sourceContext: context),
       body: GridView.count(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           physics: const ScrollPhysics(),
           shrinkWrap: true,
           primary: true,
@@ -68,7 +68,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
           crossAxisCount: 3,
           childAspectRatio: 2,
           addRepaintBoundaries: true,
-          children:globalVarsProv.beneficiaries.data.where((Ben element) {
+          children: globalVarsProv.beneficiaries.data.where((Ben element) {
             return element.name
                 .trim()
                 .toLowerCase()
@@ -88,7 +88,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                   });
                 },
                 child: Container(
-                  margin: const EdgeInsets.fromLTRB(12, 6, 12, 6),
+                  margin: const EdgeInsets.fromLTRB(6, 2, 6, 0),
                   child: Column(
                     children: <Widget>[
                       Row(
@@ -98,11 +98,10 @@ class _BeneficiariesState extends State<Beneficiaries> {
                             children: <Widget>[
                               Text(item.id.toString(),
                                   style: styles.beneficires),
-                              const SizedBox(
-                                height: 32,
-                              ),
+                              const SizedBox(height: 6),
                               IconButton(
-                                icon: const Icon(Icons.phone_forwarded),
+                                icon:
+                                    const Icon(Icons.phone_forwarded, size: 12),
                                 color: Colors.green,
                                 onPressed: () {},
                               )
@@ -111,10 +110,8 @@ class _BeneficiariesState extends State<Beneficiaries> {
                           const SizedBox(width: 6),
                           Expanded(
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
                                 Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Expanded(
                                       child: Text(item.name,
@@ -123,15 +120,14 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                   ],
                                 ),
                                 Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Text(item.address,
-                                        style: styles.underHeadgray),
+                                    Expanded(
+                                      child: Text(item.address,
+                                          style: styles.underHeadgray),
+                                    ),
                                   ],
                                 ),
                                 Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
                                     Text(item.phone,
                                         style: styles.underHeadgray),
@@ -140,7 +136,12 @@ class _BeneficiariesState extends State<Beneficiaries> {
                               ],
                             ),
                           ),
-                          if (item.visited) SvgPicture.asset("assets/images/visitedsign.svg") else SvgPicture.asset("assets/images/unvisitedBen.svg"),
+                          if (item.visited)
+                            SvgPicture.asset("assets/images/visitedsign.svg",
+                                width: 40, height: 40)
+                          else
+                            SvgPicture.asset("assets/images/unvisitedBen.svg",
+                                width: 40, height: 40),
                         ],
                       ),
                       const Divider(),
@@ -148,8 +149,9 @@ class _BeneficiariesState extends State<Beneficiaries> {
                         Expanded(
                           child: Container(
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 32),
+                                  const EdgeInsets.symmetric(horizontal: 12,vertical: 6),
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   InkWell(
                                     splashColor: Colors.transparent,
@@ -168,7 +170,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                     },
                                     child: SvgPicture.asset(
                                         "assets/images/orderButton.svg",
-                                        height: 90),
+                                        height: 50),
                                   ),
                                   InkWell(
                                     splashColor: Colors.transparent,
@@ -186,7 +188,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                     },
                                     child: SvgPicture.asset(
                                         "assets/images/returnButton.svg",
-                                        height: 90),
+                                        height: 50),
                                   ),
                                   InkWell(
                                     splashColor: Colors.transparent,
@@ -204,7 +206,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                     },
                                     child: SvgPicture.asset(
                                         "assets/images/collectionButton.svg",
-                                        height: 90),
+                                        height: 50),
                                   )
                                 ],
                               )),
@@ -212,7 +214,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
                       else
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 0),
+                              horizontal: 16, vertical:0),
                           child: RaisedButton(
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(18.0),
@@ -226,7 +228,8 @@ class _BeneficiariesState extends State<Beneficiaries> {
                             },
                             color: colors.myBlue,
                             textColor: colors.white,
-                            child: Text(trans(context, 'view_more')),
+                            child: Text(trans(context, 'view_more'),
+                                style: styles.seeMOre),
                           ),
                         )
                     ],

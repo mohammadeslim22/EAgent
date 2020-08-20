@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import '../constants/config.dart';
 import 'package:location/location.dart';
 
-
 import 'service_locator.dart';
 
 Future<List<String>> getLocation() async {
@@ -52,15 +51,18 @@ Future<bool> get updateLocation async {
   return res;
 }
 
-Future<void> setDayLog(Response<dynamic> response) async {
- // final Response<dynamic> response = await dio.get<dynamic>("day_log");
-     final DailyLog daielyLog = DailyLog.fromJson(response.data);
-    getIt<GlobalVars>().setDailyLog(
-        daielyLog.tBeneficiariryCount.toString(),
-        daielyLog.orderCount.toString(),
-        daielyLog.totalOrderCount.toString(),
-        daielyLog.returnCount.toString(),
-        daielyLog.totalReturnCount.toString(),
-        daielyLog.collectionCount.toString(),
-        daielyLog.totalCollectionCount.toString());
+Future<void> setDayLog(Response<dynamic> response, int benId) async {
+  final DailyLog daielyLog = DailyLog.fromJson(response.data);
+  getIt<GlobalVars>().setDailyLog(
+      benId,
+      daielyLog.tBeneficiariryCount.toString(),
+      daielyLog.orderCount.toString(),
+      daielyLog.totalOrderCount.toString(),
+      daielyLog.returnCount.toString(),
+      daielyLog.totalReturnCount.toString(),
+      daielyLog.collectionCount.toString(),
+      daielyLog.totalCollectionCount.toString(),
+      daielyLog.benIds,
+      daielyLog.totalOrdered,
+      daielyLog.totalReturned);
 }

@@ -6,7 +6,6 @@ import 'package:agent_second/models/transactions.dart';
 import 'package:agent_second/providers/export.dart';
 import 'package:agent_second/util/service_locator.dart';
 import 'package:animated_card/animated_card.dart';
-import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -56,14 +55,16 @@ class _AgentOrdersState extends State<AgentOrders>
               icon: Icon(billIsOn ? Icons.last_page : Icons.code),
               onPressed: () {
                 setState(() {
-                  if (billIsOn) {
-                    container1width = MediaQuery.of(context).size.width;
-                    container2width = 0;
-                    billIsOn = false;
-                  } else {
-                    container1width = MediaQuery.of(context).size.width / 2;
-                    container2width = MediaQuery.of(context).size.width / 2;
-                    billIsOn = true;
+                  if (items != null) {
+                    if (billIsOn) {
+                      container1width = MediaQuery.of(context).size.width;
+                      container2width = 0;
+                      billIsOn = false;
+                    } else {
+                      container1width = MediaQuery.of(context).size.width / 2;
+                      container2width = MediaQuery.of(context).size.width / 2;
+                      billIsOn = true;
+                    }
                   }
                 });
               })
@@ -111,8 +112,6 @@ class _AgentOrdersState extends State<AgentOrders>
 
   Widget agentTransactionBuilder(
       BuildContext context, Transaction entry, int index) {
-   
-
     return Slidable(
         actionPane: const SlidableDrawerActionPane(),
         actionExtentRatio: 0.25,
@@ -133,7 +132,8 @@ class _AgentOrdersState extends State<AgentOrders>
                 getIt<OrderListProvider>().bringOrderToOrderScreen(entry);
                 Navigator.pushNamed(context, "/Order_Screen",
                     arguments: <String, dynamic>{
-                      // "isORderOrReturn": entry.type == "order"
+                      "isORderOrReturn": false,
+                      "isAgentOrder": true
                     });
               },
             )
@@ -147,7 +147,8 @@ class _AgentOrdersState extends State<AgentOrders>
                 getIt<OrderListProvider>().bringOrderToOrderScreen(entry);
                 Navigator.pushNamed(context, "/Order_Screen",
                     arguments: <String, dynamic>{
-                      //"isORderOrReturn": entry.type == "order"
+                      "isORderOrReturn": false,
+                      "isAgentOrder": true
                     });
               },
             ),
@@ -160,26 +161,10 @@ class _AgentOrdersState extends State<AgentOrders>
                 // TODO(Mohammad): dio dlete request
               },
             )
-          else
-            IconSlideAction(
-              caption: 'Return',
-              color: colors.red,
-              icon: Icons.keyboard_return,
-              onTap: () {
-                getIt<OrderListProvider>().setScreensToPop(3);
-                getIt<OrderListProvider>().bringOrderToOrderScreen(entry);
-                Navigator.pushNamed(context, "/Order_Screen",
-                    arguments: <String, dynamic>{
-                      //   "isORderOrReturn": entry.type == "return"
-                    });
-              },
-            ),
         ],
         child: FlatButton(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          color: index % 2 == 0
-              ? Colors.blue[100]
-              : Colors.transparent,
+          color: index % 2 == 0 ? Colors.blue[100] : Colors.transparent,
           onPressed: () {
             setState(() {
               container1width = MediaQuery.of(context).size.width / 2;

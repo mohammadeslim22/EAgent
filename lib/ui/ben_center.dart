@@ -18,6 +18,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class BeneficiaryCenter extends StatefulWidget {
@@ -40,8 +41,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
   Widget noItemFound;
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
-  int orderTransColorIndecator = 0;
-  int returnTransColorIndecator = 0;
+
   Future<void> _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
 
@@ -74,8 +74,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
     billIsOn = true;
     indexedStack = 0;
     noItemFound = Container(
-      width: 400,
-      height: 350,
+      width: 300,
+      height: 250,
       child: const FlareActor("assets/images/empty.flr",
           alignment: Alignment.center, fit: BoxFit.fill, animation: "default"),
     );
@@ -112,20 +112,37 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(trans(context, "altariq")),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            Consumer<GlobalVars>(
+              builder: (BuildContext context, GlobalVars value, Widget child) {
+                return Row(
+                  children: <Widget>[
+                    Text(trans(context, 'total_orders_confirmed') + "  ",
+                        style: styles.littleangrywhitestyle),
+                    Text(ben.totalOrders.toString(),
+                        style: styles.angrywhitestyle),
+                    const SizedBox(width: 24),
+                    Text(trans(context, 'total_return_confirmed') + "  ",
+                        style: styles.littleangrywhitestyle),
+                    Text(ben.totalReturns.toString(),
+                        style: styles.angrywhitestyle),
+                  ],
+                );
+              },
+            ),
+            Text(trans(context, "altariq"), style: styles.appBar),
+          ],
+        ),
         centerTitle: true,
-        actions: <Widget>[
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(trans(context, "ben_center"),
-                    style: styles.mywhitestyle),
-              ),
-            ],
-          ),
-        ],
+        // actions: <Widget>[
+        //   Padding(
+        //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+        //     child:
+        //         Text(trans(context, "ben_center"), style: styles.mywhitestyle),
+        //   ),
+        // ],
         automaticallyImplyLeading: true,
       ),
       body: SafeArea(
@@ -147,8 +164,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Icon(Icons.person_outline,
-                                  color: colors.blue, size: 40),
-                              const SizedBox(width: 16),
+                                  color: colors.blue, size: 20),
+                              const SizedBox(width: 8),
                               Text(ben.name, style: styles.beneficiresNmae)
                             ],
                           ),
@@ -158,8 +175,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Icon(Icons.location_on,
-                                  color: colors.blue, size: 30),
-                              const SizedBox(width: 16),
+                                  color: colors.blue, size: 20),
+                              const SizedBox(width: 8),
                               Text(ben.address, style: styles.underHeadgray)
                             ],
                           ),
@@ -174,8 +191,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Icon(Icons.call, color: colors.blue, size: 30),
-                              const SizedBox(width: 16),
+                              Icon(Icons.call, color: colors.blue, size: 20),
+                              const SizedBox(width: 8),
                               Text(
                                 trans(context, "mobile_number") +
                                     " : ${ben.phone}",
@@ -188,8 +205,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Icon(Icons.email, color: colors.blue, size: 30),
-                              const SizedBox(width: 16),
+                              Icon(Icons.email, color: colors.blue, size: 20),
+                              const SizedBox(width: 8),
                               Text(
                                 ben.email,
                                 style: styles.underHeadgray,
@@ -201,7 +218,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       const Spacer(),
                       IconButton(
                         icon: Icon(Icons.my_location,
-                            color: colors.blue, size: 40),
+                            color: colors.blue, size: 24),
                         onPressed: () {
                           location.getLocation().then((LocationData value) {
                             // TODO(MOHAMAMD): send location data to back end
@@ -210,14 +227,14 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       )
                     ],
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
                         Container(
-                          width: 160,
+                          width: 110,
                           child: RaisedButton(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.0),
@@ -236,9 +253,9 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                 style: styles.mywhitestyle),
                           ),
                         ),
-                        const SizedBox(width: 32),
+                        const SizedBox(width: 16),
                         Container(
-                          width: 160,
+                          width: 110,
                           child: RaisedButton(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.0),
@@ -261,7 +278,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                         ),
                         const SizedBox(width: 32),
                         Container(
-                          width: 160,
+                          width: 110,
                           child: RaisedButton(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.0),
@@ -271,7 +288,9 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                               getIt<OrderListProvider>().setScreensToPop(2);
                               Navigator.pushNamed(context, "/Payment_Screen",
                                   arguments: <String, dynamic>{
-                                    "transOrCollection": 2
+                                    "orderTotal": ben.totalOrders,
+                                    "returnTotal": ben.totalReturns,
+                                    "orderOrRetunOrCollection": 0
                                   });
                             },
                             child: Text(trans(context, "collection"),
@@ -287,7 +306,10 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       Text(trans(context, "show_chices"),
                           style: styles.mystyle),
                       Container(
-                        margin: const EdgeInsets.all(15.0),
+                        width: 50,
+                        height: 35,
+                        padding: EdgeInsets.zero,
+                        margin: const EdgeInsets.all(8.0),
                         decoration: BoxDecoration(
                             border: Border.all(
                                 color: indexedStack == 0
@@ -307,7 +329,9 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                 "assets/images/order_icon.svg")),
                       ),
                       Container(
-                        margin: const EdgeInsets.all(15.0),
+                        width: 50,
+                        height: 35,
+                        margin: const EdgeInsets.all(8.0),
                         decoration: BoxDecoration(
                             border: Border.all(
                                 color: indexedStack == 1
@@ -327,7 +351,9 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                 "assets/images/return_icon.svg")),
                       ),
                       Container(
-                        margin: const EdgeInsets.all(15.0),
+                        width: 50,
+                        height: 35,
+                        margin: const EdgeInsets.all(8.0),
                         decoration: BoxDecoration(
                             border: Border.all(
                                 color: indexedStack == 2
@@ -365,7 +391,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           border: Border.all(color: Colors.grey),
                           color: Colors.blue[400]),
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 4, 12),
+                        padding: const EdgeInsets.fromLTRB(16, 0, 4, 4),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -437,19 +463,20 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                 .pagewiseOrderController,
                             loadingBuilder: (BuildContext context) {
                               return Container(
-                                width: 400,
-                                height: 400,
+                                width: 200,
+                                height: 200,
                                 child: FlareActor("assets/images/counter.flr",
                                     alignment: Alignment.center,
-                                    fit: BoxFit.cover,
+                                    fit: BoxFit.fill,
                                     isPaused: getIt<TransactionProvider>()
                                         .transactionsDataLoaded,
                                     animation: "play"),
                               );
                             },
-                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                             itemBuilder: (BuildContext context, dynamic entry,
                                 int index) {
+                                   getIt<TransactionProvider>().incrementOrders();
                               return AnimatedCard(
                                 direction: AnimatedCardDirection.left,
                                 initDelay: const Duration(milliseconds: 0),
@@ -470,17 +497,17 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                 .pagewiseReturnController,
                             loadingBuilder: (BuildContext context) {
                               return Container(
-                                width: 400,
-                                height: 400,
+                                width: 200,
+                                height: 200,
                                 child: FlareActor("assets/images/counter.flr",
                                     alignment: Alignment.center,
-                                    fit: BoxFit.cover,
+                                    fit: BoxFit.fill,
                                     isPaused: getIt<TransactionProvider>()
                                         .transactionsDataLoaded,
                                     animation: "play"),
                               );
                             },
-                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                             itemBuilder: (BuildContext context, dynamic entry,
                                 int index) {
                               return AnimatedCard(
@@ -501,11 +528,11 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             shrinkWrap: true,
                             loadingBuilder: (BuildContext context) {
                               return Container(
-                                width: 400,
-                                height: 400,
+                                width: 200,
+                                height: 200,
                                 child: FlareActor("assets/images/counter.flr",
                                     alignment: Alignment.center,
-                                    fit: BoxFit.cover,
+                                    fit: BoxFit.fill,
                                     isPaused: getIt<TransactionProvider>()
                                         .transactionsDataLoaded,
                                     animation: "play"),
@@ -542,12 +569,12 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                   children: <Widget>[
                     GoogleMap(
                       onMapCreated: _onMapCreated,
-                      padding: const EdgeInsets.only(bottom: 60),
+                      padding: const EdgeInsets.only(bottom: 6),
                       mapType: MapType.normal,
                       markers: Set<Marker>.of(markers.values),
                       initialCameraPosition: CameraPosition(
                         target: LatLng(lat, long),
-                        zoom: 13,
+                        zoom: 11,
                       ),
                       onCameraMove: (CameraPosition pos) {},
                     ),
@@ -630,7 +657,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
     BuildContext context,
     Transaction entry,
   ) {
-    orderTransColorIndecator++;
+   
     return Slidable(
         actionPane: const SlidableDrawerActionPane(),
         actionExtentRatio: 0.25,
@@ -664,7 +691,6 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
               icon: Icons.refresh,
               onTap: () {
                 getIt<OrderListProvider>().setScreensToPop(2);
-
                 getIt<OrderListProvider>().bringOrderToOrderScreen(entry);
                 Navigator.pushNamed(context, "/Order_Screen",
                     arguments: <String, dynamic>{
@@ -688,7 +714,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
               color: colors.red,
               icon: Icons.keyboard_return,
               onTap: () {
-                getIt<OrderListProvider>().setScreensToPop(3);
+                getIt<OrderListProvider>().setScreensToPop(2);
                 getIt<OrderListProvider>().bringOrderToOrderScreen(entry);
                 Navigator.pushNamed(context, "/Order_Screen",
                     arguments: <String, dynamic>{
@@ -698,41 +724,43 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
               },
             ),
         ],
-        child: FlatButton(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          color: orderTransColorIndecator % 2 == 0
+        child: Container(
+          color:getIt<TransactionProvider>().orderTransColorIndecator % 2 == 0
               ? Colors.blue[100]
-              : Colors.transparent,
-          onPressed: () {
-            setState(() {
-              items = entry.details;
-              billIsOn = false;
-              transaction = entry;
-            });
-          },
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Expanded(
-                  child: Text(entry.id.toString(),
-                      style: styles.mystyle, textAlign: TextAlign.start)),
-              Expanded(
-                  flex: 2, child: Text(entry.agent, style: styles.mystyle)),
-              Expanded(
-                  flex: 3,
-                  child: Text(entry.transDate,
-                      style: styles.mystyle, textAlign: TextAlign.center)),
-              Expanded(
-                flex: 1,
-                child: (entry.status == 'draft')
-                    ? Icon(Icons.edit, color: Colors.amber)
-                    : Container(),
-              ),
-              Expanded(
-                  child: Text(entry.amount.toString() + ".00",
-                      style: styles.mystyle, textAlign: TextAlign.end))
-            ],
+              : Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                items = entry.details;
+                billIsOn = false;
+                transaction = entry;
+              });
+            },
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Expanded(
+                    child: Text(entry.id.toString(),
+                        style: styles.mystyle, textAlign: TextAlign.start)),
+                Expanded(
+                    flex: 2, child: Text(entry.agent, style: styles.mystyle)),
+                Expanded(
+                    flex: 3,
+                    child: Text(entry.transDate,
+                        style: styles.mystyle, textAlign: TextAlign.center)),
+                Expanded(
+                  flex: 1,
+                  child: (entry.status == 'draft')
+                      ? Icon(Icons.edit, color: Colors.amber)
+                      : Container(),
+                ),
+                Expanded(
+                    child: Text(entry.amount.toString() + ".00",
+                        style: styles.mystyle, textAlign: TextAlign.end))
+              ],
+            ),
           ),
         ));
   }
@@ -789,22 +817,22 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               child: Row(
                 children: <Widget>[
                   Column(
                     children: <Widget>[
                       Text(trans(context, "name"), style: styles.mybluestyle),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                       Text(trans(context, "date"), style: styles.mybluestyle)
                     ],
                   ),
-                  const SizedBox(width: 32),
+                  const SizedBox(width: 24),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(ben.name, style: styles.mystyle),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -818,10 +846,9 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
             ),
             if (!billIsOn)
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                width: 130,
-                height: 130,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                width: 70,
+                height: 50,
                 child: Column(
                   children: <Widget>[
                     Expanded(
@@ -841,7 +868,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                     ),
                     Text(
                       trans(context, "back_to_map"),
-                      style: TextStyle(color: colors.black),
+                      style: TextStyle(color: colors.black, fontSize: 7),
                     )
                   ],
                 ),
@@ -854,31 +881,30 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
           child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: DataTable(
+                columnSpacing: 36,
                 columns: <DataColumn>[
                   DataColumn(
-                    label: Text(trans(context, 'item_id'),
-                        style: const TextStyle(fontStyle: FontStyle.italic)),
+                    label: Text(trans(context, '#'), style: styles.bill),
+                    numeric: true,
                   ),
                   DataColumn(
-                    label: Text(trans(context, 'product_name'),
-                        style: const TextStyle(fontStyle: FontStyle.italic)),
+                      label: Text(trans(context, 'product_name'),
+                          style: styles.bill)),
+                  DataColumn(
+                    label: Text(trans(context, 'quantity'), style: styles.bill),
+                    numeric: true,
                   ),
                   DataColumn(
-                    label: Text(trans(context, 'quantity'),
-                        style: const TextStyle(fontStyle: FontStyle.italic)),
+                      label: Text(trans(context, 'unit'), style: styles.bill)),
+                  DataColumn(
+                    label:
+                        Text(trans(context, 'unit_price'), style: styles.bill),
+                    numeric: true,
                   ),
                   DataColumn(
-                    label: Text(trans(context, 'unit'),
-                        style: const TextStyle(fontStyle: FontStyle.italic)),
-                  ),
-                  DataColumn(
-                    label: Text(trans(context, 'unit_price'),
-                        style: const TextStyle(fontStyle: FontStyle.italic)),
-                  ),
-                  DataColumn(
-                    label: Text(trans(context, 'total'),
-                        style: const TextStyle(fontStyle: FontStyle.italic)),
-                  ),
+                    label: Text(trans(context, 'total'), style: styles.bill),
+                    numeric: true,
+                  )
                 ],
                 rows: items.map((MiniItems e) {
                   return DataRow(cells: <DataCell>[

@@ -4,16 +4,12 @@ import 'dart:ui';
 import 'package:agent_second/constants/colors.dart';
 import 'package:agent_second/constants/config.dart';
 import 'package:agent_second/providers/global_variables.dart';
-import 'package:agent_second/util/data.dart';
-import 'package:agent_second/util/functions.dart';
 import 'package:agent_second/util/service_locator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:agent_second/localization/trans.dart';
-import 'package:agent_second/util/dio.dart';
 import 'package:agent_second/widgets/global_drawer.dart';
 import 'package:agent_second/constants/styles.dart';
-import 'package:dio/dio.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,20 +20,6 @@ import 'package:agent_second/models/ben.dart';
 
 class Home extends StatelessWidget {
   const Home({Key key}) : super(key: key);
-  Future<BeneficiariesModel> getBenData() async {
-    final Response<dynamic> response = await dio.get<dynamic>("beneficaries");
-    getIt<GlobalVars>().setBens(BeneficiariesModel.fromJson(response.data));
-    await Future<void>.delayed(const Duration(seconds: 3), () {});
-
-    getUserData();
-    config.agentId = int.parse(await data.getData("agent_id"));
-    return getIt<GlobalVars>().beneficiaries;
-  }
-
-  Future<void> getUserData() async {
-    final Response<dynamic> response = await dio.get<dynamic>("day_log");
-    setDayLog(response);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +28,7 @@ class Home extends StatelessWidget {
     }
     {
       return FutureBuilder<BeneficiariesModel>(
-        future: getBenData(),
+        future: getIt<GlobalVars>().getBenData(),
         builder:
             (BuildContext ctx, AsyncSnapshot<BeneficiariesModel> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
@@ -102,7 +84,7 @@ class _DashBoardState extends State<DashBoard> {
 
   Widget card(String picPath, String header, Widget widget) {
     return Container(
-      width: 206,
+      width: 156,
       child: Card(
         child: InkWell(
           onTap: () {},
@@ -114,12 +96,12 @@ class _DashBoardState extends State<DashBoard> {
               children: <Widget>[
                 SvgPicture.asset(
                   picPath,
-                  width: 120.0,
-                  height: 120.0,
+                  width: 60.0,
+                  height: 60.0,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 6),
                 Text(header, style: styles.underHead),
-                const SizedBox(height: 12),
+                const SizedBox(height: 6),
                 widget
               ],
             ),
@@ -183,7 +165,8 @@ class _DashBoardState extends State<DashBoard> {
             key: _scaffoldKey,
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
-                title: Text(trans(context, "altariq")), centerTitle: true),
+                title: Text(trans(context, "altariq"), style: styles.appBar),
+                centerTitle: true),
             drawer: GlobalDrawer(sourceContext: context),
             body: Column(
               children: <Widget>[
@@ -199,9 +182,7 @@ class _DashBoardState extends State<DashBoard> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 8),
                               decoration: BoxDecoration(
-                                  border: Border.all(
-                                color: colors.orange,
-                              )),
+                                  border: Border.all(color: colors.orange)),
                               child: Text(golbalValues.benRemaining,
                                   style: styles.redstyle))),
                       card(

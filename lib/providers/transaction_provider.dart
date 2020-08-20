@@ -20,6 +20,18 @@ class TransactionProvider with ChangeNotifier {
   PagewiseLoadController<dynamic> pagewiseOrderController;
   PagewiseLoadController<dynamic> pagewiseAgentOrderController;
 
+  int orderTransColorIndecator=0;
+  int returnTransColorIndecator=0;
+
+  void incrementOrders() {
+    orderTransColorIndecator++;
+    notifyListeners();
+  }
+  void incrementReturns() {
+    returnTransColorIndecator++;
+    notifyListeners();
+  }
+
   //Transaction lastTransaction;
   Future<List<Transaction>> getOrdersTransactions(int page, int benId) async {
     transactionsDataLoaded = false;
@@ -78,5 +90,13 @@ class TransactionProvider with ChangeNotifier {
     });
     agentTrans = Transactions.fromJson(response.data);
     return agentTrans.transactions;
+  }
+
+  Future<Response<dynamic>> getGonnaPayTransactions(
+      int benId, int agentId) async {
+    final Response<dynamic> response = await dio.post<dynamic>(
+        "transaction/confirmed",
+        data: <String, dynamic>{"beneficiary_id": benId, "agent_id": agentId});
+    return response;
   }
 }

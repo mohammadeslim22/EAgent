@@ -50,9 +50,8 @@ Future<void> main() async {
     ),
   );
 
-  dioDefaults();
+  // dioDefaults();
   await data.getData('authorization').then<dynamic>((dynamic auth) {
-    
     if (auth == null) {}
     dio.options.headers['authorization'] = '$auth';
   });
@@ -97,13 +96,13 @@ class MyApp extends StatelessWidget {
         },
         theme: mainThemeData(),
         onGenerateRoute: onGenerateRoute,
-  //       routes:  <String, WidgetBuilder> {
-  //   '/Home': (BuildContext context) =>  const Home(),
-  //   '/Beneficiaries' : (BuildContext context) =>  const Beneficiaries(),
-  //   '/Beneficiary_Center' : (BuildContext context) =>   BeneficiaryCenter(ben: getIt<GlobalVars>().getbenInFocus(),),
-  //   '/Order_Screen' : (BuildContext context) =>  OrderScreen( ),
-  //   '/Payment_Screen':(BuildContext context) =>  PaymentScreen()
-  // },
+        //       routes:  <String, WidgetBuilder> {
+        //   '/Home': (BuildContext context) =>  const Home(),
+        //   '/Beneficiaries' : (BuildContext context) =>  const Beneficiaries(),
+        //   '/Beneficiary_Center' : (BuildContext context) =>   BeneficiaryCenter(ben: getIt<GlobalVars>().getbenInFocus(),),
+        //   '/Order_Screen' : (BuildContext context) =>  OrderScreen( ),
+        //   '/Payment_Screen':(BuildContext context) =>  PaymentScreen()
+        // },
         home: const LoginScreen());
   }
 }

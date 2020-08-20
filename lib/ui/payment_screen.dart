@@ -9,10 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class PaymentScreen extends StatefulWidget {
-  const PaymentScreen({Key key, this.transOrCollection, this.returnValue})
+  const PaymentScreen(
+      {Key key,
+      this.orderTotal,
+      this.returnTotal,
+      this.orderOrRetunOrCollection})
       : super(key: key);
-  final int transOrCollection;
-  final String returnValue;
+  final double orderTotal;
+  final double returnTotal;
+  final int orderOrRetunOrCollection;
 
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
@@ -21,7 +26,6 @@ class PaymentScreen extends StatefulWidget {
 class _PaymentScreenState extends State<PaymentScreen> {
   int groupValue = 0;
   bool patmentTypeCash = true;
-
   final TextEditingController paymentAmountController = TextEditingController();
   final TextEditingController paymentCashController = TextEditingController();
   final TextEditingController paymentDeptController = TextEditingController();
@@ -36,19 +40,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void initState() {
     super.initState();
-    _type = widget.transOrCollection != 2
-        ? widget.transOrCollection == 0 ? "order" : "return"
-        : "";
+    _type = widget.orderOrRetunOrCollection == 0
+        ? "order"
+        : widget.orderOrRetunOrCollection == 1 ? "return" : "collection";
     _ben = getIt<GlobalVars>().getbenInFocus();
-    final String temp = getIt<OrderListProvider>().sumTotal.toString();
-    paymentAmountController.text = "$temp  ";
-    paymentCashController.text = "$temp  ";
-    paymentCashController.selection =
-        TextSelection(baseOffset: 0, extentOffset: temp.length);
- 
-    paymentDeptController.text =
-        _type == "order" ? _deptValue : widget.returnValue;
- 
+    paymentCashController.text = "${widget.orderTotal - widget.returnTotal}  ";
+    paymentAmountController.text = "${widget.orderTotal}  ";
+    paymentCashController.selection = TextSelection(
+        baseOffset: 0, extentOffset: widget.orderTotal.toString().length);
+
+    paymentDeptController.text = "${widget.returnTotal}  ";
   }
 
   @override
@@ -56,72 +57,72 @@ class _PaymentScreenState extends State<PaymentScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
-        title: Text(trans(context, 'altariq')),
+        title: Text(trans(context, 'altariq'), style: styles.appBar),
         centerTitle: true,
       ),
-      body: ListView(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const Spacer(),
+        //  const Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Expanded(
-                child: Card(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                    width: MediaQuery.of(context).size.width / 2.25,
-                    height: MediaQuery.of(context).size.height / 1.5,
-                    child: Column(
-                      children: <Widget>[
-                        SvgPicture.asset("assets/images/payment.svg"),
-                        Text(trans(context, 'choose_payment_method'),
-                            style: styles.underHeadblack),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            RadioListTile<int>(
-                              secondary: SvgPicture.asset(
-                                  "assets/images/cash_Icon.svg",
-                                  height: 100),
-                              value: 0,
-                              activeColor: Colors.green,
-                              groupValue: groupValue,
-                              onChanged: (int t) {
-                                setState(() {
-                                  patmentTypeCash = true;
-                                  groupValue = t;
-                                });
-                              },
-                              title: Text(
-                                trans(context, 'cash_payment'),
-                                style: styles.smallButtonactivated,
-                              ),
+              Card(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  width: MediaQuery.of(context).size.width / 2.25,
+                  height: MediaQuery.of(context).size.height / 1.6,
+                  child: Column(
+                    children: <Widget>[
+                      SvgPicture.asset("assets/images/payment.svg",
+                          height: 100, width: 100),
+                      Text(trans(context, 'choose_payment_method'),
+                          style: styles.underHeadblack),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          RadioListTile<int>(
+                            secondary: SvgPicture.asset(
+                                "assets/images/cash_Icon.svg",
+                                height: 100),
+                            value: 0,
+                            activeColor: Colors.green,
+                            groupValue: groupValue,
+                            onChanged: (int t) {
+                              setState(() {
+                                patmentTypeCash = true;
+                                groupValue = t;
+                              });
+                            },
+                            title: Text(
+                              trans(context, 'cash_payment'),
+                              style: styles.smallButtonactivated,
                             ),
-                            RadioListTile<int>(
-                              secondary: SvgPicture.asset(
-                                  "assets/images/card_Icon.svg",
-                                  height: 90),
-                              value: 1,
-                              activeColor: Colors.green,
-                              groupValue: groupValue,
-                              onChanged: (int t) {
-                                setState(() {
-                                  patmentTypeCash = false;
-                                  groupValue = t;
-                                });
-                              },
-                              title: Text(
-                                trans(context, 'card_payment'),
-                                style: styles.smallButtonactivated,
-                              ),
+                          ),
+                          RadioListTile<int>(
+                            secondary: SvgPicture.asset(
+                                "assets/images/card_Icon.svg",
+                                height: 90),
+                            value: 1,
+                            activeColor: Colors.green,
+                            groupValue: groupValue,
+                            onChanged: (int t) {
+                              // setState(() {
+                              //   patmentTypeCash = false;
+                              //   groupValue = t;
+                              // });
+                            },
+                            title: Text(
+                              trans(context, 'card_payment'),
+                              style: styles.smallButtonactivated,
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -129,21 +130,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 index: patmentTypeCash ? 0 : 1,
                 children: <Widget>[
                   Card(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 12),
                       width: MediaQuery.of(context).size.width / 2.25,
-                      height: MediaQuery.of(context).size.height / 1.5,
+                      height: MediaQuery.of(context).size.height / 1.6,
                       child: Column(
                         children: <Widget>[
-                          SvgPicture.asset(
-                            "assets/images/payment_cash.svg",
-                            height: 200,
-                            width: 200,
-                          ),
-                          const SizedBox(height: 16),
+                          SvgPicture.asset("assets/images/payment_cash.svg",
+                              height: 100, width: 100),
+                          const SizedBox(height: 8),
                           TextFormField(
                             readOnly: false,
                             keyboardType: TextInputType.number,
@@ -161,7 +159,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                         double.parse(
                                             paymentCashController.text.trim()))
                                     .toString();
-                                paymentDeptController.text = "$_deptValue.00";
                               });
                             },
                             decoration: InputDecoration(
@@ -184,12 +181,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 contentPadding:
-                                    const EdgeInsets.symmetric(vertical: 16),
+                                    const EdgeInsets.symmetric(vertical: 8),
                                 prefixIcon: const Icon(Icons.attach_money),
                                 prefix: Text(
-                                  _type == "order"
-                                      ? trans(context, 'cash_recieved')
-                                      : trans(context, 'cash_given'),
+                                  trans(context, 'cash_recieved'),
                                 )),
                             validator: (String error) {
                               return "";
@@ -227,10 +222,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   contentPadding:
-                                      const EdgeInsets.symmetric(vertical: 16),
+                                      const EdgeInsets.symmetric(vertical: 8),
                                   prefixIcon: const Icon(Icons.attach_money),
-                                  prefix:
-                                      Text(trans(context, 'cash_rquired')))),
+                                  prefix: Text(trans(context, 'cash_total')))),
                           const SizedBox(height: 12),
                           TextFormField(
                             readOnly: true,
@@ -264,26 +258,22 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 contentPadding:
-                                    const EdgeInsets.symmetric(vertical: 16),
+                                    const EdgeInsets.symmetric(vertical: 8),
                                 prefixIcon: const Icon(Icons.money_off),
-                                prefix: Text(
-                                  _type == "order"
-                                      ? trans(context, 'debt')
-                                      : trans(context, 'return_value'),
-                                )),
+                                prefix: Text(trans(context, 'cash_given'))),
                           ),
                         ],
                       ),
                     ),
                   ),
                   Card(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 12),
                       width: MediaQuery.of(context).size.width / 2.25,
-                      height: MediaQuery.of(context).size.height / 1.5,
+                      height: MediaQuery.of(context).size.height / 1.6,
                       child: Column(
                         children: <Widget>[
                           SvgPicture.asset("assets/images/payment_visa.svg"),
@@ -328,11 +318,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
               circleBar(patmentTypeCash),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 64, vertical: 32),
+                    const EdgeInsets.symmetric(horizontal: 64, vertical: 8),
                 child: Row(
                   children: <Widget>[
                     Container(
-                      width: 160,
+                      width: 110,
                       child: RaisedButton(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.0),
@@ -340,43 +330,32 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         color: Colors.green,
                         onPressed: () async {
                           showAWAITINGSENDOrderTruck();
-                          if (widget.transOrCollection == 2) {
-                            print("يا رب ساعدني ");
-                            if (await getIt<OrderListProvider>().sendCollection(
-                                context,
-                                _ben.id,
-                                int.parse(paymentCashController.text),
-                                "confirmed")) {
-                              setState(() {
-                                paymentAmountController.text = "00.00";
+                          switch (_type) {
+                            case "collection":
+                              {
+                                if (await getIt<OrderListProvider>()
+                                    .sendCollection(
+                                        context,
+                                        _ben.id,
+                                        int.parse(paymentCashController.text),
+                                        "confirmed")) {
+                                  setState(() {
+                                    paymentAmountController.text = "00.00";
 
-                                paymentCashController.text = "00.00";
+                                    paymentCashController.text = "00.00";
 
-                                paymentDeptController.text = "00.00";
-                              });
-                              //  Navigator.pop(context);
-                            }
-                          } else {
-                            print("يا رب ساعدني طب اوردر ؟");
-                            if (await getIt<OrderListProvider>().sendOrder(
-                                context,
-                                _ben.id,
-                                getIt<OrderListProvider>().sumTotal.round(),
-                                double.parse(_deptValue).round(),
-                                _type,
-                                "confirmed")) {
-                              print("طب اشتغل الاوردر ؟");
-                              setState(() {
-                                paymentAmountController.text = "00.00";
-
-                                paymentCashController.text = "00.00";
-
-                                paymentDeptController.text = "00.00";
-                              });
-                              Navigator.pop(context);
-                            } else {
-                              Navigator.pop(context);
-                            }
+                                    paymentDeptController.text = "00.00";
+                                  });
+                                }
+                              }
+                              break;
+                            default:
+                              {
+                                await getIt<OrderListProvider>()
+                                    .payMYOrdersAndReturnList(context, _ben.id);
+                                Navigator.pop(context);
+                              }
+                              break;
                           }
                         },
                         child: Text(trans(context, "confirm"),
@@ -415,8 +394,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           margin: const EdgeInsets.symmetric(horizontal: 8),
-          height: isActive ? 26 : 22,
-          width: isActive ? 26 : 22,
+          height: isActive ? 16 : 12,
+          width: isActive ? 16 : 12,
           decoration: BoxDecoration(
               color: !isActive ? Colors.green : Colors.grey,
               borderRadius: const BorderRadius.all(Radius.circular(50))),
@@ -424,8 +403,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           margin: const EdgeInsets.symmetric(horizontal: 8),
-          height: isActive ? 26 : 22,
-          width: isActive ? 26 : 22,
+          height: isActive ? 16 : 12,
+          width: isActive ? 16 : 12,
           decoration: BoxDecoration(
               color: isActive ? Colors.green : Colors.grey,
               borderRadius: const BorderRadius.all(Radius.circular(50))),

@@ -1,8 +1,6 @@
 import 'package:agent_second/constants/styles.dart';
 import 'package:agent_second/localization/trans.dart';
-import 'package:agent_second/providers/export.dart';
 import 'package:agent_second/util/data.dart';
-import 'package:agent_second/util/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -50,13 +48,10 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
                   ],
                 ),
                 CircleAvatar(
-                  maxRadius: 55,
-                  minRadius: 40,
-                  child: SvgPicture.asset(
-                    'assets/images/company_logo.svg',
-                    width: 120.0,
-                    height: 120.0,
-                  ),
+                  maxRadius: 45,
+                  minRadius: 30,
+                  child: SvgPicture.asset('assets/images/company_logo.svg',
+                      width: 80.0, height: 80.0),
                 )
               ],
             ),
@@ -66,19 +61,18 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
           ),
           ListTile(
             onTap: () {
-              getIt<GlobalVars>().closeBens();
-
               Navigator.pushNamedAndRemoveUntil(
                   widget.sourceContext, "/Home", (_) => false);
             },
-            title: Text(trans(context, "home")),
+            title: Text(trans(context, "home"), style: styles.globalDrawer),
           ),
           ListTile(
             onTap: () {
               Navigator.pushNamedAndRemoveUntil(widget.sourceContext,
                   "/Beneficiaries", (Route<dynamic> r) => r.isFirst);
             },
-            title: Text(trans(context, "beneficiaries")),
+            title: Text(trans(context, "beneficiaries"),
+                style: styles.globalDrawer),
           ),
           const Divider(),
           ListTile(
@@ -86,16 +80,17 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
               final double x = MediaQuery.of(context).size.width;
               Navigator.pushNamedAndRemoveUntil(widget.sourceContext,
                   "/Agent_Orders", (Route<dynamic> r) => r.isFirst,
-                  arguments: <String, dynamic>{"expand": true,"width":x });
+                  arguments: <String, dynamic>{"expand": true, "width": x});
             },
-            title: Text(trans(context, "stock_transaction")),
+            title: Text(trans(context, "stock_transaction"),
+                style: styles.globalDrawer),
           ),
           ListTile(
             onTap: () {
               Navigator.pushNamedAndRemoveUntil(widget.sourceContext, "/items",
                   (Route<dynamic> r) => r.isFirst);
             },
-            title: Text(trans(context, "items")),
+            title: Text(trans(context, "items"), style: styles.globalDrawer),
           ),
         ],
       ),

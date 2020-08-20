@@ -35,25 +35,21 @@ class TextFormInput extends StatelessWidget {
   final FocusNode focusNode;
   final FocusNode nextfocusNode;
   final Function onFieldSubmitted;
-    final Function(String st) onFieldChanged;
+  final Function(String st) onFieldChanged;
 
   final String Function(String error) validator;
   final Widget prefixWidget;
 
-
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
       child: TextFormField(
         readOnly: readOnly,
         keyboardType: kt,
         onTap: () => onTab(),
         controller: cController,
-        style: const TextStyle(
-          color: Colors.black,
-          fontSize: 15,
-        ),
+        style: const TextStyle(color: Colors.black, fontSize: 12),
         obscureText: obscureText,
         decoration: InputDecoration(
             suffix: prefixWidget,
@@ -63,8 +59,8 @@ class TextFormInput extends StatelessWidget {
             filled: true,
             fillColor: Colors.white70,
             hintText: text,
-            hintStyle: TextStyle(color: colors.ggrey, fontSize: 15),
-            disabledBorder:const OutlineInputBorder(
+            hintStyle: TextStyle(color: colors.ggrey, fontSize: 10),
+            disabledBorder: const OutlineInputBorder(
                 borderSide: BorderSide(
               color: Colors.blue,
             )),
@@ -77,10 +73,11 @@ class TextFormInput extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(12),
             ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(vertical: 8),
             prefixIcon: Icon(
               prefixIcon,
               color: colors.blue,
+              size: 24,
             ),
             suffixIcon: suffixicon),
         focusNode: focusNode,
@@ -88,7 +85,6 @@ class TextFormInput extends StatelessWidget {
           onFieldSubmitted();
         },
         onChanged: onFieldChanged,
-        
         validator: (String error) {
           return validator(error);
         },

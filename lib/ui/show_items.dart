@@ -6,8 +6,6 @@ import 'package:agent_second/util/service_locator.dart';
 import 'package:agent_second/widgets/text_form_input.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/src/result/download_progress.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import 'package:agent_second/providers/order_provider.dart';
 
@@ -39,7 +37,7 @@ class _OrderScreenState extends State<ShowItems> {
           const SizedBox(width: 320),
           Text(item.name, style: styles.bluestyle, textAlign: TextAlign.start),
           const Spacer(),
-          Text(item.balanceInventory.toString(),
+          Text(item.shipmentBalance.toString(),
               style: styles.bluestyle, textAlign: TextAlign.start),
           const SizedBox(width: 320)
         ],
@@ -65,12 +63,12 @@ class _OrderScreenState extends State<ShowItems> {
         backgroundColor: colors.blue,
         title: Text(trans(context, "altariq")),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        // ),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.refresh, size: 32),
@@ -123,8 +121,16 @@ class _OrderScreenState extends State<ShowItems> {
                               shrinkWrap: true,
                               itemCount: orderProvider.itemsList.length,
                               itemBuilder: (BuildContext ctxt, int index) {
-                                return childForDragging(
-                                    orderProvider.itemsList[index]);
+                                if (orderProvider.itemsList[index].name
+                                    .trim()
+                                    .toLowerCase()
+                                    .contains(searchController.text
+                                        .trim()
+                                        .toLowerCase()))
+                                  return childForDragging(
+                                      orderProvider.itemsList[index]);
+                                else
+                                  return Container();
                               })
                         else
                           Container()

@@ -35,7 +35,8 @@ class SingleItem {
       this.createdAt,
       this.queantity,
       this.updatedAt,
-      this.units});
+      this.units,
+      this.shipmentBalance});
 
   SingleItem.fromJson(dynamic json) {
     id = json['id'] as int;
@@ -63,6 +64,7 @@ class SingleItem {
         units.add(Units.fromJson(v));
       });
     }
+    shipmentBalance = json['shipment_balance'] as int;
   }
 
   Map<String, dynamic> toJson() {
@@ -90,6 +92,7 @@ class SingleItem {
     if (units != null) {
       data['units'] = units.map((Units v) => v.toJson()).toList();
     }
+
     return data;
   }
 
@@ -114,6 +117,7 @@ class SingleItem {
   String updatedAt;
   int queantity = 1;
   List<Units> units;
+  int shipmentBalance;
 }
 
 class SingleItemForSend {
