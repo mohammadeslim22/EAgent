@@ -35,7 +35,7 @@ class _BeneficiariesState extends State<Beneficiaries> {
     final GlobalVars globalVarsProv = Provider.of<GlobalVars>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(trans(context, "altariq"), style: styles.appBar),
+        title: Text(trans(context, "beneficiaries"), style: styles.appBar),
         centerTitle: true,
         actions: <Widget>[
           Container(

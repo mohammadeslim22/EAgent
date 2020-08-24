@@ -17,7 +17,7 @@ class ShowItems extends StatefulWidget {
 
 class _OrderScreenState extends State<ShowItems> {
   int indexedStackId = 0;
-
+  int colorIndex;
   double animatedHight = 0;
 
   final TextEditingController searchController = TextEditingController();
@@ -25,21 +25,24 @@ class _OrderScreenState extends State<ShowItems> {
   List<int> prices = <int>[];
 
   Widget childForDragging(SingleItem item) {
+    if (item.id % 2 == 0) 
+    colorIndex++;
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(width: 1, color: Colors.green),
           borderRadius: BorderRadius.circular(8.0)),
-      color: item.id % 2 == 1 ? colors.white : colors.grey,
+      color: colorIndex % 2 == 1 ? colors.white : colors.grey,
       child: InkWell(
           child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          const SizedBox(width: 320),
+          const SizedBox(width: 80),
           Text(item.name, style: styles.bluestyle, textAlign: TextAlign.start),
           const Spacer(),
+          // const SizedBox(width: 32),
           Text(item.shipmentBalance.toString(),
               style: styles.bluestyle, textAlign: TextAlign.start),
-          const SizedBox(width: 320)
+          const SizedBox(width: 40)
         ],
       )),
     );
@@ -48,6 +51,7 @@ class _OrderScreenState extends State<ShowItems> {
   @override
   void initState() {
     super.initState();
+    colorIndex = 0;
     if (getIt<OrderListProvider>().itemsDataLoaded) {
     } else {
       getIt<OrderListProvider>().indexedStack = 0;
@@ -61,7 +65,7 @@ class _OrderScreenState extends State<ShowItems> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: colors.blue,
-        title: Text(trans(context, "altariq")),
+        title: Text(trans(context, "items")),
         centerTitle: true,
         // leading: IconButton(
         //   icon: const Icon(Icons.arrow_back),
@@ -117,23 +121,86 @@ class _OrderScreenState extends State<ShowItems> {
                               animation: "analysis"),
                         ),
                         if (orderProvider.itemsDataLoaded)
-                          ListView.builder(
+                          GridView.count(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              physics: const ScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: orderProvider.itemsList.length,
-                              itemBuilder: (BuildContext ctxt, int index) {
-                                if (orderProvider.itemsList[index].name
-                                    .trim()
-                                    .toLowerCase()
-                                    .contains(searchController.text
-                                        .trim()
-                                        .toLowerCase()))
-                                  return childForDragging(
-                                      orderProvider.itemsList[index]);
-                                else
-                                  return Container();
-                              })
-                        else
-                          Container()
+                              primary: true,
+                              crossAxisSpacing: 3,
+                              mainAxisSpacing: 3,
+                              crossAxisCount: 2,
+                              childAspectRatio: 10,
+                              addRepaintBoundaries: true,
+                              children: orderProvider.itemsList
+                                  .map((SingleItem item) {
+                                return childForDragging(item);
+                              }).toList()),
+                        // ListView.builder(
+                        //     shrinkWrap: true,
+                        //     itemCount: orderProvider.itemsList.length - 1,
+                        //     itemBuilder: (BuildContext ctxt, int index) {
+                        //       if (index == 0) {
+
+                        //        if (orderProvider.itemsList[index].name
+                        //             .trim()
+                        //             .toLowerCase()
+                        //             .contains(searchController.text
+                        //                 .trim()
+                        //                 .toLowerCase())) {
+                        //           return childForDragging(
+                        //               orderProvider.itemsList[index]);
+                        //         } else {
+                        //           return Container();
+                        //         }
+                        //       } else if (index % 2 == 0   ) {
+                        //         if (orderProvider.itemsList[index].name
+                        //             .trim()
+                        //             .toLowerCase()
+                        //             .contains(searchController.text
+                        //                 .trim()
+                        //                 .toLowerCase()))
+                        //           return Row(
+                        //             children: <Widget>[
+                        //               Expanded(
+                        //                 child: childForDragging(
+                        //                     orderProvider.itemsList[index]),
+                        //               ),
+                        //               // const SizedBox(width: 200),
+                        //               Expanded(
+                        //                 child: childForDragging(orderProvider
+                        //                     .itemsList[index + 1]),
+                        //               ),
+                        //             ],
+                        //           );
+                        //         else
+                        //           return Container();
+                        //       } else {
+                        //         // if (orderProvider.itemsList[index].name
+                        //         //     .trim()
+                        //         //     .toLowerCase()
+                        //         //     .contains(searchController.text
+                        //         //         .trim()
+                        //         //         .toLowerCase()))
+                        //         //   return Row(
+                        //         //     children: <Widget>[
+                        //         //       Expanded(
+                        //         //         child: childForDragging(
+                        //         //             orderProvider.itemsList[index]),
+                        //         //       ),
+                        //         //       // const SizedBox(width: 200),
+                        //         //       Expanded(
+                        //         //         child: childForDragging(orderProvider
+                        //         //             .itemsList[index + 1]),
+                        //         //       ),
+                        //         //     ],
+                        //         //   );
+                        //         // else
+                        //           return Container();
+                        //       }
+                        //     })
+                        // else
+                        //   Container()
                       ]),
                 );
               },

@@ -134,7 +134,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                 );
               },
             ),
-            Text(trans(context, "altariq"), style: styles.appBar),
+            Text(trans(context, "ben_center"), style: styles.appBar),
           ],
         ),
         centerTitle: true,

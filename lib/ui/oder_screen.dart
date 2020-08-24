@@ -644,7 +644,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                   awaitTransaction();
                                   if (await sendTransFunction(
                                       context, widget.isAgentOrder, "draft")) {
-                                    Navigator.pop(context);
+                                    // Navigator.pop(context);
                                   } else {
                                     final SnackBar snackBar = SnackBar(
                                       content: Text(
@@ -680,138 +680,99 @@ class _OrderScreenState extends State<OrderScreen> {
                     ),
                     color: colors.blue,
                     onPressed: () async {
-                      !widget.isAgentOrder
-                          ? showDialog<dynamic>(
-                              context: context,
-                              builder: (BuildContext contex) => AlertDialog(
-                                titlePadding: EdgeInsets.zero,
-                                contentPadding: EdgeInsets.zero,
-                                actionsPadding: EdgeInsets.zero,
-                                buttonPadding: EdgeInsets.zero,
-                                insetPadding: EdgeInsets.zero,
-                                title: Image.asset(
-                                    "assets/images/movingcloud.gif",
-                                    height: 200.0,
-                                    width: 400.0,
-                                    fit: BoxFit.cover),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
+                      print("hello from the other side ${widget.isAgentOrder}");
+                      if (!widget.isAgentOrder) {
+                        showDialog<dynamic>(
+                          context: context,
+                          builder: (BuildContext contex) => AlertDialog(
+                            titlePadding: EdgeInsets.zero,
+                            contentPadding: EdgeInsets.zero,
+                            actionsPadding: EdgeInsets.zero,
+                            buttonPadding: EdgeInsets.zero,
+                            insetPadding: EdgeInsets.zero,
+                            title: Image.asset("assets/images/movingcloud.gif",
+                                height: 200.0, width: 400.0, fit: BoxFit.cover),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                const SizedBox(height: 8),
+                                Text(trans(context, 'confirm_or_pay'),
+                                    style: styles.typeOrderScreen,
+                                    textAlign: TextAlign.center),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
                                   children: <Widget>[
-                                    const SizedBox(height: 8),
-                                    Text(trans(context, 'confirm_or_pay'),
-                                        style: styles.typeOrderScreen,
-                                        textAlign: TextAlign.center),
-                                    const SizedBox(height: 12),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: <Widget>[
-                                        FlatButton(
-                                          color: Colors.pink,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(18.0),
-                                          ),
-                                          onPressed: () async {
-                                            Navigator.pop(context);
-                                            //  awaitTransaction();
-                                            if (await sendTransFunction(
-                                                context,
-                                                widget.isAgentOrder,
-                                                "confirmed")) {
-                                              Navigator.pop(context);
-                                            } else {
-                                              final SnackBar snackBar =
-                                                  SnackBar(
-                                                content: Text(
-                                                    trans(context,
-                                                        "some_items_quantities are more than_u_have"),
-                                                    style:
-                                                        styles.angrywhitestyle),
-                                                backgroundColor:
-                                                    const Color(0xFF3B3B3B),
-                                              );
-                                              Scaffold.of(context)
-                                                  .showSnackBar(snackBar);
-                                            }
-                                          },
-                                          child: Text(
-                                              trans(context, 'other_confirm'),
-                                              style: styles.screenOrderDialoge),
-                                        ),
-                                        FlatButton(
-                                          color: Colors.grey,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(18.0),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            sendTransFunction(
-                                                context,
-                                                widget.isAgentOrder,
-                                                "confirmed");
-                                            Navigator.pushNamed(
-                                                context, "/Payment_Screen",
-                                                arguments: <String, dynamic>{
-                                                  "orderTotal": isORderOrReturn
-                                                      ? getIt<OrderListProvider>()
-                                                          .sumTotal
-                                                      : 0.0,
-                                                  "returnTotal": isORderOrReturn
-                                                      ? 0.0
-                                                      : getIt<OrderListProvider>()
-                                                          .sumTotal,
-                                                  "orderOrRetunOrCollection": 0
-                                                });
-                                          },
-                                          child: Text(
-                                              trans(context, 'confirm&pay'),
-                                              style: styles.screenOrderDialoge),
-                                        )
-                                      ],
+                                    FlatButton(
+                                      color: Colors.pink,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(18.0),
+                                      ),
+                                      onPressed: () async {
+                                         Navigator.pop(context);
+                                          awaitTransaction();
+                                        if (await sendTransFunction(context,
+                                            widget.isAgentOrder, "confirmed")) {
+                                          Navigator.pop(context);
+                                        } else {
+                                          
+                                          showOverQuantitySnakBar(context);
+                                    
+                                        }
+                                      },
+                                      child: Text(
+                                          trans(context, 'other_confirm'),
+                                          style: styles.screenOrderDialoge),
+                                    ),
+                                    FlatButton(
+                                      color: Colors.grey,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(18.0),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        sendTransFunction(context,
+                                            widget.isAgentOrder, "confirmed");
+                                        Navigator.pushNamed(
+                                            context, "/Payment_Screen",
+                                            arguments: <String, dynamic>{
+                                              "orderTotal": isORderOrReturn
+                                                  ? getIt<OrderListProvider>()
+                                                      .sumTotal
+                                                  : 0.0,
+                                              "returnTotal": isORderOrReturn
+                                                  ? 0.0
+                                                  : getIt<OrderListProvider>()
+                                                      .sumTotal,
+                                              "orderOrRetunOrCollection": 0
+                                            });
+                                      },
+                                      child: Text(trans(context, 'confirm&pay'),
+                                          style: styles.screenOrderDialoge),
                                     )
                                   ],
-                                ),
-                                // titleTextStyle: styles.darkbluestyle,
-                              ),
-                              //     FancyDialog(
-                              //   title: trans(context, 'confirm_or_pay'),
-                              //   cancel: trans(context, 'confirm&pay'),
-                              //   ok: trans(context, 'other_confirm'),
+                                )
+                              ],
+                            ),
+                          ),
+          
+                        );
+                      } else {
+                        print("where am i ? ");
+                         Navigator.pop(context);
+                          awaitTransaction();
+                        if (await sendTransFunction(
+                            context, true, "confirmed")) {
+                        } else {
+                          showOverQuantitySnakBar(context);
+                        }
 
-                              //   cancelFun: () {
-                              //     print("ok what ? $isORderOrReturn");
-                              //     Navigator.pop(context);
-                              //     print("ok what ? 1");
-                              //     Navigator.pushNamed(
-                              //         context, "/Payment_Screen",
-                              //         arguments: <String, dynamic>{
-                              //           "orderTotal": ben.totalOrders,
-                              //           "returnTotal": ben.totalReturns,
-                              //           "orderOrRetunOrCollection": 0
-                              //         });
-                              //     print("ok what ? 2");
-                              //   },
-                              //   okFun: () async {
-                              //  //   awaitTransaction();
-                              //     await sendTransFunction(
-                              //         widget.isAgentOrder, "confirmed");
-                              //   //  Navigator.pop(context);
-                              //     value.clearOrcerList();
-                              //   },
-                              //   gifPath: FancyGif.MOVE_FORWARD,
-                              //   descreption: trans(context, 'confirm_or_pay'),
-                              // ),
-                            )
-                          : () async {
-                              // Navigator.pop(context);
-                              awaitTransaction();
-                              await sendTransFunction(
-                                  context, widget.isAgentOrder, "confirmed");
-                              // Navigator.pop(context);
-                              value.clearOrcerList();
-                            };
+                        // Navigator.pop(context);
+                        //  value.clearOrcerList();
+                      }
                     },
                     child: Text(
                         widget.isAgentOrder
@@ -849,10 +810,10 @@ class _OrderScreenState extends State<OrderScreen> {
       BuildContext c, bool agentOrBen, String status) async {
     if (agentOrBen) {
       bool res;
-      res = await getIt<OrderListProvider>().sendAgentOrder(context,
+      res = await getIt<OrderListProvider>().sendAgentOrder(c,
           getIt<OrderListProvider>().sumTotal.round(), 0, "preorder", status);
-      Navigator.pop(context);
-      Navigator.pop(context);
+      print("iam after res $res");
+      // Navigator.pop(context);
       return res;
     } else {
       return await getIt<OrderListProvider>().sendOrder(
@@ -863,6 +824,22 @@ class _OrderScreenState extends State<OrderScreen> {
           isORderOrReturn ? "order" : "return",
           status);
     }
+  }
+
+  void showOverQuantitySnakBar(BuildContext c) {
+    final SnackBar snackBar = SnackBar(
+      content: Text(
+          trans(c, "some_items_quantities are more than_u_have"),
+          style: styles.angrywhitestyle),
+      duration: const Duration(milliseconds: 1700),
+      action: SnackBarAction(
+          label: trans(c, 'ok'),
+          onPressed: () {
+            Scaffold.of(c).hideCurrentSnackBar();
+          }),
+      backgroundColor: const Color(0xFF3B3B3B),
+    );
+     Scaffold.of(c).showSnackBar(snackBar);
   }
 
   void cacelTransaction(bool downCacel) {
@@ -924,11 +901,11 @@ class _OrderScreenState extends State<OrderScreen> {
           FlatButton(
               child: Text(trans(context, "set")),
               onPressed: () {
-                 !widget.isAgentOrder
-                                ?
-                getIt<OrderListProvider>()
-                    .setQuantity(itemId, int.parse(quantityController.text)): getIt<OrderListProvider>()
-                    .setQuantityForAgentOrder(itemId, int.parse(quantityController.text));
+                !widget.isAgentOrder
+                    ? getIt<OrderListProvider>()
+                        .setQuantity(itemId, int.parse(quantityController.text))
+                    : getIt<OrderListProvider>().setQuantityForAgentOrder(
+                        itemId, int.parse(quantityController.text));
                 quantityController.clear();
                 Navigator.pop(context);
               })
