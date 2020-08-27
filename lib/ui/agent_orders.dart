@@ -48,7 +48,7 @@ class _AgentOrdersState extends State<AgentOrders>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colors.blue,
-        title: Text(trans(context, "altariq")),
+        title: Text(trans(context, "stock_transaction")),
         centerTitle: true,
         actions: <Widget>[
           IconButton(
@@ -147,6 +147,7 @@ class _AgentOrdersState extends State<AgentOrders>
                 getIt<OrderListProvider>().bringOrderToOrderScreen(entry);
                 Navigator.pushNamed(context, "/Order_Screen",
                     arguments: <String, dynamic>{
+                      "ben":null,
                       "isORderOrReturn": false,
                       "isAgentOrder": true
                     });

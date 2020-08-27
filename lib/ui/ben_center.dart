@@ -130,11 +130,19 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                         style: styles.littleangrywhitestyle),
                     Text(ben.totalReturns.toString(),
                         style: styles.angrywhitestyle),
+                    const SizedBox(width: 24),
+                    Text(trans(context, 'total_between_order_return') + "  ",
+                        style: styles.littleangrywhitestyle),
+                    Text(
+                        (double.parse(ben.totalOrders.toString()) -
+                                double.parse(ben.totalReturns.toString()))
+                            .toString(),
+                        style: styles.angrywhitestyle),
                   ],
                 );
               },
             ),
-            Text(trans(context, "altariq"), style: styles.appBar),
+            Text(trans(context, "ben_center"), style: styles.appBar),
           ],
         ),
         centerTitle: true,
@@ -223,7 +231,9 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             color: colors.blue, size: 24),
                         onPressed: () {
                           location.getLocation().then((LocationData value) {
-                            // TODO(MOHAMAMD): send location data to back end
+                            print(value);
+                            getIt<GlobalVars>().updateBenLocation(
+                                ben.id, value.latitude, value.longitude);
                           });
                         },
                       )
@@ -711,7 +721,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
               color: colors.red,
               icon: Icons.delete,
               onTap: () {
-                // TODO(Mohammad): dio dlete request
+                getIt<TransactionProvider>().deleteDradftTrans(entry.id);
               },
             )
           else

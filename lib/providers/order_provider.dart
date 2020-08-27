@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:agent_second/models/Items.dart';
 import 'package:vibration/vibration.dart';
 
+
 class OrderListProvider with ChangeNotifier {
   List<SingleItemForSend> ordersList = <SingleItemForSend>[];
   List<SingleItem> itemsList;
@@ -99,19 +100,19 @@ class OrderListProvider with ChangeNotifier {
 
     notifyListeners();
   }
-    void incrementQuantityForAgentOrder(int itemId) {
+
+  void incrementQuantityForAgentOrder(int itemId) {
     // final int quantity = ordersList.firstWhere((SingleItemForSend element) {
     //   return element.id == itemId;
     // }).queantity;
-   // if (checkValidation(itemId, quantity + 1)) {
+    // if (checkValidation(itemId, quantity + 1)) {
 
-      ordersList.firstWhere((SingleItemForSend element) {
-        return element.id == itemId;
-      }).queantity += 1;
-      sumTotal +=
-          double.parse(ordersList.firstWhere((SingleItemForSend element) {
-        return element.id == itemId;
-      }).unitPrice);
+    ordersList.firstWhere((SingleItemForSend element) {
+      return element.id == itemId;
+    }).queantity += 1;
+    sumTotal += double.parse(ordersList.firstWhere((SingleItemForSend element) {
+      return element.id == itemId;
+    }).unitPrice);
 
     // } else {
     //   Vibration.vibrate(duration: 600);
@@ -119,19 +120,21 @@ class OrderListProvider with ChangeNotifier {
 
     notifyListeners();
   }
+
   void setQuantityForAgentOrder(int itemId, int quantity) {
-    // TODO(MOhammad): check balance in the car 
+    // TODO(MOhammad): check balance in the car
     // if (checkValidation(itemId, quantity)) {
-      ordersList.firstWhere((SingleItemForSend element) {
-        return element.id == itemId;
-      }).queantity = quantity;
-      getTotla();
+    ordersList.firstWhere((SingleItemForSend element) {
+      return element.id == itemId;
+    }).queantity = quantity;
+    getTotla();
     // } else {
     //   Vibration.vibrate(duration: 600);
     // }
 
     notifyListeners();
   }
+
   void setQuantity(int itemId, int quantity) {
     if (checkValidation(itemId, quantity)) {
       ordersList.firstWhere((SingleItemForSend element) {
@@ -168,6 +171,7 @@ class OrderListProvider with ChangeNotifier {
     ordersList.removeWhere((SingleItemForSend element) {
       return element.id == itemId;
     });
+    selectedOptions.remove(itemId);
     getTotla();
     notifyListeners();
   }
@@ -208,7 +212,7 @@ class OrderListProvider with ChangeNotifier {
     sumTotal = transaction.amount.toDouble();
 
     transaction.details.forEach((MiniItems element) {
-      print("mini element item $element");
+      print("mini element item ${element.item}");
       selectedOptions.add(element.itemId);
       ordersList.add(SingleItemForSend(
           id: element.itemId,
@@ -232,7 +236,7 @@ class OrderListProvider with ChangeNotifier {
       setDayLog(response, benId);
       if (getIt<TransactionProvider>().pagewiseCollectionController != null)
         getIt<TransactionProvider>().pagewiseCollectionController.reset();
-        Navigator.of(c).pushNamedAndRemoveUntil("/Beneficiary_Center",
+      Navigator.of(c).pushNamedAndRemoveUntil("/Beneficiary_Center",
           (Route<dynamic> route) {
         return howManyscreensToPop-- == 0;
       }, arguments: <String, dynamic>{
@@ -274,6 +278,8 @@ class OrderListProvider with ChangeNotifier {
       "quantity": itemsQuantity,
       "unit": itemsUnit,
     });
+    print("respons ::::::::: $response");
+
     if (response.statusCode == 200) {
       clearOrcerList();
       setDayLog(response, benId);
@@ -288,7 +294,7 @@ class OrderListProvider with ChangeNotifier {
       //   "ben": getIt<GlobalVars>().getbenInFocus()
       // });
       //     howManyscreensToPop = 2;
-      notifyListeners();
+
       if (getIt<TransactionProvider>().pagewiseOrderController != null) {
         if (type == "order") {
           getIt<TransactionProvider>().pagewiseOrderController.reset();
@@ -296,8 +302,13 @@ class OrderListProvider with ChangeNotifier {
           getIt<TransactionProvider>().pagewiseReturnController.reset();
         }
       }
+      Navigator.pop(c);
+      notifyListeners();
       return true;
     } else if (response.statusCode == 422) {
+      // Fluttertoast.showToast(
+      //     msg: trans(c, "some_items_quantities are more than_u_have"));
+
       notifyListeners();
       return false;
 // Find the Scaffold in the widget tree and use it to show a SnackBar.
@@ -337,7 +348,16 @@ class OrderListProvider with ChangeNotifier {
       "unit": itemsUnit,
     });
     if (response.statusCode == 200) {
+      clearOrcerList();
+      Navigator.pop(c);
+      getIt<TransactionProvider>().pagewiseAgentOrderController.reset();
+      notifyListeners();
       return true;
+    } else if (response.statusCode == 422) {
+      notifyListeners();
+      return false;
+// Find the Scaffold in the widget tree and use it to show a SnackBar.
+
     } else {
       return false;
     }

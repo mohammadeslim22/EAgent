@@ -47,7 +47,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     paymentCashController.text = "${widget.orderTotal - widget.returnTotal}  ";
     paymentAmountController.text = "${widget.orderTotal}  ";
     paymentCashController.selection = TextSelection(
-        baseOffset: 0, extentOffset: widget.orderTotal.toString().length);
+        baseOffset: 0, extentOffset: widget.orderTotal.toString().length + 2);
 
     paymentDeptController.text = "${widget.returnTotal}  ";
   }
@@ -145,55 +145,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               height: 100, width: 100),
                           const SizedBox(height: 8),
                           TextFormField(
-                            readOnly: false,
-                            keyboardType: TextInputType.number,
-                            onTap: () {},
-                            autofocus: true,
-                            textAlign: TextAlign.center,
-                            controller: paymentCashController,
-                            style: styles.paymentCashStyle,
-                            obscureText: false,
-                            onChanged: (String t) {
-                              setState(() {
-                                _deptValue = (double.parse(
-                                            paymentAmountController.text
-                                                .trim()) -
-                                        double.parse(
-                                            paymentCashController.text.trim()))
-                                    .toString();
-                              });
-                            },
-                            decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide:
-                                        BorderSide(color: colors.green)),
-                                filled: true,
-                                fillColor: Colors.white70,
-                                hintStyle: TextStyle(
-                                    color: colors.ggrey, fontSize: 15),
-                                disabledBorder: const OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.green)),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: colors.green),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                contentPadding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                prefixIcon: const Icon(Icons.attach_money),
-                                prefix: Text(
-                                  trans(context, 'cash_recieved'),
-                                )),
-                            validator: (String error) {
-                              return "";
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          TextFormField(
                               readOnly: true,
                               keyboardType: TextInputType.number,
                               autofocus: false,
@@ -264,6 +215,56 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 prefixIcon: const Icon(Icons.money_off),
                                 prefix: Text(trans(context, 'cash_given'))),
                           ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            readOnly: false,
+                            keyboardType: TextInputType.number,
+                            onTap: () {},
+                            autofocus: true,
+                            textAlign: TextAlign.center,
+                            controller: paymentCashController,
+                            style: styles.paymentCashStyle,
+                            obscureText: false,
+                            onChanged: (String t) {
+                              setState(() {
+                                _deptValue = (double.parse(
+                                            paymentAmountController.text
+                                                .trim()) -
+                                        double.parse(
+                                            paymentCashController.text.trim()))
+                                    .toString();
+                              });
+                            },
+                            decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide:
+                                        BorderSide(color: colors.green)),
+                                filled: true,
+                                fillColor: Colors.white70,
+                                hintStyle: TextStyle(
+                                    color: colors.ggrey, fontSize: 15),
+                                disabledBorder: const OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.green)),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: colors.green),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                prefixIcon: const Icon(Icons.attach_money),
+                                prefix: Text(
+                                  trans(context, 'cash_recieved'),
+                                )),
+                            validator: (String error) {
+                              return "";
+                            },
+                          ),
+                          const SizedBox(height: 12),
                         ],
                       ),
                     ),

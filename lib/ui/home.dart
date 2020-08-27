@@ -8,7 +8,6 @@ import 'package:agent_second/util/service_locator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:agent_second/localization/trans.dart';
-import 'package:agent_second/widgets/global_drawer.dart';
 import 'package:agent_second/constants/styles.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
@@ -185,217 +184,304 @@ class _DashBoardState extends State<DashBoard> {
             appBar: AppBar(
                 title: Text(trans(context, "altariq"), style: styles.appBar),
                 centerTitle: true),
-            drawer: GlobalDrawer(sourceContext: context),
-            body: Column(
+            // drawer: GlobalDrawer(sourceContext: context),
+            body: Row(
               children: <Widget>[
-                Consumer<GlobalVars>(builder: (BuildContext context,
-                    GlobalVars golbalValues, Widget child) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      card(
-                          'assets/images/remain_bin.svg',
-                          trans(context, 'remain_transaction'),
-                          Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: colors.orange)),
-                              child: Text(golbalValues.benRemaining,
-                                  style: styles.redstyle))),
-                      card(
-                        'assets/images/order_transaction.svg',
-                        trans(context, 'order_transaction'),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                  color: const Color(0xFF008585),
-                                )),
-                                child: Text(golbalValues.orderscount ?? "",
-                                    style: styles.greenstyle)),
-                            const SizedBox(
-                              width: 12,
-                            ),
-                            Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                  color: const Color(0xFF008585),
-                                )),
-                                child: Text(golbalValues.orderTotal,
-                                    style: styles.greenstyle))
-                          ],
-                        ),
-                      ),
-                      card(
-                        'assets/images/return_transaction.svg',
-                        trans(context, 'return_transaction'),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                  color: colors.purple,
-                                )),
-                                child: Text(golbalValues.returnscount,
-                                    style: styles.purplestyle)),
-                            const SizedBox(width: 12),
-                            Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                  color: colors.purple,
-                                )),
-                                child: Text(golbalValues.returnTotal,
-                                    style: styles.purplestyle))
-                          ],
-                        ),
-                      ),
-                      card(
-                          'assets/images/collection.svg',
-                          trans(context, 'collection_transaction'),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                    color: colors.blue,
-                                  )),
-                                  child: Text(golbalValues.collectionscount,
-                                      style: styles.darkbluestyle)),
-                              const SizedBox(width: 12),
-                              Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                    color: colors.blue,
-                                  )),
-                                  child: Text(golbalValues.collectionTotal,
-                                      style: styles.darkbluestyle))
-                            ],
-                          )),
-                      card(
-                          'assets/images/login_time.svg',
-                          trans(context, 'time_since_login'),
-                          Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                color: colors.green,
-                              )),
-                              child: Text(golbalValues.timeSinceLogin,
-                                  style: styles.darkgreenstyle))),
-                      card(
-                          'assets/images/last_trip_time.svg',
-                          trans(context, 'time_since_last_trip'),
-                          Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                color: const Color(0xFF00158F),
-                              )),
-                              child: Text(golbalValues.timeSinceLastTrans,
-                                  style: styles.bluestyle))),
-                    ],
-                  );
-                }),
                 Expanded(
-                  child: Stack(
+                  
+                  child: Column(
+                    
+                    // mainAxisSize: MainAxisSize.min,
+                    // padding: EdgeInsets.zero,
                     children: <Widget>[
-                      GoogleMap(
-                        onMapCreated: _onMapCreated,
-                        mapType: MapType.normal,
-                        markers: Set<Marker>.of(markers.values),
-                        initialCameraPosition: CameraPosition(
-                          target: LatLng(lat, long),
-                          zoom: 13,
+                      DrawerHeader(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Text("agentName", style: styles.underHeadwhite),
+                              ],
+                            ),
+                            CircleAvatar(
+                              maxRadius: 45,
+                              minRadius: 30,
+                              child: SvgPicture.asset(
+                                  'assets/images/company_logo.svg',
+                                  width: 80.0,
+                                  height: 80.0),
+                            )
+                          ],
                         ),
-                        onCameraMove: (CameraPosition pos) {
-                          setState(() {
-                            lat = pos.target.latitude;
-                            long = pos.target.longitude;
-                          });
-                        },
+                        decoration: const BoxDecoration(
+                          color: Colors.blue,
+                        ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0, bottom: 69),
-                        child: Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            child: Material(
-                              color: colors.white,
-                              borderRadius: BorderRadius.circular(6),
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(6),
-                                onTap: () {},
-                                child: GestureDetector(
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.my_location,
-                                      color:
-                                          Color.fromARGB(1023, 150, 150, 150),
+                      ListTile(
+                        
+                        onTap: () {
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, "/Home", (_) => false);
+                        },
+                        title: Text(trans(context, "home"),
+                            style: styles.globalDrawer),
+                      ),
+                      ListTile(
+                        onTap: () {
+                          Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              "/Beneficiaries",
+                              (Route<dynamic> r) => r.isFirst);
+                        },
+                        title: Text(trans(context, "beneficiaries"),
+                            style: styles.globalDrawer),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        onTap: () {
+                          final double x = MediaQuery.of(context).size.width;
+                          Navigator.pushNamedAndRemoveUntil(context,
+                              "/Agent_Orders", (Route<dynamic> r) => r.isFirst,
+                              arguments: <String, dynamic>{
+                                "expand": true,
+                                "width": x
+                              });
+                        },
+                        title: Text(trans(context, "stock_transaction"),
+                            style: styles.globalDrawer),
+                      ),
+                      ListTile(
+                        onTap: () {
+                          Navigator.pushNamedAndRemoveUntil(context, "/items",
+                              (Route<dynamic> r) => r.isFirst);
+                        },
+                        title: Text(trans(context, "items"),
+                            style: styles.globalDrawer),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: Column(
+                    children: <Widget>[
+                      Consumer<GlobalVars>(builder: (BuildContext context,
+                          GlobalVars golbalValues, Widget child) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            card(
+                                'assets/images/remain_bin.svg',
+                                trans(context, 'remain_transaction'),
+                                Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    decoration: BoxDecoration(
+                                        border:
+                                            Border.all(color: colors.orange)),
+                                    child: Text(golbalValues.benRemaining,
+                                        style: styles.redstyle))),
+                            card(
+                              'assets/images/order_transaction.svg',
+                              trans(context, 'order_transaction'),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                        color: const Color(0xFF008585),
+                                      )),
+                                      child: Text(
+                                          golbalValues.orderscount ?? "",
+                                          style: styles.greenstyle)),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
+                                  Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                        color: const Color(0xFF008585),
+                                      )),
+                                      child: Text(golbalValues.orderTotal,
+                                          style: styles.greenstyle))
+                                ],
+                              ),
+                            ),
+                            card(
+                              'assets/images/return_transaction.svg',
+                              trans(context, 'return_transaction'),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                        color: colors.purple,
+                                      )),
+                                      child: Text(golbalValues.returnscount,
+                                          style: styles.purplestyle)),
+                                  const SizedBox(width: 12),
+                                  Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                        color: colors.purple,
+                                      )),
+                                      child: Text(golbalValues.returnTotal,
+                                          style: styles.purplestyle))
+                                ],
+                              ),
+                            ),
+                            card(
+                                'assets/images/collection.svg',
+                                trans(context, 'collection_transaction'),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8),
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                          color: colors.blue,
+                                        )),
+                                        child: Text(
+                                            golbalValues.collectionscount,
+                                            style: styles.darkbluestyle)),
+                                    const SizedBox(width: 12),
+                                    Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8),
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                          color: colors.blue,
+                                        )),
+                                        child: Text(
+                                            golbalValues.collectionTotal,
+                                            style: styles.darkbluestyle))
+                                  ],
+                                )),
+                            card(
+                                'assets/images/login_time.svg',
+                                trans(context, 'time_since_login'),
+                                Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                      color: colors.green,
+                                    )),
+                                    child: Text(golbalValues.timeSinceLogin,
+                                        style: styles.darkgreenstyle))),
+                            // card(
+                            //     'assets/images/last_trip_time.svg',
+                            //     trans(context, 'time_since_last_trip'),
+                            //     Container(
+                            //         padding: const EdgeInsets.symmetric(
+                            //             horizontal: 8),
+                            //         decoration: BoxDecoration(
+                            //             border: Border.all(
+                            //           color: const Color(0xFF00158F),
+                            //         )),
+                            //         child: Text(golbalValues.timeSinceLastTrans,
+                            //             style: styles.bluestyle))),
+                          ],
+                        );
+                      }),
+                      Expanded(
+                        child: Stack(
+                          children: <Widget>[
+                            GoogleMap(
+                              onMapCreated: _onMapCreated,
+                              mapType: MapType.normal,
+                              markers: Set<Marker>.of(markers.values),
+                              initialCameraPosition: CameraPosition(
+                                target: LatLng(lat, long),
+                                zoom: 13,
+                              ),
+                              onCameraMove: (CameraPosition pos) {
+                                setState(() {
+                                  lat = pos.target.latitude;
+                                  long = pos.target.longitude;
+                                });
+                              },
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 8.0, bottom: 69),
+                              child: Align(
+                                alignment: Alignment.bottomLeft,
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  child: Material(
+                                    color: colors.white,
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(6),
+                                      onTap: () {},
+                                      child: GestureDetector(
+                                        child: const Center(
+                                          child: Icon(
+                                            Icons.my_location,
+                                            color: Color.fromARGB(
+                                                1023, 150, 150, 150),
+                                          ),
+                                        ),
+                                        onTap: () async {
+                                          serviceEnabled =
+                                              await location.serviceEnabled();
+                                          if (!serviceEnabled) {
+                                            serviceEnabled =
+                                                await location.requestService();
+                                            if (!serviceEnabled) {
+                                            } else {
+                                              permissionGranted = await location
+                                                  .hasPermission();
+                                              if (permissionGranted ==
+                                                  PermissionStatus.denied) {
+                                                permissionGranted =
+                                                    await location
+                                                        .requestPermission();
+                                                if (permissionGranted ==
+                                                    PermissionStatus.granted) {
+                                                  _animateToUser();
+                                                }
+                                              } else {
+                                                _animateToUser();
+                                              }
+                                            }
+                                          } else {
+                                            permissionGranted =
+                                                await location.hasPermission();
+                                            if (permissionGranted ==
+                                                PermissionStatus.denied) {
+                                              permissionGranted = await location
+                                                  .requestPermission();
+                                              if (permissionGranted ==
+                                                  PermissionStatus.granted) {
+                                                _animateToUser();
+                                              }
+                                            } else {
+                                              _animateToUser();
+                                            }
+                                          }
+                                        },
+                                      ),
                                     ),
                                   ),
-                                  onTap: () async {
-                                    serviceEnabled =
-                                        await location.serviceEnabled();
-                                    if (!serviceEnabled) {
-                                      serviceEnabled =
-                                          await location.requestService();
-                                      if (!serviceEnabled) {
-                                      } else {
-                                        permissionGranted =
-                                            await location.hasPermission();
-                                        if (permissionGranted ==
-                                            PermissionStatus.denied) {
-                                          permissionGranted = await location
-                                              .requestPermission();
-                                          if (permissionGranted ==
-                                              PermissionStatus.granted) {
-                                            _animateToUser();
-                                          }
-                                        } else {
-                                          _animateToUser();
-                                        }
-                                      }
-                                    } else {
-                                      permissionGranted =
-                                          await location.hasPermission();
-                                      if (permissionGranted ==
-                                          PermissionStatus.denied) {
-                                        permissionGranted =
-                                            await location.requestPermission();
-                                        if (permissionGranted ==
-                                            PermissionStatus.granted) {
-                                          _animateToUser();
-                                        }
-                                      } else {
-                                        _animateToUser();
-                                      }
-                                    }
-                                  },
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                     ],

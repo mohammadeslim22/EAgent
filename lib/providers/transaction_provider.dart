@@ -5,6 +5,7 @@ import 'package:agent_second/util/dio.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class TransactionProvider with ChangeNotifier {
   Ben ben;
@@ -20,18 +21,31 @@ class TransactionProvider with ChangeNotifier {
   PagewiseLoadController<dynamic> pagewiseOrderController;
   PagewiseLoadController<dynamic> pagewiseAgentOrderController;
 
-  int orderTransColorIndecator=0;
-  int returnTransColorIndecator=0;
+  int orderTransColorIndecator = 0;
+  int returnTransColorIndecator = 0;
 
   void incrementOrders() {
     orderTransColorIndecator++;
     notifyListeners();
   }
+
   void incrementReturns() {
     returnTransColorIndecator++;
     notifyListeners();
   }
-
+  Future<void> deleteDradftTrans(int id) async {
+    final Response<dynamic> response = await dio.post<dynamic>(
+        "transaction/draft/delete",
+        data: <String, dynamic>{"transaction_id": id});
+    if (response.statusCode == 200) {
+      benOrderTrans.transactions.removeWhere((Transaction element) {
+        return element.id == id;
+      });
+      notifyListeners();
+    } else {
+      Fluttertoast.showToast(msg: "حدث خطأ");
+    }
+  }
   //Transaction lastTransaction;
   Future<List<Transaction>> getOrdersTransactions(int page, int benId) async {
     transactionsDataLoaded = false;
@@ -52,6 +66,8 @@ class TransactionProvider with ChangeNotifier {
   //   lastTransaction = x;
   //   notifyListeners();
   // }
+
+
 
   Future<List<Transaction>> getReturnTransactions(int page, int benId) async {
     transactionsDataLoaded = false;
@@ -99,24 +115,22 @@ class TransactionProvider with ChangeNotifier {
         data: <String, dynamic>{"beneficiary_id": benId, "agent_id": agentId});
     return response;
   }
-  void declearPagWiseControllers(){
-        pagewiseCollectionController =
-        PagewiseLoadController<dynamic>(
-            pageSize: 15,
-            pageFuture: (int pageIndex) async {
-              return getCollectionTransactions(pageIndex, ben.id);
-            });
-   pagewiseOrderController =
-        PagewiseLoadController<dynamic>(
-            pageSize: 15,
-            pageFuture: (int pageIndex) async {
-              return getOrdersTransactions(pageIndex, ben.id);
-            });
-    pagewiseReturnController =
-        PagewiseLoadController<dynamic>(
-            pageSize: 15,
-            pageFuture: (int pageIndex) async {
-              return getReturnTransactions(pageIndex, ben.id);
-            });
+
+  void declearPagWiseControllers() {
+    pagewiseCollectionController = PagewiseLoadController<dynamic>(
+        pageSize: 15,
+        pageFuture: (int pageIndex) async {
+          return getCollectionTransactions(pageIndex, ben.id);
+        });
+    pagewiseOrderController = PagewiseLoadController<dynamic>(
+        pageSize: 15,
+        pageFuture: (int pageIndex) async {
+          return getOrdersTransactions(pageIndex, ben.id);
+        });
+    pagewiseReturnController = PagewiseLoadController<dynamic>(
+        pageSize: 15,
+        pageFuture: (int pageIndex) async {
+          return getReturnTransactions(pageIndex, ben.id);
+        });
   }
 }

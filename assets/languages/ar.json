@@ -76,7 +76,7 @@
     "altariq":"اسم شركة التوزيع",
     "ben_center":"شاشة المستفيد",
     "stock_transaction":"طلبات مندوب",
-    "beneficiaries":"المستفيدين",
+    "beneficiaries":"الزبائن",
     "product_name":"اسم الصنف",
     "unit_price":"س.الوحدة",
     "ben_name":"اسم المستفيد",
@@ -91,5 +91,6 @@
     "confirm_or_pay":"اختيار نوع العملية",
     "cash_total":"المبلغ الإجمالي","total_orders_confirmed":" اجمالي الطلبات المعتمدة",
     "total_return_confirmed":" اجمال المرجع المعتمد",
-    "some_items_quantities are more than_u_have":"بعض كميات الأصناف أكبر مما لديك !"
+    "some_items_quantities are more than_u_have":"بعض كميات الأصناف أكبر مما لديك !",
+    "total_between_order_return":"المحصلة"
 }
