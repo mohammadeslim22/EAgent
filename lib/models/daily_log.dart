@@ -26,8 +26,8 @@ class DailyLog {
     collectionCount = json['collection_count'] as int;
     benIds = json['ben_ids'].cast<int>() as List<int>;
     if(json['total_ordered']!=null){
-          totalOrdered = json['total_ordered'].toString();
-    totalReturned = json['total_returned'].toString();
+          totalOrdered = json['total_confirmed'].toString();
+    totalReturned = json['total_returned_confirmed'].toString();
     }
 
   }

@@ -25,8 +25,9 @@ class _OrderScreenState extends State<ShowItems> {
   List<int> prices = <int>[];
 
   Widget childForDragging(SingleItem item) {
-    if (item.id % 2 == 0) 
-    colorIndex++;
+    if (item.id % 2 == 0) {
+      colorIndex++;
+    }
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(width: 1, color: Colors.green),

@@ -423,9 +423,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                           onTap: () {
                                             setState(() {
                                               value.removeItemFromList(item.id);
-                                              getIt<OrderListProvider>()
-                                                  .selectedOptions
-                                                  .remove(item.id);
+                                              // getIt<OrderListProvider>()
+                                              //     .selectedOptions
+                                              //     .remove(item.id);
                                             });
                                           },
                                         ),
@@ -711,15 +711,14 @@ class _OrderScreenState extends State<OrderScreen> {
                                             BorderRadius.circular(18.0),
                                       ),
                                       onPressed: () async {
-                                         Navigator.pop(context);
-                                          awaitTransaction();
+                                        Navigator.pop(context);
+                                        awaitTransaction();
                                         if (await sendTransFunction(context,
                                             widget.isAgentOrder, "confirmed")) {
                                           Navigator.pop(context);
                                         } else {
-                                          
+                                          Navigator.pop(context);
                                           showOverQuantitySnakBar(context);
-                                    
                                         }
                                       },
                                       child: Text(
@@ -758,15 +757,16 @@ class _OrderScreenState extends State<OrderScreen> {
                               ],
                             ),
                           ),
-          
                         );
                       } else {
                         print("where am i ? ");
-                         Navigator.pop(context);
-                          awaitTransaction();
+                        awaitTransaction();
                         if (await sendTransFunction(
                             context, true, "confirmed")) {
+                          print("cotchi cotchi  ");
+                          Navigator.pop(context);
                         } else {
+                          print("i have no idea  ");
                           showOverQuantitySnakBar(context);
                         }
 
@@ -828,8 +828,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
   void showOverQuantitySnakBar(BuildContext c) {
     final SnackBar snackBar = SnackBar(
-      content: Text(
-          trans(c, "some_items_quantities are more than_u_have"),
+      content: Text(trans(c, "some_items_quantities are more than_u_have"),
           style: styles.angrywhitestyle),
       duration: const Duration(milliseconds: 1700),
       action: SnackBarAction(
@@ -839,7 +838,7 @@ class _OrderScreenState extends State<OrderScreen> {
           }),
       backgroundColor: const Color(0xFF3B3B3B),
     );
-     Scaffold.of(c).showSnackBar(snackBar);
+    Scaffold.of(c).showSnackBar(snackBar);
   }
 
   void cacelTransaction(bool downCacel) {

@@ -8,6 +8,7 @@ import 'package:cron/cron.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class GlobalVars with ChangeNotifier {
   BeneficiariesModel beneficiaries;
@@ -54,12 +55,20 @@ class GlobalVars with ChangeNotifier {
     notifyListeners();
   }
 
-  // void setBenVisted(int benId) {
-  //   beneficiaries.data.firstWhere((Ben element) {
-  //     return element.id == benId;
-  //   }).visited = true;
-  //   notifyListeners();
-  // }
+  Future<void> updateBenLocation(int benId, double lat, double long) async {
+    final Response<dynamic> response = await dio
+        .post<dynamic>("beneficiary/update_location", data: <String, dynamic>{
+      "beneficiary_id": benId,
+      "latitude": lat,
+      "longitude": long
+    });
+    print(response);
+    if (response.statusCode == 200) {
+      Fluttertoast.showToast(msg: "تم تحديث بيانات الموقع");
+    } else {
+      Fluttertoast.showToast(msg: "حدث خطأ");
+    }
+  }
 
   void setDailyLog(
       int benId,

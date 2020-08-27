@@ -47,7 +47,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     paymentCashController.text = "${widget.orderTotal - widget.returnTotal}  ";
     paymentAmountController.text = "${widget.orderTotal}  ";
     paymentCashController.selection = TextSelection(
-        baseOffset: 0, extentOffset: widget.orderTotal.toString().length+2);
+        baseOffset: 0, extentOffset: widget.orderTotal.toString().length + 2);
 
     paymentDeptController.text = "${widget.returnTotal}  ";
   }
@@ -144,7 +144,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           SvgPicture.asset("assets/images/payment_cash.svg",
                               height: 100, width: 100),
                           const SizedBox(height: 8),
-                      
                           TextFormField(
                               readOnly: true,
                               keyboardType: TextInputType.number,
@@ -216,7 +215,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 prefixIcon: const Icon(Icons.money_off),
                                 prefix: Text(trans(context, 'cash_given'))),
                           ),
-                              TextFormField(
+                          const SizedBox(height: 12),
+                          TextFormField(
                             readOnly: false,
                             keyboardType: TextInputType.number,
                             onTap: () {},
