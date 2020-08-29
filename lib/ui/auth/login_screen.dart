@@ -8,6 +8,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
+import 'package:flare_flutter/flare_actor.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key key}) : super(key: key);
@@ -163,6 +165,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   onPressed: () async {
                                     if (_isButtonEnabled) {
                                       if (_formKey.currentState.validate()) {
+                                        checkInternetConnection(bolc);
                                         bolc.togelf(true);
                                         setState(() {
                                           _isButtonEnabled = false;
@@ -232,5 +235,53 @@ class _LoginScreenState extends State<LoginScreen>
             ],
           ),
         ));
+  }
+
+  Future<void> checkInternetConnection(MyCounter bolc) async {
+    try {
+      final List<InternetAddress> result =
+          await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      } else {
+        showAWAITINGSENDOrderTruck();
+        setState(() {
+          _isButtonEnabled = true;
+        });
+        bolc.togelf(false);
+      }
+    } on SocketException catch (_) {
+      showAWAITINGSENDOrderTruck();
+      setState(() {
+        _isButtonEnabled = true;
+      });
+      bolc.togelf(false);
+    }
+  }
+
+  void showAWAITINGSENDOrderTruck() {
+    showGeneralDialog<dynamic>(
+        barrierLabel: "Label",
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(0.73),
+        transitionDuration: const Duration(milliseconds: 350),
+        context: context,
+        pageBuilder: (BuildContext context, Animation<double> anim1,
+            Animation<double> anim2) {
+          return InkWell(
+            child: Container(
+              decoration:
+                  BoxDecoration(border: Border.all(color: Colors.blueAccent)),
+              height: 250,
+              width: 250,
+              child: const FlareActor("assets/images/Wifianimation.flr",
+                  alignment: Alignment.center,
+                  fit: BoxFit.cover,
+                  animation: "loading"),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          );
+        });
   }
 }

@@ -63,6 +63,5 @@ Future<void> setDayLog(Response<dynamic> response, int benId) async {
       daielyLog.collectionCount.toString(),
       daielyLog.totalCollectionCount.toString(),
       daielyLog.benIds,
-      daielyLog.totalOrdered,
-      daielyLog.totalReturned);
+      daielyLog.balance);
 }

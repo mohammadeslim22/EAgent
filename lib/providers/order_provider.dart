@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:agent_second/models/Items.dart';
 import 'package:vibration/vibration.dart';
 
-
 class OrderListProvider with ChangeNotifier {
   List<SingleItemForSend> ordersList = <SingleItemForSend>[];
   List<SingleItem> itemsList;
@@ -37,10 +36,10 @@ class OrderListProvider with ChangeNotifier {
     return name;
   }
 
-  void addIdTOTransactionToPayIdsList(int id) {
-    transactionTopAyIds.add(id);
-    notifyListeners();
-  }
+  // void addIdTOTransactionToPayIdsList(int id) {
+  //   transactionTopAyIds.add(id);
+  //   notifyListeners();
+  // }
 
   void setScreensToPop(int x) {
     howManyscreensToPop = x;
@@ -251,7 +250,7 @@ class OrderListProvider with ChangeNotifier {
   }
 
   Future<bool> sendOrder(BuildContext c, int benId, int ammoutn, int shortage,
-      String type, String status) async {
+      String type, String status, int fromTransactionId) async {
     final List<int> itemsId = <int>[];
     final List<int> itemsQuantity = <int>[];
     final List<int> itemsPrice = <int>[];
@@ -277,14 +276,16 @@ class OrderListProvider with ChangeNotifier {
       "item_price": itemsPrice,
       "quantity": itemsQuantity,
       "unit": itemsUnit,
+      "from_transaction_id": fromTransactionId
     });
     print("respons ::::::::: $response");
 
     if (response.statusCode == 200) {
       clearOrcerList();
       setDayLog(response, benId);
-      addIdTOTransactionToPayIdsList(
-          int.parse(response.data['transaction_id'].toString()));
+
+      // addIdTOTransactionToPayIdsList(
+      //     int.parse(response.data['transaction_id'].toString()));
 
       // howManyscreensToPop++;
       // Navigator.of(c).pushNamedAndRemoveUntil("/Beneficiary_Center",
@@ -294,7 +295,11 @@ class OrderListProvider with ChangeNotifier {
       //   "ben": getIt<GlobalVars>().getbenInFocus()
       // });
       //     howManyscreensToPop = 2;
-
+      if (type == "order") {
+        getIt<GlobalVars>().setOrderTotalsAfterPay(ammoutn.toString(), benId);
+      } else {
+        getIt<GlobalVars>().setReturnTotalsAfterPay(ammoutn.toString(), benId);
+      }
       if (getIt<TransactionProvider>().pagewiseOrderController != null) {
         if (type == "order") {
           getIt<TransactionProvider>().pagewiseOrderController.reset();
@@ -363,12 +368,11 @@ class OrderListProvider with ChangeNotifier {
     }
   }
 
-  Future<void> payMYOrdersAndReturnList(BuildContext c, int id) async {
-    final Response<dynamic> response = await dio
-        .post<dynamic>("transaction/pay", data: <String, dynamic>{
-      "transactions": transactionTopAyIds,
-      "beneficiary_id": id
-    });
+  Future<void> payMYOrdersAndReturnList(
+      BuildContext c, int benId, double amount) async {
+    final Response<dynamic> response = await dio.post<dynamic>(
+        "transaction/pay",
+        data: <String, dynamic>{"amount": amount, "beneficiary_id": benId});
     if (response.statusCode == 200) {
       Navigator.of(c).pushNamedAndRemoveUntil("/Beneficiary_Center",
           (Route<dynamic> route) {
@@ -376,12 +380,13 @@ class OrderListProvider with ChangeNotifier {
       }, arguments: <String, dynamic>{
         "ben": getIt<GlobalVars>().getbenInFocus()
       });
-      getIt<GlobalVars>().setOrderandReturnTotalsAfterPay(
-          response.data['ordered'].toString() ?? "0.0",
-          response.data['returned'].toString() ?? "0.0",
-          id);
+      getIt<GlobalVars>()
+          .setBalanceForBen(benId, response.data['balance'].toString());
+      getIt<GlobalVars>().setOrderTotalsAfterPay("0.0", benId);
+      getIt<GlobalVars>().setReturnTotalsAfterPay("0.0", benId);
+
       print("pay response value :  ${response.data}");
-      transactionTopAyIds.clear();
+      // transactionTopAyIds.clear();
       notifyListeners();
     }
   }

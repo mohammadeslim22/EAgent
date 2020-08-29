@@ -24,12 +24,15 @@ class DailyLog {
     totalReturnCount = json['total_return_count'].toString();
     totalCollectionCount = json['total_collection_count'] as int;
     collectionCount = json['collection_count'] as int;
-    benIds = json['ben_ids'].cast<int>() as List<int>;
-    if(json['total_ordered']!=null){
-          totalOrdered = json['total_confirmed'].toString();
-    totalReturned = json['total_returned_confirmed'].toString();
+    if (json['ben_ids'] != null)
+      benIds = json['ben_ids'].cast<int>() as List<int>;
+    if (json['total_ordered'] != null) {
+      totalOrdered = json['total_confirmed'].toString();
+      totalReturned = json['total_returned_confirmed'].toString();
     }
-
+    if (json['balance'] != null) {
+      balance = json['balance'].toString();
+    }
   }
   int transactionsCount;
   int tBeneficiariryCount;
@@ -42,4 +45,5 @@ class DailyLog {
   List<int> benIds;
   String totalOrdered;
   String totalReturned;
+  String balance;
 }

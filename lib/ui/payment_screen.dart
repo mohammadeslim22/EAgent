@@ -13,10 +13,12 @@ class PaymentScreen extends StatefulWidget {
       {Key key,
       this.orderTotal,
       this.returnTotal,
-      this.orderOrRetunOrCollection})
+      this.orderOrRetunOrCollection,
+      this.cashTotal})
       : super(key: key);
   final double orderTotal;
   final double returnTotal;
+  final double cashTotal;
   final int orderOrRetunOrCollection;
 
   @override
@@ -35,7 +37,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final TextEditingController ammountPayController = TextEditingController();
   Ben _ben;
   String _type;
-  String _deptValue = "00.00";
   // Transaction _transaction;
   @override
   void initState() {
@@ -44,7 +45,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ? "order"
         : widget.orderOrRetunOrCollection == 1 ? "return" : "collection";
     _ben = getIt<GlobalVars>().getbenInFocus();
-    paymentCashController.text = "${widget.orderTotal - widget.returnTotal}  ";
+    paymentCashController.text = "${widget.cashTotal}  ";
     paymentAmountController.text = "${widget.orderTotal}  ";
     paymentCashController.selection = TextSelection(
         baseOffset: 0, extentOffset: widget.orderTotal.toString().length + 2);
@@ -225,16 +226,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             controller: paymentCashController,
                             style: styles.paymentCashStyle,
                             obscureText: false,
-                            onChanged: (String t) {
-                              setState(() {
-                                _deptValue = (double.parse(
-                                            paymentAmountController.text
-                                                .trim()) -
-                                        double.parse(
-                                            paymentCashController.text.trim()))
-                                    .toString();
-                              });
-                            },
                             decoration: InputDecoration(
                                 enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -332,39 +323,49 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ),
                         color: Colors.green,
                         onPressed: () async {
-                          showAWAITINGSENDOrderTruck();
-                          switch (_type) {
-                            case "collection":
-                              {
-                                try {
-                                  if (await getIt<OrderListProvider>()
-                                      .sendCollection(
-                                          context,
-                                          _ben.id,
-                                          int.parse(paymentCashController.text),
-                                          "confirmed")) {
-                                    setState(() {
-                                      paymentAmountController.text = "00.00";
+                          if (double.parse(paymentCashController.text) > 0) {
+                            showAWAITINGSENDOrderTruck();
 
-                                      paymentCashController.text = "00.00";
+                            switch (_type) {
+                              case "collection":
+                                {
+                                  try {
+                                    if (await getIt<OrderListProvider>()
+                                        .sendCollection(
+                                            context,
+                                            _ben.id,
+                                            int.parse(
+                                                paymentCashController.text),
+                                            "confirmed")) {
+                                      setState(() {
+                                        paymentAmountController.text = "00.00";
 
-                                      paymentDeptController.text = "00.00";
-                                    });
+                                        paymentCashController.text = "00.00";
+
+                                        paymentDeptController.text = "00.00";
+                                      });
+                                    }
+                                  } catch (e) {
+                                    print("error in collection");
+                                    Navigator.pop(context);
                                   }
-                                } catch (e) {
-                                  print("error in collection");
                                   Navigator.pop(context);
                                 }
-                                Navigator.pop(context);
-                              }
-                              break;
-                            default:
-                              {
-                                await getIt<OrderListProvider>()
-                                    .payMYOrdersAndReturnList(context, _ben.id);
-                                Navigator.pop(context);
-                              }
-                              break;
+                                break;
+                              default:
+                                {
+                                  await getIt<OrderListProvider>()
+                                      .payMYOrdersAndReturnList(
+                                          context,
+                                          _ben.id,
+                                          double.parse(
+                                              paymentCashController.text));
+                                  Navigator.pop(context);
+                                }
+                                break;
+                            }
+                          } else {
+                            showAmmountUnderZero();
                           }
                         },
                         child: Text(trans(context, "confirm"),
@@ -517,6 +518,33 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 alignment: Alignment.center,
                 fit: BoxFit.cover,
                 animation: "Animations"),
+          );
+        });
+  }
+
+  void showAmmountUnderZero() {
+    showGeneralDialog<dynamic>(
+        barrierLabel: "Label",
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(0.73),
+        transitionDuration: const Duration(milliseconds: 350),
+        context: context,
+        pageBuilder: (BuildContext context, Animation<double> anim1,
+            Animation<double> anim2) {
+          return Column(
+            children: <Widget>[
+              Container(
+                height: 300,
+                width: 300,
+                margin: const EdgeInsets.only(
+                    bottom: 160, left: 260, right: 260, top: 160),
+                child: const FlareActor("assets/images/errorconnection.flr",
+                    alignment: Alignment.center,
+                    fit: BoxFit.cover,
+                    animation: "Untitled"),
+              ),
+              Material(child: Text(trans(context, 'amount_must_be_over_0'),style: styles.darkbluestyle))
+            ],
           );
         });
   }

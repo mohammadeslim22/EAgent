@@ -121,6 +121,11 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
               builder: (BuildContext context, GlobalVars value, Widget child) {
                 return Row(
                   children: <Widget>[
+                    Text(trans(context, 'total_between_order_return') + "  ",
+                        style: styles.littleangrywhitestyle),
+                    Text((double.parse(ben.balance)).toString(),
+                        style: styles.angrywhitestyle),
+                    const SizedBox(width: 24),
                     Text(trans(context, 'total_orders_confirmed') + "  ",
                         style: styles.littleangrywhitestyle),
                     Text(ben.totalOrders.toString(),
@@ -129,14 +134,6 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                     Text(trans(context, 'total_return_confirmed') + "  ",
                         style: styles.littleangrywhitestyle),
                     Text(ben.totalReturns.toString(),
-                        style: styles.angrywhitestyle),
-                    const SizedBox(width: 24),
-                    Text(trans(context, 'total_between_order_return') + "  ",
-                        style: styles.littleangrywhitestyle),
-                    Text(
-                        (double.parse(ben.totalOrders.toString()) -
-                                double.parse(ben.totalReturns.toString()))
-                            .toString(),
                         style: styles.angrywhitestyle),
                   ],
                 );
@@ -266,29 +263,30 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        Container(
-                          width: 110,
-                          child: RaisedButton(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            color: colors.red,
-                            onPressed: () {
-                              getIt<OrderListProvider>().clearOrcerList();
-                              Navigator.pushNamed(context, "/Order_Screen",
-                                  arguments: <String, dynamic>{
-                                    "ben": ben,
-                                    "isORderOrReturn": false,
-                                    "isAgentOrder": false
-                                  });
-                            },
-                            child: Text(
-                              trans(context, "return"),
-                              style: styles.mywhitestyle,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 32),
+                        // Container(
+                        //   width: 110,
+                        //   child: RaisedButton(
+                        //     shape: RoundedRectangleBorder(
+                        //       borderRadius: BorderRadius.circular(12.0),
+                        //     ),
+                        //     color: colors.red,
+                        //     onPressed: () {
+                        //       getIt<OrderListProvider>().clearOrcerList();
+                        //       Navigator.pushNamed(context, "/Order_Screen",
+                        //           arguments: <String, dynamic>{
+                        //             "ben": ben,
+                        //             "isORderOrReturn": false,
+                        //             "isAgentOrder": false,
+                        //             "transId":tr
+                        //           });
+                        //     },
+                        //     child: Text(
+                        //       trans(context, "return"),
+                        //       style: styles.mywhitestyle,
+                        //     ),
+                        //   ),
+                        // ),
+                        //  const SizedBox(width: 32),
                         Container(
                           width: 110,
                           child: RaisedButton(
@@ -302,6 +300,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                   arguments: <String, dynamic>{
                                     "orderTotal": ben.totalOrders,
                                     "returnTotal": ben.totalReturns,
+                                    "cashTotal": 0 - double.parse(ben.balance),
                                     "orderOrRetunOrCollection":
                                         getIt<OrderListProvider>()
                                                 .transactionTopAyIds
@@ -696,7 +695,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                 Navigator.pushNamed(context, "/Order_Screen",
                     arguments: <String, dynamic>{
                       "ben": ben,
-                      "isORderOrReturn": entry.type == "order"
+                      "isORderOrReturn": entry.type == "order",
+                      "transId": entry.type == "return" ? entry.id : null
                     });
               },
             )
@@ -711,7 +711,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                 Navigator.pushNamed(context, "/Order_Screen",
                     arguments: <String, dynamic>{
                       "ben": ben,
-                      "isORderOrReturn": entry.type == "order"
+                      "isORderOrReturn": entry.type == "order",
+                      "transId": entry.type == "return" ? entry.id : null
                     });
               },
             ),
@@ -735,7 +736,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                 Navigator.pushNamed(context, "/Order_Screen",
                     arguments: <String, dynamic>{
                       "ben": ben,
-                      "isORderOrReturn": entry.type == "return"
+                      "isORderOrReturn": entry.type == "return",
+                      "transId": entry.type == "return" ? entry.id : null
                     });
               },
             ),
@@ -790,7 +792,9 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
             caption: 'Share',
             color: colors.blue,
             icon: Icons.share,
-            onTap: () {},
+            onTap: () {
+              sendMail(transaction);
+            },
           ),
           IconSlideAction(
             caption: 'Delete',
@@ -941,13 +945,13 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
           children: <Widget>[
             FlatButton(
               onPressed: () async {
-                sendMail(transaction);
+// TODO(MOHAMAMD): USER PRINT FUNCTION
               },
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
-                  Text(trans(context, "share"), style: styles.mybluestyle),
-                  const Icon(Icons.share, size: 20)
+                  Text(trans(context, "print"), style: styles.mybluestyle),
+                  const Icon(Icons.print, size: 20)
                 ],
               ),
             ),

@@ -70,6 +70,16 @@ class GlobalVars with ChangeNotifier {
     }
   }
 
+  void setBalanceForBen(int benId, String balance) {
+    if (benId != null) {
+      beneficiaries.data.firstWhere((Ben element) {
+        return element.id == benId;
+      }, orElse: () {
+        return;
+      }).balance = double.parse(balance ?? "0.0").toString();
+    }
+  }
+
   void setDailyLog(
       int benId,
       String ben,
@@ -80,8 +90,7 @@ class GlobalVars with ChangeNotifier {
       String collection,
       String collectionTot,
       List<int> bens,
-      String totOrd,
-      String totRet) {
+      String balance) {
     benRemaining = "$ben / ${beneficiaries.data.length}";
     orderscount = orders;
     orderTotal = "$orderTot.00";
@@ -94,15 +103,7 @@ class GlobalVars with ChangeNotifier {
     }).forEach((Ben element) {
       element.visited = true;
     });
-    if (benId != null) {
-      beneficiaries.data.firstWhere((Ben element) {
-        return element.id == benId;
-      }, orElse: () {
-        return;
-      })
-        ..totalOrders = double.parse(totOrd ?? "0.0")
-        ..totalReturns = double.parse(totRet ?? "0.0");
-    }
+    setBalanceForBen(benId, balance);
 
     // if (totOrd != null && totRet != null) {
     //   totalOrders = double.parse(totOrd);
@@ -112,15 +113,21 @@ class GlobalVars with ChangeNotifier {
     notifyListeners();
   }
 
-  void setOrderandReturnTotalsAfterPay(
-      String ordertot, String returntot, int benId) {
+  void setOrderTotalsAfterPay(String ordertot, int benId) {
     beneficiaries.data.firstWhere((Ben element) {
       return element.id == benId;
     }, orElse: () {
       return;
-    })
-      ..totalOrders = double.parse(ordertot ?? "0.0")
-      ..totalReturns = double.parse(returntot ?? "0.0");
+    }).totalOrders += double.parse(ordertot ?? "0.0");
+    notifyListeners();
+  }
+
+  void setReturnTotalsAfterPay(String returntot, int benId) {
+    beneficiaries.data.firstWhere((Ben element) {
+      return element.id == benId;
+    }, orElse: () {
+      return;
+    }).totalReturns += double.parse(returntot ?? "0.0");
     notifyListeners();
   }
 

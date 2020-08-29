@@ -39,14 +39,14 @@ Route<PageController> onGenerateRoute(RouteSettings settings) {
       page = PageTransition<PageController>(
         child: OrderScreen(
             ben: args['ben'] as Ben,
-            isORderOrReturn: args['isORderOrReturn'] as bool,isAgentOrder:  args['isAgentOrder']as bool??false),
+            isORderOrReturn: args['isORderOrReturn'] as bool,isAgentOrder:  args['isAgentOrder']as bool??false,transId: args['transId']as int),
         type: PageTransitionType.rightToLeftWithFade,
       );
       break;
     case "/Payment_Screen":
       page = PageTransition<PageController>(
         child:
-            PaymentScreen(orderTotal: args['orderTotal'] as double,returnTotal: args['returnTotal'] as double,orderOrRetunOrCollection: args['orderOrRetunOrCollection']as int,),
+            PaymentScreen(orderTotal: args['orderTotal'] as double,returnTotal: args['returnTotal'] as double,cashTotal:args['cashTotal']as double, orderOrRetunOrCollection: args['orderOrRetunOrCollection']as int,),
         type: PageTransitionType.rightToLeftWithFade,
       );
       break;

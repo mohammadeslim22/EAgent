@@ -13,38 +13,40 @@ class BeneficiariesModel {
 }
 
 class Ben {
-  Ben(
-      {this.id,
-      this.name,
-      this.commercialRecord,
-      this.city,
-      this.address,
-      this.latitude,
-      this.longitude,
-      this.region,
-      this.managerName,
-      this.phone,
-      this.phone2,
-      this.email,
-      this.classification,
-      this.status,
-      this.price,
-      this.isreturn,
-      this.limitDebt,
-      this.notes,
-      this.lastTransDate,
-      this.transTotal,
-      this.transCount,
-      this.itemsCap,
-      this.visited,
-      this.orderTransTotal,
-      this.collectionTransCount,
-      this.collectionTransTotal,
-      this.orderTransCount,
-      this.returnTransCount,
-      this.returnTransTotal,
-      this.totalOrders,
-      this.totalReturns});
+  Ben({
+    this.id,
+    this.name,
+    this.commercialRecord,
+    this.city,
+    this.address,
+    this.latitude,
+    this.longitude,
+    this.region,
+    this.managerName,
+    this.phone,
+    this.phone2,
+    this.email,
+    this.classification,
+    this.status,
+    this.price,
+    this.isreturn,
+    this.limitDebt,
+    this.notes,
+    this.lastTransDate,
+    this.transTotal,
+    this.transCount,
+    this.itemsCap,
+    this.visited,
+    this.orderTransTotal,
+    this.collectionTransCount,
+    this.collectionTransTotal,
+    this.orderTransCount,
+    this.returnTransCount,
+    this.returnTransTotal,
+    this.balance,
+    this.totalOrders,
+    this.totalReturns
+  });
 
   Ben.fromJson(dynamic json) {
     id = json['id'] as int;
@@ -57,8 +59,8 @@ class Ben {
       });
     }
     address = json['address'].toString();
-    latitude =double.parse(json['latitude'].toString());
-    longitude =double.parse(json['longitude'].toString());
+    latitude = double.parse(json['latitude'].toString());
+    longitude = double.parse(json['longitude'].toString());
     region = json['region'].toString();
     managerName = json['manager_name'].toString();
     phone = json['phone'].toString();
@@ -91,8 +93,9 @@ class Ben {
     orderTransCount = json['order_trans_count'].toString();
     returnTransCount = json['return_trans_count'].toString();
     returnTransTotal = json['return_trans_total'].toString();
-    totalOrders =double.parse(json['total_confirmed'].toString());
-    totalReturns = double.parse(json['total_returned_confirmed'].toString());
+    balance = json['balance'].toString();
+    // totalOrders =double.parse(json['total_confirmed'].toString());
+    // totalReturns = double.parse(json['total_returned_confirmed'].toString());
   }
   int id;
   String name;
@@ -124,6 +127,7 @@ class Ben {
   String returnTransCount;
   String collectionTransTotal;
   String collectionTransCount;
+  String balance;
   double totalOrders = 0.0;
   double totalReturns = 0.0;
 }

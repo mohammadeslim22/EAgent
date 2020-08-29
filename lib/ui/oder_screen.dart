@@ -19,11 +19,16 @@ import 'package:giffy_dialog/giffy_dialog.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen(
-      {Key key, this.ben, this.isORderOrReturn, this.isAgentOrder})
+      {Key key,
+      this.ben,
+      this.isORderOrReturn,
+      this.isAgentOrder,
+      this.transId})
       : super(key: key);
   final Ben ben;
   final bool isORderOrReturn;
   final bool isAgentOrder;
+  final int transId;
   @override
   _OrderScreenState createState() => _OrderScreenState();
 }
@@ -33,7 +38,7 @@ class _OrderScreenState extends State<OrderScreen> {
   Ben ben;
   bool isORderOrReturn;
   double animatedHight = 0;
-
+  int transId;
   final TextEditingController searchController = TextEditingController();
   Map<String, String> itemsBalances = <String, String>{};
   List<int> prices = <int>[];
@@ -121,7 +126,7 @@ class _OrderScreenState extends State<OrderScreen> {
       getIt<OrderListProvider>().indexedStack = 0;
       getIt<OrderListProvider>().getItems();
     }
-    //   c = context;
+    transId = widget.transId;
   }
 
 //  BuildContext c;
@@ -520,11 +525,13 @@ class _OrderScreenState extends State<OrderScreen> {
                           icon: const Icon(Icons.add),
                           color: Colors.white,
                           onPressed: () {
-                            !widget.isAgentOrder
-                                ? getIt<OrderListProvider>()
-                                    .incrementQuantity(item.id)
-                                : getIt<OrderListProvider>()
-                                    .incrementQuantityForAgentOrder(item.id);
+                            isORderOrReturn
+                                ? !widget.isAgentOrder
+                                    ? getIt<OrderListProvider>()
+                                        .incrementQuantity(item.id)
+                                    : getIt<OrderListProvider>()
+                                        .incrementQuantityForAgentOrder(item.id)
+                                : print("");
                           },
                         ),
                       ),
@@ -822,7 +829,8 @@ class _OrderScreenState extends State<OrderScreen> {
           getIt<OrderListProvider>().sumTotal.round(),
           0,
           isORderOrReturn ? "order" : "return",
-          status);
+          status,
+          transId);
     }
   }
 

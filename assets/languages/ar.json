@@ -92,5 +92,6 @@
     "cash_total":"المبلغ الإجمالي","total_orders_confirmed":" اجمالي الطلبات المعتمدة",
     "total_return_confirmed":" اجمال المرجع المعتمد",
     "some_items_quantities are more than_u_have":"بعض كميات الأصناف أكبر مما لديك !",
-    "total_between_order_return":"المحصلة"
+    "total_between_order_return":"الرصيد",
+    "amount_must_be_over_0":"يجب أن يكون المبلغ المستلم أكبر من صفر"
 }
