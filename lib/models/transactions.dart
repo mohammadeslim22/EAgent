@@ -52,10 +52,12 @@ class Transaction {
     status = json['status'].toString();
     type = json['type'].toString();
     notes = json['notes'].toString();
-    amount = json['amount'] as int;
+    amount =double.parse(json['amount'].toString());
     shortage = json['shortage'] as int;
-    latitude = json['latitude'] as int;
-    longitude = json['longitude'] as int;
+    if(json['latitude']!=null)
+    latitude =double.parse(json['latitude'].toString());
+   if(json['longitude']!=null)
+    longitude =double.parse(json['longitude'].toString());
     createdAt = json['created_at'].toString();
     if (json['details'] != null) {
       details = <MiniItems>[];
@@ -97,10 +99,10 @@ class Transaction {
   String status;
   String type;
   String notes;
-  int amount;
+  double amount;
   int shortage;
-  int latitude;
-  int longitude;
+  double latitude;
+  double longitude;
   String createdAt;
   List<MiniItems> details;
 }
@@ -121,9 +123,9 @@ class MiniItems {
     itemId = json['item_id'] as int;
     item = json['item'].toString();
     unit = json['unit'].toString();
-    itemPrice = json['item_price'] as int;
+    itemPrice =double.parse(json['item_price'].toString());
     quantity = json['quantity'] as int;
-    total = json['total'] as int;
+    total =double.parse(json['total'].toString());
     notes = json['notes'].toString();
   }
 
@@ -143,8 +145,8 @@ class MiniItems {
   int itemId;
   String item;
   String unit;
-  int itemPrice;
+  double itemPrice;
   int quantity;
-  int total;
+  double total;
   String notes;
 }

@@ -24,7 +24,7 @@ class _OrderScreenState extends State<ShowItems> {
   Map<String, String> itemsBalances = <String, String>{};
   List<int> prices = <int>[];
 
-  Widget childForDragging(SingleItem item) {
+  Widget childForDragging(Balance item) {
     if (item.id % 2 == 0) {
       colorIndex++;
     }
@@ -40,8 +40,7 @@ class _OrderScreenState extends State<ShowItems> {
           const SizedBox(width: 80),
           Text(item.name, style: styles.bluestyle, textAlign: TextAlign.start),
           const Spacer(),
-          // const SizedBox(width: 32),
-          Text(item.shipmentBalance.toString(),
+          Text(item.balance.toString(),
               style: styles.bluestyle, textAlign: TextAlign.start),
           const SizedBox(width: 40)
         ],
@@ -56,7 +55,7 @@ class _OrderScreenState extends State<ShowItems> {
     if (getIt<OrderListProvider>().itemsDataLoaded) {
     } else {
       getIt<OrderListProvider>().indexedStack = 0;
-      getIt<OrderListProvider>().getItems();
+      getIt<OrderListProvider>().getItemsBalances();
     }
   }
 
@@ -78,7 +77,7 @@ class _OrderScreenState extends State<ShowItems> {
           IconButton(
             icon: const Icon(Icons.refresh, size: 32),
             onPressed: () {
-              getIt<OrderListProvider>().getItems();
+              getIt<OrderListProvider>().getItemsBalances();
             },
           ),
           Row(
@@ -121,7 +120,7 @@ class _OrderScreenState extends State<ShowItems> {
                               isPaused: orderProvider.itemsDataLoaded,
                               animation: "analysis"),
                         ),
-                        if (orderProvider.itemsDataLoaded)
+                        if (orderProvider.itemsBalanceDataLoaded)
                           GridView.count(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 6, vertical: 2),
@@ -133,8 +132,8 @@ class _OrderScreenState extends State<ShowItems> {
                               crossAxisCount: 2,
                               childAspectRatio: 10,
                               addRepaintBoundaries: true,
-                              children: orderProvider.itemsList
-                                  .map((SingleItem item) {
+                              children: orderProvider.itemsBalances
+                                  .map((Balance item) {
                                 return childForDragging(item);
                               }).toList()),
                         // ListView.builder(

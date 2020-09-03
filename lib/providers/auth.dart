@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:agent_second/constants/config.dart';
 import 'package:agent_second/localization/trans.dart';
 import 'package:agent_second/util/data.dart';
 import 'package:agent_second/util/dio.dart';
@@ -35,14 +36,19 @@ class Auth with ChangeNotifier {
           data.setData(
               "verchil_id", value.data['agent']['vehicle_id'].toString());
           data.setData("agent_id", value.data['id'].toString());
+          data.setData("company_name", value.data['company_name'].toString());
           data.setData("agent_name", value.data['username'].toString());
+          data.setData("tax", value.data['tax'].toString());
+          config.companyName = value.data['company_name'].toString();
+          config.tax = double.parse(value.data['tax'].toString());
           data.setData("agent_email", value.data['email'].toString());
           final GlobalVars globalVarsProv =
               Provider.of<GlobalVars>(context, listen: false);
           cron.schedule(Schedule.parse('*/1 * * * *'), () async {
             globalVarsProv.incrementTimeSinceLogin();
           });
-          Navigator.popAndPushNamed(context, '/Home', arguments: <String, dynamic>{});
+          Navigator.popAndPushNamed(context, '/Home',
+              arguments: <String, dynamic>{});
         } else {
           showToastWidget(
               IconToastWidget.fail(msg: trans(context, 'invalid_credentals')),

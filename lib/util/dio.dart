@@ -3,6 +3,7 @@ import 'package:agent_second/util/service_locator.dart';
 import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../constants/config.dart';
+import 'package:location/location.dart';
 
 String token;
 
@@ -22,16 +23,29 @@ BaseOptions options = BaseOptions(
 Response<dynamic> response;
 
 Dio dio = Dio(options);
+Location location = Location();
+double latTosend;
+double longTosend;
 
-void dioDefaults() {
+Future<void> dioDefaults() async {
+  await location.getLocation().then((LocationData value) {
+    latTosend = value.latitude;
+    longTosend = value.longitude;
+  });
+  location.onLocationChanged.listen((LocationData currentLocation) {
+    latTosend = currentLocation.latitude;
+    longTosend = currentLocation.longitude;
+    print(
+        "hola hola lat ${currentLocation.latitude} hola hola long ${currentLocation.longitude}");
+  });
   // dio.options.headers['authorization'] = 'Bearer ${config.token}';
   dio.interceptors
       .add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
     // Do something before request is sent
-    // options.queryParameters.addAll(<String, String>{
-    //   'latitude': config.lat.toString(),
-    //   'longitude': config.long.toString()
-    // });
+    options.queryParameters.addAll(<String, String>{
+      'latitude': latTosend.toString() ?? "0.0",
+      'longitude': longTosend.toString() ?? "0.0"
+    });
     return options;
     // If you want to resolve the request with some custom data，
     // you can return a `Response` object or return `dio.resolve(data)`.

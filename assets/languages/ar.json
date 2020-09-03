@@ -93,5 +93,20 @@
     "total_return_confirmed":" اجمال المرجع المعتمد",
     "some_items_quantities are more than_u_have":"بعض كميات الأصناف أكبر مما لديك !",
     "total_between_order_return":"الرصيد",
-    "amount_must_be_over_0":"يجب أن يكون المبلغ المستلم أكبر من صفر"
+    "amount_must_be_over_0":"يجب أن يكون المبلغ المستلم أكبر من صفر",
+    "done":"تم",
+    "print_invoice":"طباعة الفاتورة",
+    "sahari":"مخبز الصحاري",
+    "tax_invoice":"",
+    "cust":"العميل",
+    "invoice_no":"رقم الفاتورة",
+    "slno":"#",
+    "oty":"OTY",
+    "rate":"RATE",
+    "discount":"الخصم",
+    "sub_total":"الناتج الكلي",
+    "vat_amount":"قيمة الضريبة",
+    "net_total":"الناتج الإجمالي",
+    "salesman":"المندوب",
+    "signature":"التوقيع"
 }

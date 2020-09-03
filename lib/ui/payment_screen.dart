@@ -10,16 +10,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen(
-      {Key key,
-      this.orderTotal,
-      this.returnTotal,
-      this.orderOrRetunOrCollection,
-      this.cashTotal})
+      {Key key, this.orderTotal, this.returnTotal, this.cashTotal})
       : super(key: key);
   final double orderTotal;
   final double returnTotal;
   final double cashTotal;
-  final int orderOrRetunOrCollection;
 
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
@@ -36,19 +31,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final TextEditingController cvcCashController = TextEditingController();
   final TextEditingController ammountPayController = TextEditingController();
   Ben _ben;
-  String _type;
-  // Transaction _transaction;
   @override
   void initState() {
     super.initState();
-    _type = widget.orderOrRetunOrCollection == 0
-        ? "order"
-        : widget.orderOrRetunOrCollection == 1 ? "return" : "collection";
     _ben = getIt<GlobalVars>().getbenInFocus();
     paymentCashController.text = "${widget.cashTotal}  ";
     paymentAmountController.text = "${widget.orderTotal}  ";
-    paymentCashController.selection = TextSelection(
-        baseOffset: 0, extentOffset: widget.orderTotal.toString().length + 2);
+    if (widget.orderTotal != null)
+      paymentCashController.selection = TextSelection(
+          baseOffset: 0, extentOffset: widget.cashTotal.toString().length + 2);
 
     paymentDeptController.text = "${widget.returnTotal}  ";
   }
@@ -321,49 +312,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.0),
                         ),
-                        color: Colors.green,
+                        color: colors.green,
                         onPressed: () async {
                           if (double.parse(paymentCashController.text) > 0) {
                             showAWAITINGSENDOrderTruck();
-
-                            switch (_type) {
-                              case "collection":
-                                {
-                                  try {
-                                    if (await getIt<OrderListProvider>()
-                                        .sendCollection(
-                                            context,
-                                            _ben.id,
-                                            int.parse(
-                                                paymentCashController.text),
-                                            "confirmed")) {
-                                      setState(() {
-                                        paymentAmountController.text = "00.00";
-
-                                        paymentCashController.text = "00.00";
-
-                                        paymentDeptController.text = "00.00";
-                                      });
-                                    }
-                                  } catch (e) {
-                                    print("error in collection");
-                                    Navigator.pop(context);
-                                  }
-                                  Navigator.pop(context);
-                                }
-                                break;
-                              default:
-                                {
-                                  await getIt<OrderListProvider>()
-                                      .payMYOrdersAndReturnList(
-                                          context,
-                                          _ben.id,
-                                          double.parse(
-                                              paymentCashController.text));
-                                  Navigator.pop(context);
-                                }
-                                break;
-                            }
+                            await getIt<OrderListProvider>()
+                                .payMYOrdersAndReturnList(context, _ben.id,
+                                    double.parse(paymentCashController.text));
+                            Navigator.pop(context);
                           } else {
                             showAmmountUnderZero();
                           }
@@ -407,12 +363,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             ),
                             actions: <Widget>[
                               FlatButton(
-                                  child: Text(trans(context, "cancel")),
+                                  child: Text(trans(context, "cancel"),
+                                      style: styles.darkgreenstyle),
                                   onPressed: () {
                                     Navigator.pop(context);
                                   }),
                               FlatButton(
-                                  child: Text(trans(context, "set")),
+                                  child: Text(trans(context, "done"),
+                                      style: styles.darkgreenstyle),
                                   onPressed: () {
                                     // add note to the payment
                                   })
@@ -543,7 +501,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     fit: BoxFit.cover,
                     animation: "Untitled"),
               ),
-              Material(child: Text(trans(context, 'amount_must_be_over_0'),style: styles.darkbluestyle))
+              Material(
+                  child: Text(trans(context, 'amount_must_be_over_0'),
+                      style: styles.darkbluestyle))
             ],
           );
         });

@@ -13,40 +13,39 @@ class BeneficiariesModel {
 }
 
 class Ben {
-  Ben({
-    this.id,
-    this.name,
-    this.commercialRecord,
-    this.city,
-    this.address,
-    this.latitude,
-    this.longitude,
-    this.region,
-    this.managerName,
-    this.phone,
-    this.phone2,
-    this.email,
-    this.classification,
-    this.status,
-    this.price,
-    this.isreturn,
-    this.limitDebt,
-    this.notes,
-    this.lastTransDate,
-    this.transTotal,
-    this.transCount,
-    this.itemsCap,
-    this.visited,
-    this.orderTransTotal,
-    this.collectionTransCount,
-    this.collectionTransTotal,
-    this.orderTransCount,
-    this.returnTransCount,
-    this.returnTransTotal,
-    this.balance,
-    this.totalOrders,
-    this.totalReturns
-  });
+  Ben(
+      {this.id,
+      this.name,
+      this.commercialRecord,
+      this.city,
+      this.address,
+      this.latitude,
+      this.longitude,
+      this.region,
+      this.managerName,
+      this.phone,
+      this.phone2,
+      this.email,
+      this.classification,
+      this.status,
+      this.price,
+      this.isreturn,
+      this.limitDebt,
+      this.notes,
+      this.lastTransDate,
+      this.transTotal,
+      this.transCount,
+      this.itemsCap,
+      this.visited,
+      this.orderTransTotal,
+      this.collectionTransCount,
+      this.collectionTransTotal,
+      this.orderTransCount,
+      this.returnTransCount,
+      this.returnTransTotal,
+      this.balance,
+      this.totalOrders,
+      this.totalReturns});
 
   Ben.fromJson(dynamic json) {
     id = json['id'] as int;
@@ -59,8 +58,10 @@ class Ben {
       });
     }
     address = json['address'].toString();
-    latitude = double.parse(json['latitude'].toString());
-    longitude = double.parse(json['longitude'].toString());
+    if (json['latitude'] != null)
+      latitude = double.parse(json['latitude'].toString());
+    if (json['longitude'] != null)
+      longitude = double.parse(json['longitude'].toString());
     region = json['region'].toString();
     managerName = json['manager_name'].toString();
     phone = json['phone'].toString();
@@ -134,7 +135,6 @@ class Ben {
 
 class City {
   City({this.id, this.name, this.createdAt, this.updatedAt});
-
   City.fromJson(dynamic json) {
     id = json['id'] as int;
     name = json['name'].toString();

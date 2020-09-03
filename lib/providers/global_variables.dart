@@ -130,7 +130,14 @@ class GlobalVars with ChangeNotifier {
     }).totalReturns += double.parse(returntot ?? "0.0");
     notifyListeners();
   }
-
+void clearOrderTotAndReturnTotal(int benId){
+  beneficiaries.data.firstWhere((Ben element) {
+      return element.id == benId;
+    }, orElse: () {
+      return;
+    })..totalReturns = 0.0..totalOrders=0.0;
+    notifyListeners();
+}
   void incrementTimeSinceLogin() {
     timeSinceLoginn = timeSinceLoginn.add(const Duration(minutes: 1));
     timeSinceLogin = DateFormat.Hm().format(timeSinceLoginn);

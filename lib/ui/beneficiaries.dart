@@ -28,6 +28,8 @@ class _BeneficiariesState extends State<Beneficiaries> {
     final GlobalVars globalVarsProv =
         Provider.of<GlobalVars>(context, listen: false);
     beneficiaries = globalVarsProv.beneficiaries;
+    getIt<OrderListProvider>().getItemsBalances();
+
   }
 
   @override

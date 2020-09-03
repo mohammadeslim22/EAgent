@@ -4,6 +4,7 @@ import 'package:agent_second/constants/styles.dart';
 import 'package:agent_second/localization/trans.dart';
 import 'package:agent_second/models/ben.dart';
 import 'package:agent_second/models/collection.dart';
+import 'package:agent_second/models/finanical_records.dart';
 import 'package:agent_second/models/transactions.dart';
 import 'package:agent_second/providers/export.dart';
 import 'package:agent_second/providers/transaction_provider.dart';
@@ -20,8 +21,6 @@ import 'package:location/location.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
-import 'package:esc_pos_utils/esc_pos_utils.dart';
 
 class BeneficiaryCenter extends StatefulWidget {
   const BeneficiaryCenter({Key key, this.long, this.lat, this.ben})
@@ -53,8 +52,29 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
       permissionGranted = await location.hasPermission();
       if (permissionGranted == PermissionStatus.denied) {
       } else {
-        // _animateToUser();
+        _animateToUser();
       }
+    }
+  }
+
+  Future<void> _animateToUser() async {
+    try {
+      if (mounted) {
+        await location.getLocation().then((LocationData value) {
+          mapController
+              .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+            target: LatLng(value.latitude, value.longitude),
+            zoom: 13,
+          )));
+
+          setState(() {
+            lat = value.latitude;
+            long = value.longitude;
+          });
+        });
+      }
+    } catch (e) {
+      return;
     }
   }
 
@@ -263,30 +283,6 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        // Container(
-                        //   width: 110,
-                        //   child: RaisedButton(
-                        //     shape: RoundedRectangleBorder(
-                        //       borderRadius: BorderRadius.circular(12.0),
-                        //     ),
-                        //     color: colors.red,
-                        //     onPressed: () {
-                        //       getIt<OrderListProvider>().clearOrcerList();
-                        //       Navigator.pushNamed(context, "/Order_Screen",
-                        //           arguments: <String, dynamic>{
-                        //             "ben": ben,
-                        //             "isORderOrReturn": false,
-                        //             "isAgentOrder": false,
-                        //             "transId":tr
-                        //           });
-                        //     },
-                        //     child: Text(
-                        //       trans(context, "return"),
-                        //       style: styles.mywhitestyle,
-                        //     ),
-                        //   ),
-                        // ),
-                        //  const SizedBox(width: 32),
                         Container(
                           width: 110,
                           child: RaisedButton(
@@ -301,12 +297,6 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                     "orderTotal": ben.totalOrders,
                                     "returnTotal": ben.totalReturns,
                                     "cashTotal": 0 - double.parse(ben.balance),
-                                    "orderOrRetunOrCollection":
-                                        getIt<OrderListProvider>()
-                                                .transactionTopAyIds
-                                                .isEmpty
-                                            ? 2
-                                            : 0
                                   });
                             },
                             child: Text(trans(context, "collection"),
@@ -390,16 +380,6 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                               width: 40),
                         ),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: <Widget>[
-                          Text(trans(context, "total" "    ${ben.transTotal}"),
-                              style: styles.mystyle),
-                          const SizedBox(height: 6),
-                          Text(trans(context, "count") + "   ${ben.transCount}",
-                              style: styles.mystyle),
-                        ],
-                      ),
                     ],
                   ),
                   Container(
@@ -448,7 +428,13 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       onRefresh: () async {
                         if (mounted) {
                           if (indexedStack == 0) {
+                            getIt<TransactionProvider>()
+                                .pagewiseCollectionController
+                                .reset();
                           } else if (indexedStack == 1) {
+                            getIt<TransactionProvider>()
+                                .pagewiseReturnController
+                                .reset();
                           } else {
                             getIt<TransactionProvider>()
                                 .pagewiseOrderController
@@ -562,8 +548,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                 initDelay: const Duration(milliseconds: 0),
                                 duration: const Duration(seconds: 1),
                                 curve: Curves.ease,
-                                child: collectionBuilder(
-                                    entry as SingleCollection),
+                                child:
+                                    collectionBuilder(entry as FinanicalRecord),
                               );
                             },
                             pageLoadController: getIt<TransactionProvider>()
@@ -630,10 +616,10 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                             await location.requestPermission();
                                         if (permissionGranted ==
                                             PermissionStatus.granted) {
-                                          //  _animateToUser();
+                                          _animateToUser();
                                         }
                                       } else {
-                                        //    _animateToUser();
+                                        _animateToUser();
                                       }
                                     }
                                   } else {
@@ -645,10 +631,10 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                           await location.requestPermission();
                                       if (permissionGranted ==
                                           PermissionStatus.granted) {
-                                        //  _animateToUser();
+                                        _animateToUser();
                                       }
                                     } else {
-                                      //   _animateToUser();
+                                      _animateToUser();
                                     }
                                   }
                                 },
@@ -775,7 +761,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       : Container(),
                 ),
                 Expanded(
-                    child: Text(entry.amount.toString() + ".00",
+                    child: Text(entry.amount.toString(),
                         style: styles.mystyle, textAlign: TextAlign.end))
               ],
             ),
@@ -783,7 +769,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
         ));
   }
 
-  Widget collectionBuilder(SingleCollection collection) {
+  Widget collectionBuilder(FinanicalRecord collection) {
     return Slidable(
         actionPane: const SlidableDrawerActionPane(),
         actionExtentRatio: 0.25,
@@ -816,13 +802,12 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                       style: styles.mystyle, textAlign: TextAlign.start)),
               Expanded(
                   flex: 2,
-                  child: Text(collection.agent ?? "اسم المندوب هنا",
+                  child: Text(collection.agent.name ?? "اسم المندوب هنا",
                       style: styles.mystyle)),
               Expanded(
-                  flex: 2,
-                  child: Text(collection.createdAt, style: styles.mystyle)),
+                  flex: 2, child: Text(collection.date, style: styles.mystyle)),
               Expanded(
-                  child: Text(collection.amount.toString() + ".00",
+                  child: Text(collection.credit.toString() + ".00",
                       style: styles.mystyle, textAlign: TextAlign.end))
             ],
           ),
@@ -932,9 +917,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                     DataCell(Text(e.item)),
                     DataCell(Text(e.quantity.toString())),
                     DataCell(Text(e.unit.toString())),
-                    DataCell(Text(e.itemPrice.toString() + ".00")),
-                    DataCell(
-                        Text((e.itemPrice * e.quantity).toString() + ".00"))
+                    DataCell(Text(e.itemPrice.toString())),
+                    DataCell(Text(e.total.toString()))
                   ]);
                 }).toList(),
               )),
@@ -945,7 +929,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
           children: <Widget>[
             FlatButton(
               onPressed: () async {
-// TODO(MOHAMAMD): USER PRINT FUNCTION
+                Navigator.pushNamed(context, "/Bluetooth",
+                    arguments: <String, dynamic>{"transaction": transaction});
               },
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -977,51 +962,5 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
         isHTML: true,
         body: t.toString());
     await FlutterMailer.send(mailOptions);
-  }
-
-  Ticket testTicket() {
-    final Ticket ticket = Ticket(PaperSize.mm80);
-
-    ticket.text(
-        'Regular: aA bB cC dD eE fF gG hH iI jJ kK lL mM nN oO pP qQ rR sS tT uU vV wW xX yY zZ');
-    ticket.text('Special 1: àÀ èÈ éÉ ûÛ üÜ çÇ ôÔ',
-        styles: PosStyles(codeTable: PosCodeTable.westEur));
-    ticket.text('Special 2: blåbærgrød',
-        styles: PosStyles(codeTable: PosCodeTable.westEur));
-
-    ticket.text('Bold text', styles: const PosStyles(bold: true));
-    ticket.text('Reverse text', styles: const PosStyles(reverse: true));
-    ticket.text('Underlined text',
-        styles: const PosStyles(underline: true), linesAfter: 1);
-    ticket.text('Align left', styles: const PosStyles(align: PosAlign.left));
-    ticket.text('Align center',
-        styles: const PosStyles(align: PosAlign.center));
-    ticket.text('Align right',
-        styles: const PosStyles(align: PosAlign.right), linesAfter: 1);
-
-    ticket.text('Text size 200%',
-        styles: PosStyles(
-          height: PosTextSize.size2,
-          width: PosTextSize.size2,
-        ));
-
-    ticket.feed(2);
-    ticket.cut();
-    return ticket;
-  }
-
-  Future<void> testPrint() async {
-    final PrinterBluetoothManager printerManager = PrinterBluetoothManager();
-
-    printerManager.scanResults
-        .listen((List<PrinterBluetooth> printers) async {});
-    printerManager.startScan(const Duration(seconds: 4));
-
-// ...
-
-// printerManager.selectPrinter(printer);
-    final PosPrintResult res = await printerManager.printTicket(testTicket());
-
-    print('Print result: ${res.msg}');
   }
 }

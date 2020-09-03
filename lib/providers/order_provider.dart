@@ -12,7 +12,11 @@ import 'package:vibration/vibration.dart';
 class OrderListProvider with ChangeNotifier {
   List<SingleItemForSend> ordersList = <SingleItemForSend>[];
   List<SingleItem> itemsList;
+  List<Balance> itemsBalances;
+
   bool itemsDataLoaded = false;
+  bool itemsBalanceDataLoaded = false;
+
   int indexedStack = 0;
   Set<int> selectedOptions = <int>{};
   double sumTotal = 0;
@@ -223,6 +227,20 @@ class OrderListProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  bool checkItemsBalancesBrforeLeaving() {
+    for (int i = 0; i < ordersList.length; i++) {
+      if (ordersList[i].queantity >
+          itemsBalances.firstWhere((Balance e) {
+            return e.id == ordersList[i].id;
+          }, orElse: () {
+            return Balance(id: 99999, balance: 0);
+          }).balance) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   Future<bool> sendCollection(
       BuildContext c, int benId, int amount, String status) async {
     final Response<dynamic> response =
@@ -249,17 +267,17 @@ class OrderListProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> sendOrder(BuildContext c, int benId, int ammoutn, int shortage,
+  Future<bool> sendOrder(BuildContext c, int benId, double ammoutn, int shortage,
       String type, String status, int fromTransactionId) async {
     final List<int> itemsId = <int>[];
     final List<int> itemsQuantity = <int>[];
-    final List<int> itemsPrice = <int>[];
+    final List<double> itemsPrice = <double>[];
     final List<int> itemsUnit = <int>[];
     final List<String> itemsNote = <String>[];
     for (int i = 0; i < ordersList.length; i++) {
       itemsId.add(ordersList[i].id);
       itemsQuantity.add(ordersList[i].queantity);
-      itemsPrice.add(double.parse(ordersList[i].unitPrice).round());
+      itemsPrice.add(double.parse(ordersList[i].unitPrice));
       itemsUnit.add(ordersList[i].unitId);
       itemsNote.add(ordersList[i].notes);
     }
@@ -284,6 +302,8 @@ class OrderListProvider with ChangeNotifier {
       clearOrcerList();
       setDayLog(response, benId);
 
+      // لتحديث رصيد الصنف فقط
+      getItemsBalances();
       // addIdTOTransactionToPayIdsList(
       //     int.parse(response.data['transaction_id'].toString()));
 
@@ -382,8 +402,7 @@ class OrderListProvider with ChangeNotifier {
       });
       getIt<GlobalVars>()
           .setBalanceForBen(benId, response.data['balance'].toString());
-      getIt<GlobalVars>().setOrderTotalsAfterPay("0.0", benId);
-      getIt<GlobalVars>().setReturnTotalsAfterPay("0.0", benId);
+      getIt<GlobalVars>().clearOrderTotAndReturnTotal(benId);
 
       print("pay response value :  ${response.data}");
       // transactionTopAyIds.clear();
@@ -405,6 +424,17 @@ class OrderListProvider with ChangeNotifier {
     });
   }
 
+  Future<void> getItemsBalances() async {
+    await dio
+        .get<dynamic>("items_info/balance")
+        .then((Response<dynamic> value) {
+      itemsBalances = ItemsBalance.fromJson(value.data).itemsList;
+      itemsBalanceDataLoaded = true;
+      indexedStack = 1;
+      notifyListeners();
+    });
+  }
+
   SingleItem getItemForUnit(int itemId) {
     return itemsList.firstWhere((SingleItem element) {
       return element.id == itemId;
@@ -412,10 +442,15 @@ class OrderListProvider with ChangeNotifier {
   }
 
   bool checkValidation(int itemId, int quantity) {
-    if (quantity <=
+    print(quantity);
+
+    print(itemId);
+    if ((quantity <=
             itemsList.firstWhere((SingleItem element) {
               return element.id == itemId;
-            }).balanceInventory &&
+            }, orElse: () {
+              return dummySiglItem;
+            }).balanceInventory) &&
         quantity > 0) {
       if (quantity <=
           getIt<GlobalVars>().benInFocus.itemsCap.firstWhere(

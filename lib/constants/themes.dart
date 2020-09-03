@@ -8,12 +8,14 @@ ThemeData mainThemeData() {
     scaffoldBackgroundColor:const Color(0xFFF2FBFF),
     appBarTheme: AppBarTheme(
       color: colors.myBlue,
+
       elevation: 0.0,
       iconTheme: IconThemeData(color: colors.white),
       textTheme: const TextTheme(),
     ),
     fontFamily: "Almarai",
     canvasColor: Colors.white,
+    
     cursorColor: colors.myBlue,
     hintColor: colors.white,
    // bottomSheetTheme:  BottomSheetThemeData(elevation: 10,backgroundColor: Colors.white.withOpacity(.75)),

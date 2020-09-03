@@ -49,8 +49,11 @@ class SingleItem {
     price3 = json['price3'].toString();
     price4 = json['price4'].toString();
     price5 = json['price5'].toString();
+    if(json['balance_inventory']!=null)
     balanceInventory = json['balance_inventory'] as int;
-    wholesalePrice = json['wholesale_price'] as int;
+    else
+    balanceInventory=9999;
+    wholesalePrice = json['wholesale_price'].toString();
     barcode = json['barcode'].toString();
     image = json['image'].toString();
     vat = json['vat'].toString();
@@ -107,7 +110,7 @@ class SingleItem {
   String price4;
   String price5;
   int balanceInventory;
-  int wholesalePrice;
+  String wholesalePrice;
   String barcode;
   String image;
   String vat;
@@ -171,4 +174,32 @@ class Units {
   int id;
   String name;
   String conversionFactor;
+}
+
+class ItemsBalance {
+  ItemsBalance({this.itemsList});
+
+  ItemsBalance.fromJson(dynamic json) {
+    if (json['data'] != null) {
+      itemsList = <Balance>[];
+      json['data'].forEach((dynamic v) {
+        itemsList.add(Balance.fromJson(v));
+      });
+    }
+  }
+
+  List<Balance> itemsList;
+}
+
+class Balance {
+  Balance({this.id, this.balance});
+
+  Balance.fromJson(dynamic json) {
+    id = json['id'] as int;
+    balance = json['shipment_balance'] as int;
+    name = json['name'].toString();
+  }
+  int id;
+  int balance;
+  String name;
 }

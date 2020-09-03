@@ -73,8 +73,10 @@ class _DashBoardState extends State<DashBoard> {
     super.initState();
     lat = widget.lat ?? 25.063054;
     long = widget.long ?? 55.170010;
+    
     getIt<GlobalVars>().beneficiaries.data.forEach((Ben element) {
-      _addMarker(element);
+      if (element.latitude != null && element.longitude != null)
+        _addMarker(element);
     });
   }
 
@@ -188,9 +190,7 @@ class _DashBoardState extends State<DashBoard> {
             body: Row(
               children: <Widget>[
                 Expanded(
-                  
                   child: Column(
-                    
                     // mainAxisSize: MainAxisSize.min,
                     // padding: EdgeInsets.zero,
                     children: <Widget>[
@@ -218,7 +218,6 @@ class _DashBoardState extends State<DashBoard> {
                         ),
                       ),
                       ListTile(
-                        
                         onTap: () {
                           Navigator.pushNamedAndRemoveUntil(
                               context, "/Home", (_) => false);

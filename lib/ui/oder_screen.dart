@@ -62,7 +62,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       item.notes,
                       item.queantity,
                       item.unit,
-                      item.unitPrice,
+                      item.unitPrice.toString(),
                       item.image);
                   orsderListProvider.selectedOptions.add(item.id);
                 })
@@ -370,7 +370,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                       value.notes,
                                       value.queantity,
                                       value.unit,
-                                      value.unitPrice,
+                                      value.unitPrice.toString(),
                                       value.image);
                                   getIt<OrderListProvider>()
                                       .selectedOptions
@@ -525,13 +525,11 @@ class _OrderScreenState extends State<OrderScreen> {
                           icon: const Icon(Icons.add),
                           color: Colors.white,
                           onPressed: () {
-                            isORderOrReturn
-                                ? !widget.isAgentOrder
-                                    ? getIt<OrderListProvider>()
-                                        .incrementQuantity(item.id)
-                                    : getIt<OrderListProvider>()
-                                        .incrementQuantityForAgentOrder(item.id)
-                                : print("");
+                            !widget.isAgentOrder
+                                ? getIt<OrderListProvider>()
+                                    .incrementQuantity(item.id)
+                                : getIt<OrderListProvider>()
+                                    .incrementQuantityForAgentOrder(item.id);
                           },
                         ),
                       ),
@@ -720,9 +718,17 @@ class _OrderScreenState extends State<OrderScreen> {
                                       onPressed: () async {
                                         Navigator.pop(context);
                                         awaitTransaction();
-                                        if (await sendTransFunction(context,
-                                            widget.isAgentOrder, "confirmed")) {
-                                          Navigator.pop(context);
+                                        if (value
+                                            .checkItemsBalancesBrforeLeaving()) {
+                                          if (await sendTransFunction(
+                                              context,
+                                              widget.isAgentOrder,
+                                              "confirmed")) {
+                                            Navigator.pop(context);
+                                          } else {
+                                            Navigator.pop(context);
+                                            showOverQuantitySnakBar(context);
+                                          }
                                         } else {
                                           Navigator.pop(context);
                                           showOverQuantitySnakBar(context);
@@ -746,13 +752,14 @@ class _OrderScreenState extends State<OrderScreen> {
                                             context, "/Payment_Screen",
                                             arguments: <String, dynamic>{
                                               "orderTotal": isORderOrReturn
-                                                  ? getIt<OrderListProvider>()
-                                                      .sumTotal
+                                                  ? value.sumTotal
                                                   : 0.0,
                                               "returnTotal": isORderOrReturn
                                                   ? 0.0
-                                                  : getIt<OrderListProvider>()
-                                                      .sumTotal,
+                                                  : value.sumTotal,
+                                              "cashTotal": isORderOrReturn
+                                                  ? value.sumTotal
+                                                  : -value.sumTotal,
                                               "orderOrRetunOrCollection": 0
                                             });
                                       },
@@ -776,9 +783,6 @@ class _OrderScreenState extends State<OrderScreen> {
                           print("i have no idea  ");
                           showOverQuantitySnakBar(context);
                         }
-
-                        // Navigator.pop(context);
-                        //  value.clearOrcerList();
                       }
                     },
                     child: Text(
@@ -797,7 +801,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
                     ),
-                    color: Colors.red,
+                    color: colors.red,
                     onPressed: () {
                       cacelTransaction(true);
                     },
@@ -826,7 +830,7 @@ class _OrderScreenState extends State<OrderScreen> {
       return await getIt<OrderListProvider>().sendOrder(
           context,
           ben.id,
-          getIt<OrderListProvider>().sumTotal.round(),
+          getIt<OrderListProvider>().sumTotal,
           0,
           isORderOrReturn ? "order" : "return",
           status,

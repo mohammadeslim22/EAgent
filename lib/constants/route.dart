@@ -1,4 +1,5 @@
 import 'package:agent_second/models/ben.dart';
+import 'package:agent_second/models/transactions.dart';
 import 'package:agent_second/ui/agent_orders.dart';
 import 'package:agent_second/ui/auth/login_screen.dart';
 import 'package:agent_second/ui/ben_center.dart';
@@ -7,6 +8,7 @@ import 'package:agent_second/ui/home.dart';
 import 'package:agent_second/ui/oder_screen.dart';
 import 'package:agent_second/ui/payment_screen.dart';
 import 'package:agent_second/ui/show_items.dart';
+import 'package:agent_second/util/bluetooth.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -46,7 +48,7 @@ Route<PageController> onGenerateRoute(RouteSettings settings) {
     case "/Payment_Screen":
       page = PageTransition<PageController>(
         child:
-            PaymentScreen(orderTotal: args['orderTotal'] as double,returnTotal: args['returnTotal'] as double,cashTotal:args['cashTotal']as double, orderOrRetunOrCollection: args['orderOrRetunOrCollection']as int,),
+            PaymentScreen(orderTotal: args['orderTotal'] as double,returnTotal: args['returnTotal'] as double,cashTotal:args['cashTotal']as double),
         type: PageTransitionType.rightToLeftWithFade,
       );
       break;
@@ -70,6 +72,14 @@ Route<PageController> onGenerateRoute(RouteSettings settings) {
         type: PageTransitionType.rightToLeftWithFade,
       );
       break;
+            case "/Bluetooth":
+      page = PageTransition<PageController>(
+        child:  Bluetooth(transaction : args['transaction'] as Transaction),
+        type: PageTransitionType.rightToLeftWithFade,
+      );
+      break;
   }
+
+  
   return page;
 }
