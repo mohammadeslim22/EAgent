@@ -22,7 +22,7 @@ import 'package:agent_second/providers/order_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupLocator();
- await dioDefaults();
+  dioDefaults();
   SystemChrome.setPreferredOrientations(<DeviceOrientation>[
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight

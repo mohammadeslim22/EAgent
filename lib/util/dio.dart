@@ -28,16 +28,16 @@ double latTosend;
 double longTosend;
 
 Future<void> dioDefaults() async {
-  await location.getLocation().then((LocationData value) {
+   location.getLocation().then((LocationData value) {
     latTosend = value.latitude;
     longTosend = value.longitude;
   });
-  location.onLocationChanged.listen((LocationData currentLocation) {
-    latTosend = currentLocation.latitude;
-    longTosend = currentLocation.longitude;
-    print(
-        "hola hola lat ${currentLocation.latitude} hola hola long ${currentLocation.longitude}");
-  });
+  // location.onLocationChanged.listen((LocationData currentLocation) {
+  //   latTosend = currentLocation.latitude;
+  //   longTosend = currentLocation.longitude;
+  //   print(
+  //       "hola hola lat ${currentLocation.latitude} hola hola long ${currentLocation.longitude}");
+  // });
   // dio.options.headers['authorization'] = 'Bearer ${config.token}';
   dio.interceptors
       .add(InterceptorsWrapper(onRequest: (RequestOptions options) async {

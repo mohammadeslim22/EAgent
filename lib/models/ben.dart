@@ -45,7 +45,8 @@ class Ben {
       this.returnTransTotal,
       this.balance,
       this.totalOrders,
-      this.totalReturns});
+      this.totalReturns,
+      this.trn});
 
   Ben.fromJson(dynamic json) {
     id = json['id'] as int;
@@ -95,6 +96,8 @@ class Ben {
     returnTransCount = json['return_trans_count'].toString();
     returnTransTotal = json['return_trans_total'].toString();
     balance = json['balance'].toString();
+    trn = json['trn'].toString();
+    
     // totalOrders =double.parse(json['total_confirmed'].toString());
     // totalReturns = double.parse(json['total_returned_confirmed'].toString());
   }
@@ -131,6 +134,7 @@ class Ben {
   String balance;
   double totalOrders = 0.0;
   double totalReturns = 0.0;
+  String trn;
 }
 
 class City {

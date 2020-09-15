@@ -29,7 +29,6 @@ class _BeneficiariesState extends State<Beneficiaries> {
         Provider.of<GlobalVars>(context, listen: false);
     beneficiaries = globalVarsProv.beneficiaries;
     getIt<OrderListProvider>().getItemsBalances();
-
   }
 
   @override
@@ -176,27 +175,26 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                         "assets/images/orderButton.svg",
                                         height: 50),
                                   ),
-                                  // InkWell(
-                                  //   splashColor: Colors.transparent,
-                                  //   highlightColor: Colors.transparent,
-                                  //   onTap: () {
-                                  //     getIt<OrderListProvider>()
-                                  //         .clearOrcerList();
-                                  //     getIt<OrderListProvider>()
-                                  //         .setScreensToPop(2);
-                                  //     globalVarsProv.setBenInFocus(item);
-                                  //     Navigator.pushNamed(
-                                  //         context, "/Order_Screen",
-                                  //         arguments: <String, dynamic>{
-                                  //           "ben": item,
-                                  //           "isORderOrReturn": false,
-                                  //            "transId": entry.type == "return" ? entry.id : null
-                                  //         });
-                                  //   },
-                                  //   child: SvgPicture.asset(
-                                  //       "assets/images/returnButton.svg",
-                                  //       height: 50),
-                                  // ),
+                                  InkWell(
+                                    splashColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    onTap: () {
+                                      getIt<OrderListProvider>()
+                                          .clearOrcerList();
+                                      getIt<OrderListProvider>()
+                                          .setScreensToPop(2);
+                                      globalVarsProv.setBenInFocus(item);
+                                     Navigator.pushNamed(
+                                          context, "/Order_Screen",
+                                          arguments: <String, dynamic>{
+                                            "ben": item,
+                                            "isORderOrReturn": false
+                                          });
+                                    },
+                                    child: SvgPicture.asset(
+                                        "assets/images/returnButton.svg",
+                                        height: 50),
+                                  ),
                                   InkWell(
                                     splashColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
@@ -212,12 +210,8 @@ class _BeneficiariesState extends State<Beneficiaries> {
                                           arguments: <String, dynamic>{
                                             "orderTotal": item.totalOrders,
                                             "returnTotal": item.totalReturns,
-                                            "orderOrRetunOrCollection":
-                                                getIt<OrderListProvider>()
-                                                        .transactionTopAyIds
-                                                        .isEmpty
-                                                    ? 2
-                                                    : 0
+                                            "cashTotal":
+                                                double.parse(item.balance),
                                           });
                                     },
                                     child: SvgPicture.asset(

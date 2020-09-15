@@ -9,6 +9,7 @@ import 'package:animated_card/animated_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:agent_second/widgets/orderListCell.dart';
 
 class AgentOrders extends StatefulWidget {
   const AgentOrders({Key key, this.expand, this.width}) : super(key: key);
@@ -196,7 +197,7 @@ class _AgentOrdersState extends State<AgentOrders>
                     : Container(),
               ),
               Expanded(
-                  child: Text(entry.amount.toString() + ".00",
+                  child: Text(entry.amount.toString(),
                       style: styles.mystyle, textAlign: TextAlign.end))
             ],
           ),
@@ -209,49 +210,50 @@ class _AgentOrdersState extends State<AgentOrders>
       width: container2width,
       child: Column(
         children: <Widget>[
-          Expanded(
-            child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: DataTable(
-                  columns: <DataColumn>[
-                    DataColumn(
-                      label: Text(trans(context, 'item_id'),
-                          style: const TextStyle(fontStyle: FontStyle.italic)),
-                    ),
-                    DataColumn(
-                      label: Text(trans(context, 'product_name'),
-                          style: const TextStyle(fontStyle: FontStyle.italic)),
-                    ),
-                    DataColumn(
-                      label: Text(trans(context, 'quantity'),
-                          style: const TextStyle(fontStyle: FontStyle.italic)),
-                    ),
-                    DataColumn(
-                      label: Text(trans(context, 'unit'),
-                          style: const TextStyle(fontStyle: FontStyle.italic)),
-                    ),
-                    DataColumn(
-                      label: Text(trans(context, 'unit_price'),
-                          style: const TextStyle(fontStyle: FontStyle.italic)),
-                    ),
-                    DataColumn(
-                      label: Text(trans(context, 'total'),
-                          style: const TextStyle(fontStyle: FontStyle.italic)),
-                    ),
-                  ],
-                  rows: items.map((MiniItems e) {
-                    return DataRow(cells: <DataCell>[
-                      DataCell(Text(e.id.toString())),
-                      DataCell(Text(e.item)),
-                      DataCell(Text(e.quantity.toString())),
-                      DataCell(Text(e.unit.toString())),
-                      DataCell(Text(e.itemPrice.toString() + ".00")),
-                      DataCell(
-                          Text((e.itemPrice * e.quantity).toString() + ".00"))
-                    ]);
-                  }).toList(),
-                )),
-          ),
+           OrderListCell(items:items)
+          // Expanded(
+          //   child: SingleChildScrollView(
+          //       scrollDirection: Axis.vertical,
+          //       child: DataTable(
+          //         columns: <DataColumn>[
+          //           DataColumn(
+          //             label: Text(trans(context, '#'),
+          //                 style: const TextStyle(fontStyle: FontStyle.italic)),
+          //           ),
+          //           DataColumn(
+          //             label: Text(trans(context, 'product_name'),
+          //                 style: const TextStyle(fontStyle: FontStyle.italic)),
+          //           ),
+          //           DataColumn(
+          //             label: Text(trans(context, 'quantity'),
+          //                 style: const TextStyle(fontStyle: FontStyle.italic)),
+          //           ),
+          //           DataColumn(
+          //             label: Text(trans(context, 'unit'),
+          //                 style: const TextStyle(fontStyle: FontStyle.italic)),
+          //           ),
+          //           DataColumn(
+          //             label: Text(trans(context, 'unit_price'),
+          //                 style: const TextStyle(fontStyle: FontStyle.italic)),
+          //           ),
+          //           DataColumn(
+          //             label: Text(trans(context, 'total'),
+          //                 style: const TextStyle(fontStyle: FontStyle.italic)),
+          //           ),
+          //         ],
+          //         rows: items.map((MiniItems e) {
+          //           return DataRow(cells: <DataCell>[
+          //             DataCell(Text(e.id.toString())),
+          //             DataCell(Text(e.item)),
+          //             DataCell(Text(e.quantity.toString())),
+          //             DataCell(Text(e.unit.toString())),
+          //             DataCell(Text(e.itemPrice.toString())),
+          //             DataCell(
+          //                 Text((e.itemPrice * e.quantity).toString()))
+          //           ]);
+          //         }).toList(),
+          //       )),
+          // ),
         ],
       ),
     );

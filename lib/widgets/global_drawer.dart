@@ -3,6 +3,9 @@ import 'package:agent_second/localization/trans.dart';
 import 'package:agent_second/util/data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:agent_second/util/dio.dart';
+import 'package:location/location.dart';
+import 'package:agent_second/constants/colors.dart';
 
 class GlobalDrawer extends StatefulWidget {
   const GlobalDrawer({
@@ -29,13 +32,18 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
   @override
   void initState() {
     super.initState();
+    location.onLocationChanged.listen((LocationData currentLocation) {
+      latTosend = currentLocation.latitude;
+      longTosend = currentLocation.longitude;
+      print(
+          "hola hola lat ${currentLocation.latitude} hola hola long ${currentLocation.longitude}");
+    });
     restoreData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
@@ -48,12 +56,18 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
                     Text(agentName, style: styles.underHeadwhite),
                   ],
                 ),
-                CircleAvatar(
-                  maxRadius: 45,
-                  minRadius: 30,
-                  child: SvgPicture.asset('assets/images/company_logo.svg',
-                      width: 80.0, height: 80.0),
-                )
+                   ClipRRect(
+                                borderRadius: BorderRadius.circular(80.0),
+                                child: CircleAvatar(
+                                  maxRadius: 45,
+                                  minRadius: 30,
+                                  backgroundColor: colors.white,
+                                  child: SvgPicture.asset(
+                                      'assets/images/drawer_logo.svg',
+                                      width: 80.0,
+                                      height: 80.0),
+                                )),
+           
               ],
             ),
             decoration: const BoxDecoration(

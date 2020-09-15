@@ -135,8 +135,11 @@
     "consruction_date":"Construction Date",
     "affiliation_date":"Affiliation Date",
     "membership_status":"Status",
+    "altariq":"Destribution company Name",
     "associate_members_count":"The number of associate members",
-    "altariq":"Destribution company Name"
+    "print_today_invoices":"Print Today Invoices",
+    "invoice_printing":"Invoice Printeing",
+    "error_happened":"Sudden Error !"
 
 
 

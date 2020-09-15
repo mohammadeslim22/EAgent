@@ -121,15 +121,17 @@ class _OrderScreenState extends State<OrderScreen> {
     super.initState();
     isORderOrReturn = widget.isORderOrReturn;
     ben = widget.ben;
-    if (getIt<OrderListProvider>().itemsDataLoaded) {
-    } else {
-      getIt<OrderListProvider>().indexedStack = 0;
-      getIt<OrderListProvider>().getItems();
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (getIt<OrderListProvider>().itemsDataLoaded) {
+      } else {
+        getIt<OrderListProvider>().indexedStack = 0;
+        getIt<OrderListProvider>().getItems();
+      }
+    });
+
     transId = widget.transId;
   }
 
-//  BuildContext c;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,12 +142,6 @@ class _OrderScreenState extends State<OrderScreen> {
             : colors.blue,
         title: Text(trans(context, "altariq"), style: styles.appBar),
         centerTitle: true,
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back),
-        //   onPressed: () {
-        //     Navigator.pop(context);
-        //   },
-        // ),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.refresh, size: 16),
@@ -718,8 +714,23 @@ class _OrderScreenState extends State<OrderScreen> {
                                       onPressed: () async {
                                         Navigator.pop(context);
                                         awaitTransaction();
-                                        if (value
-                                            .checkItemsBalancesBrforeLeaving()) {
+                                        if (widget.isORderOrReturn) {
+                                          if (value
+                                              .checkItemsBalancesBrforeLeaving()) {
+                                            if (await sendTransFunction(
+                                                context,
+                                                widget.isAgentOrder,
+                                                "confirmed")) {
+                                              Navigator.pop(context);
+                                            } else {
+                                              Navigator.pop(context);
+                                              showErrorSnakBar(context);
+                                            }
+                                          } else {
+                                            Navigator.pop(context);
+                                            showOverQuantitySnakBar(context);
+                                          }
+                                        } else {
                                           if (await sendTransFunction(
                                               context,
                                               widget.isAgentOrder,
@@ -727,11 +738,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                             Navigator.pop(context);
                                           } else {
                                             Navigator.pop(context);
-                                            showOverQuantitySnakBar(context);
+                                            showErrorSnakBar(context);
                                           }
-                                        } else {
-                                          Navigator.pop(context);
-                                          showOverQuantitySnakBar(context);
                                         }
                                       },
                                       child: Text(
@@ -821,12 +829,13 @@ class _OrderScreenState extends State<OrderScreen> {
       BuildContext c, bool agentOrBen, String status) async {
     if (agentOrBen) {
       bool res;
-      res = await getIt<OrderListProvider>().sendAgentOrder(c,
-          getIt<OrderListProvider>().sumTotal.round(), 0, "preorder", status);
+      res = await getIt<OrderListProvider>().sendAgentOrder(
+          c, getIt<OrderListProvider>().sumTotal, 0, "preorder", status);
       print("iam after res $res");
       // Navigator.pop(context);
       return res;
     } else {
+      print("order details: ben_id:${ben.id} ");
       return await getIt<OrderListProvider>().sendOrder(
           context,
           ben.id,
@@ -842,6 +851,20 @@ class _OrderScreenState extends State<OrderScreen> {
     final SnackBar snackBar = SnackBar(
       content: Text(trans(c, "some_items_quantities are more than_u_have"),
           style: styles.angrywhitestyle),
+      duration: const Duration(milliseconds: 1700),
+      action: SnackBarAction(
+          label: trans(c, 'ok'),
+          onPressed: () {
+            Scaffold.of(c).hideCurrentSnackBar();
+          }),
+      backgroundColor: const Color(0xFF3B3B3B),
+    );
+    Scaffold.of(c).showSnackBar(snackBar);
+  }
+
+  void showErrorSnakBar(BuildContext c) {
+    final SnackBar snackBar = SnackBar(
+      content: Text(trans(c, "error_happened"), style: styles.angrywhitestyle),
       duration: const Duration(milliseconds: 1700),
       action: SnackBarAction(
           label: trans(c, 'ok'),

@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 
 class TransactionProvider with ChangeNotifier {
   Ben ben;
@@ -25,6 +26,8 @@ class TransactionProvider with ChangeNotifier {
 
   int orderTransColorIndecator = 0;
   int returnTransColorIndecator = 0;
+  List<Transaction> ordersToPrint;
+  List<Transaction> returnsToPrint;
 
   void incrementOrders() {
     orderTransColorIndecator++;
@@ -118,21 +121,61 @@ class TransactionProvider with ChangeNotifier {
     return response;
   }
 
-  void declearPagWiseControllers() {
-    pagewiseCollectionController = PagewiseLoadController<dynamic>(
-        pageSize: 15,
-        pageFuture: (int pageIndex) async {
-          return getCollectionTransactions(pageIndex, ben.id);
-        });
-    pagewiseOrderController = PagewiseLoadController<dynamic>(
-        pageSize: 15,
-        pageFuture: (int pageIndex) async {
-          return getOrdersTransactions(pageIndex, ben.id);
-        });
-    pagewiseReturnController = PagewiseLoadController<dynamic>(
-        pageSize: 15,
-        pageFuture: (int pageIndex) async {
-          return getReturnTransactions(pageIndex, ben.id);
-        });
+  // void declearPagWiseControllers() {
+  //   pagewiseCollectionController = PagewiseLoadController<dynamic>(
+  //       pageSize: 15,
+  //       pageFuture: (int pageIndex) async {
+  //         return getCollectionTransactions(pageIndex, ben.id);
+  //       });
+  //   pagewiseOrderController = PagewiseLoadController<dynamic>(
+  //       pageSize: 15,
+  //       pageFuture: (int pageIndex) async {
+  //         return getOrdersTransactions(pageIndex, ben.id);
+  //       });
+  //   pagewiseReturnController = PagewiseLoadController<dynamic>(
+  //       pageSize: 15,
+  //       pageFuture: (int pageIndex) async {
+  //         return getReturnTransactions(pageIndex, ben.id);
+  //       });
+  // }
+
+  List<Transaction> getTodayOrderTransactions() {
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    final String formatted = formatter.format(now);
+    print(" niow : $formatted");
+    print(" orders list length : ${benOrderTrans.transactions.length}");
+    final List<Transaction> temp = <Transaction>[];
+    temp.addAll(benOrderTrans.transactions.where((Transaction element) {
+      print("order ${element.transDate}");
+      return element.transDate == formatted;
+    }));
+
+    return temp;
+  }
+
+  List<Transaction> getTodayReturnTransactions() {
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    final String formatted = formatter.format(now);
+    final List<Transaction> temp = <Transaction>[];
+    temp.addAll(benReturnTrans.transactions.where((Transaction element) {
+      print("return ${element.transDate}");
+      return element.transDate == formatted;
+    }));
+    return temp;
+  }
+
+  Future<void> getTransactionsToPrint(int benId) async {
+    final Response<dynamic> response1 = await dio.get<dynamic>(
+        "daily_order_transactions",
+        queryParameters: <String, dynamic>{"beneficiary_id": benId});
+    final Response<dynamic> response2 = await dio.get<dynamic>(
+        "daily_return_transactions",
+        queryParameters: <String, dynamic>{"beneficiary_id": benId});
+        ordersToPrint = Transactions.fromJson(response1.data).transactions;
+        returnsToPrint = Transactions.fromJson(response2.data).transactions;
+
+
   }
 }

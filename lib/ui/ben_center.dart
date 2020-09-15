@@ -21,6 +21,7 @@ import 'package:location/location.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:agent_second/widgets/orderListCell.dart';
 
 class BeneficiaryCenter extends StatefulWidget {
   const BeneficiaryCenter({Key key, this.long, this.lat, this.ben})
@@ -148,12 +149,12 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                     const SizedBox(width: 24),
                     Text(trans(context, 'total_orders_confirmed') + "  ",
                         style: styles.littleangrywhitestyle),
-                    Text(ben.totalOrders.toString(),
+                    Text(ben.totalOrders.toStringAsFixed(2),
                         style: styles.angrywhitestyle),
                     const SizedBox(width: 24),
                     Text(trans(context, 'total_return_confirmed') + "  ",
                         style: styles.littleangrywhitestyle),
-                    Text(ben.totalReturns.toString(),
+                    Text(ben.totalReturns.toStringAsFixed(2),
                         style: styles.angrywhitestyle),
                   ],
                 );
@@ -163,13 +164,6 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
           ],
         ),
         centerTitle: true,
-        // actions: <Widget>[
-        //   Padding(
-        //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-        //     child:
-        //         Text(trans(context, "ben_center"), style: styles.mywhitestyle),
-        //   ),
-        // ],
         automaticallyImplyLeading: true,
       ),
       body: SafeArea(
@@ -289,6 +283,27 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.0),
                             ),
+                            color: colors.red,
+                            onPressed: () {
+                              getIt<OrderListProvider>().clearOrcerList();
+                              Navigator.pushNamed(context, "/Order_Screen",
+                                  arguments: <String, dynamic>{
+                                    "ben": ben,
+                                    "isORderOrReturn": false,
+                                    "isAgentOrder": false
+                                  });
+                            },
+                            child: Text(trans(context, "return"),
+                                style: styles.mywhitestyle),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Container(
+                          width: 110,
+                          child: RaisedButton(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
                             color: colors.green,
                             onPressed: () {
                               getIt<OrderListProvider>().setScreensToPop(2);
@@ -296,7 +311,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                   arguments: <String, dynamic>{
                                     "orderTotal": ben.totalOrders,
                                     "returnTotal": ben.totalReturns,
-                                    "cashTotal": 0 - double.parse(ben.balance),
+                                    "cashTotal": double.parse(ben.balance),
                                   });
                             },
                             child: Text(trans(context, "collection"),
@@ -429,7 +444,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                         if (mounted) {
                           if (indexedStack == 0) {
                             getIt<TransactionProvider>()
-                                .pagewiseCollectionController
+                                .pagewiseOrderController
                                 .reset();
                           } else if (indexedStack == 1) {
                             getIt<TransactionProvider>()
@@ -437,15 +452,11 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                 .reset();
                           } else {
                             getIt<TransactionProvider>()
-                                .pagewiseOrderController
+                                .pagewiseCollectionController
                                 .reset();
                           }
                           _refreshController.refreshCompleted();
                         }
-                        getIt<TransactionProvider>()
-                            .pagewiseOrderController
-                            .reset();
-                        _refreshController.refreshCompleted();
                       },
                       onLoading: () async {
                         await Future<void>.delayed(
@@ -807,7 +818,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
               Expanded(
                   flex: 2, child: Text(collection.date, style: styles.mystyle)),
               Expanded(
-                  child: Text(collection.credit.toString() + ".00",
+                  child: Text(collection.credit.toString(),
                       style: styles.mystyle, textAlign: TextAlign.end))
             ],
           ),
@@ -882,47 +893,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
               Container(),
           ],
         ),
-        Expanded(
-          child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: DataTable(
-                columnSpacing: 36,
-                columns: <DataColumn>[
-                  DataColumn(
-                    label: Text(trans(context, '#'), style: styles.bill),
-                    numeric: true,
-                  ),
-                  DataColumn(
-                      label: Text(trans(context, 'product_name'),
-                          style: styles.bill)),
-                  DataColumn(
-                    label: Text(trans(context, 'quantity'), style: styles.bill),
-                    numeric: true,
-                  ),
-                  DataColumn(
-                      label: Text(trans(context, 'unit'), style: styles.bill)),
-                  DataColumn(
-                    label:
-                        Text(trans(context, 'unit_price'), style: styles.bill),
-                    numeric: true,
-                  ),
-                  DataColumn(
-                    label: Text(trans(context, 'total'), style: styles.bill),
-                    numeric: true,
-                  )
-                ],
-                rows: items.map((MiniItems e) {
-                  return DataRow(cells: <DataCell>[
-                    DataCell(Text(e.id.toString())),
-                    DataCell(Text(e.item)),
-                    DataCell(Text(e.quantity.toString())),
-                    DataCell(Text(e.unit.toString())),
-                    DataCell(Text(e.itemPrice.toString())),
-                    DataCell(Text(e.total.toString()))
-                  ]);
-                }).toList(),
-              )),
-        ),
+        OrderListCell(items: items),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

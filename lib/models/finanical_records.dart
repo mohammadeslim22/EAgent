@@ -30,8 +30,8 @@ class FinanicalRecord {
     agent = Agent.fromJson(json['agent']);
     beneficiaryId = json['beneficiary_id'] as int;
     type = json['type'].toString();
-    debit = json['debit'] as int;
-    credit = json['credit'] as int;
+    debit = double.parse(json['debit'].toString());
+    credit =double.parse(json['credit'].toString());
     status = json['status'].toString();
     date = json['date'].toString();
   }
@@ -55,8 +55,8 @@ class FinanicalRecord {
   Agent agent;
   int beneficiaryId;
   String type;
-  int debit;
-  int credit;
+  double debit;
+  double credit;
   String status;
   String date;
 }

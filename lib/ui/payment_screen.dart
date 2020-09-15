@@ -35,13 +35,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
   void initState() {
     super.initState();
     _ben = getIt<GlobalVars>().getbenInFocus();
-    paymentCashController.text = "${widget.cashTotal}  ";
-    paymentAmountController.text = "${widget.orderTotal}  ";
+    paymentCashController.text = "${widget.cashTotal.toStringAsFixed(2)}";
+    paymentAmountController.text = "${widget.orderTotal.toStringAsFixed(2)}";
     if (widget.orderTotal != null)
       paymentCashController.selection = TextSelection(
           baseOffset: 0, extentOffset: widget.cashTotal.toString().length + 2);
 
-    paymentDeptController.text = "${widget.returnTotal}  ";
+    paymentDeptController.text = "${widget.returnTotal.toStringAsFixed(2)}";
   }
 
   TextEditingController noteController = TextEditingController();
@@ -317,8 +317,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           if (double.parse(paymentCashController.text) > 0) {
                             showAWAITINGSENDOrderTruck();
                             await getIt<OrderListProvider>()
-                                .payMYOrdersAndReturnList(context, _ben.id,
-                                    double.parse(paymentCashController.text));
+                                .payMYOrdersAndReturnList(
+                                    context,
+                                    _ben.id,
+                                    double.parse(paymentCashController.text),
+                                    noteController.text.trim());
                             Navigator.pop(context);
                           } else {
                             showAmmountUnderZero();

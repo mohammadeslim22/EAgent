@@ -33,13 +33,16 @@ class Auth with ChangeNotifier {
               "authorization", "Bearer ${value.data['api_token']}");
           dio.options.headers['authorization'] =
               'Bearer ${value.data['api_token']}';
+          config.verchilId = value.data['agent']['vehicle_id'].toString();
           data.setData(
               "verchil_id", value.data['agent']['vehicle_id'].toString());
           data.setData("agent_id", value.data['id'].toString());
           data.setData("company_name", value.data['company_name'].toString());
           data.setData("agent_name", value.data['username'].toString());
           data.setData("tax", value.data['tax'].toString());
+          data.setData("trn", value.data['trn'].toString());
           config.companyName = value.data['company_name'].toString();
+          config.trn = value.data['trn'].toString();
           config.tax = double.parse(value.data['tax'].toString());
           data.setData("agent_email", value.data['email'].toString());
           final GlobalVars globalVarsProv =

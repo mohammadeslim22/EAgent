@@ -93,11 +93,11 @@ class GlobalVars with ChangeNotifier {
       String balance) {
     benRemaining = "$ben / ${beneficiaries.data.length}";
     orderscount = orders;
-    orderTotal = "$orderTot.00";
+    orderTotal = "$orderTot";
     returnscount = rturned;
-    returnTotal = "$rturnTot.00";
+    returnTotal = "$rturnTot";
     collectionscount = collection;
-    collectionTotal = "$collectionTot.00";
+    collectionTotal = "$collectionTot";
     beneficiaries.data.where((Ben element) {
       return bens.contains(element.id);
     }).forEach((Ben element) {

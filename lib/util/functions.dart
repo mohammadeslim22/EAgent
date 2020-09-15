@@ -55,12 +55,12 @@ Future<void> setDayLog(Response<dynamic> response, int benId) async {
   final DailyLog daielyLog = DailyLog.fromJson(response.data);
   getIt<GlobalVars>().setDailyLog(
       benId,
-      daielyLog.tBeneficiariryCount.toString(),
-      daielyLog.orderCount.toString(),
+      daielyLog.tBeneficiariryCount.toStringAsFixed(2),
+      daielyLog.orderCount.toStringAsFixed(2),
       daielyLog.totalOrderCount.toString(),
-      daielyLog.returnCount.toString(),
+      daielyLog.returnCount.toStringAsFixed(2),
       daielyLog.totalReturnCount.toString(),
-      daielyLog.collectionCount.toString(),
+      daielyLog.collectionCount.toStringAsFixed(2),
       daielyLog.totalCollectionCount.toString(),
       daielyLog.benIds,
       daielyLog.balance);

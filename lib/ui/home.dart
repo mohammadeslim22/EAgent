@@ -16,6 +16,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:agent_second/models/ben.dart';
+import 'package:agent_second/util/dio.dart';
 
 class Home extends StatelessWidget {
   const Home({Key key}) : super(key: key);
@@ -73,7 +74,12 @@ class _DashBoardState extends State<DashBoard> {
     super.initState();
     lat = widget.lat ?? 25.063054;
     long = widget.long ?? 55.170010;
-    
+    location.onLocationChanged.listen((LocationData currentLocation) {
+      latTosend = currentLocation.latitude;
+      longTosend = currentLocation.longitude;
+      print(
+          "hola hola lat ${currentLocation.latitude} hola hola long ${currentLocation.longitude}");
+    });
     getIt<GlobalVars>().beneficiaries.data.forEach((Ben element) {
       if (element.latitude != null && element.longitude != null)
         _addMarker(element);
@@ -203,14 +209,17 @@ class _DashBoardState extends State<DashBoard> {
                                 Text("agentName", style: styles.underHeadwhite),
                               ],
                             ),
-                            CircleAvatar(
-                              maxRadius: 45,
-                              minRadius: 30,
-                              child: SvgPicture.asset(
-                                  'assets/images/company_logo.svg',
-                                  width: 80.0,
-                                  height: 80.0),
-                            )
+                            ClipRRect(
+                                borderRadius: BorderRadius.circular(80.0),
+                                child: CircleAvatar(
+                                  maxRadius: 45,
+                                  minRadius: 30,
+                                  backgroundColor: colors.white,
+                                  child: SvgPicture.asset(
+                                      'assets/images/drawer_logo.svg',
+                                      width: 80.0,
+                                      height: 80.0),
+                                ))
                           ],
                         ),
                         decoration: const BoxDecoration(

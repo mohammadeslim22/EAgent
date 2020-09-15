@@ -52,9 +52,9 @@ class _OrderScreenState extends State<ShowItems> {
   void initState() {
     super.initState();
     colorIndex = 0;
-    if (getIt<OrderListProvider>().itemsDataLoaded) {
+    if (getIt<OrderListProvider>().itemsBalanceDataLoaded) {
     } else {
-      getIt<OrderListProvider>().indexedStack = 0;
+      getIt<OrderListProvider>().indexedStackBalance = 0;
       getIt<OrderListProvider>().getItemsBalances();
     }
   }
@@ -111,13 +111,13 @@ class _OrderScreenState extends State<ShowItems> {
                   Widget child) {
                 return Container(
                   child: IndexedStack(
-                      index: orderProvider.indexedStack,
+                      index: orderProvider.indexedStackBalance,
                       children: <Widget>[
                         Container(
                           child: FlareActor("assets/images/analysis_new.flr",
                               alignment: Alignment.center,
                               fit: BoxFit.cover,
-                              isPaused: orderProvider.itemsDataLoaded,
+                              isPaused: orderProvider.itemsBalanceDataLoaded,
                               animation: "analysis"),
                         ),
                         if (orderProvider.itemsBalanceDataLoaded)
@@ -133,7 +133,14 @@ class _OrderScreenState extends State<ShowItems> {
                               childAspectRatio: 10,
                               addRepaintBoundaries: true,
                               children: orderProvider.itemsBalances
-                                  .map((Balance item) {
+                                  .where((Balance element) {
+                                return element.name
+                                    .trim()
+                                    .toLowerCase()
+                                    .contains(searchController.text
+                                        .trim()
+                                        .toLowerCase());
+                              }).map((Balance item) {
                                 return childForDragging(item);
                               }).toList()),
                         // ListView.builder(

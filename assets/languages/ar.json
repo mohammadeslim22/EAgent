@@ -108,5 +108,8 @@
     "vat_amount":"قيمة الضريبة",
     "net_total":"الناتج الإجمالي",
     "salesman":"المندوب",
-    "signature":"التوقيع"
+    "signature":"التوقيع",
+    "print_today_invoices":"طباعة فواتير اليوم",
+    "invoice_printing":"إدارة طباعة الفواتير",
+    "error_happened":"حدث خطأ!"
 }

@@ -18,12 +18,13 @@ class Config {
   Address first;
   Coordinates coordinates;
   List<Address> addresses;
-
+  String verchilId;
   double lat = 0.0;
   double long = 0.0;
   String token = "";
   String companyName;
   double tax;
+  String trn;
 }
 
 final Config config = Config();

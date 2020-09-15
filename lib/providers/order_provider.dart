@@ -1,3 +1,4 @@
+import 'package:agent_second/constants/config.dart';
 import 'package:agent_second/models/ben.dart';
 import 'package:agent_second/models/transactions.dart';
 import 'package:agent_second/providers/export.dart';
@@ -18,6 +19,8 @@ class OrderListProvider with ChangeNotifier {
   bool itemsBalanceDataLoaded = false;
 
   int indexedStack = 0;
+  int indexedStackBalance = 0;
+
   Set<int> selectedOptions = <int>{};
   double sumTotal = 0;
   List<SingleItemForSend> get currentordersList => ordersList;
@@ -267,8 +270,8 @@ class OrderListProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> sendOrder(BuildContext c, int benId, double ammoutn, int shortage,
-      String type, String status, int fromTransactionId) async {
+  Future<bool> sendOrder(BuildContext c, int benId, double ammoutn,
+      int shortage, String type, String status, int fromTransactionId) async {
     final List<int> itemsId = <int>[];
     final List<int> itemsQuantity = <int>[];
     final List<double> itemsPrice = <double>[];
@@ -316,11 +319,14 @@ class OrderListProvider with ChangeNotifier {
       // });
       //     howManyscreensToPop = 2;
       if (type == "order") {
-        getIt<GlobalVars>().setOrderTotalsAfterPay(ammoutn.toString(), benId);
+        getIt<GlobalVars>().setOrderTotalsAfterPay(
+            (ammoutn * config.tax / 100 + ammoutn).toString(), benId);
       } else {
-        getIt<GlobalVars>().setReturnTotalsAfterPay(ammoutn.toString(), benId);
+        getIt<GlobalVars>().setReturnTotalsAfterPay(
+            ((ammoutn * config.tax / 100) + ammoutn).toString(), benId);
       }
       if (getIt<TransactionProvider>().pagewiseOrderController != null) {
+        print("انت بتفوت هنا يسطا ؟ ");
         if (type == "order") {
           getIt<TransactionProvider>().pagewiseOrderController.reset();
         } else {
@@ -345,17 +351,17 @@ class OrderListProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> sendAgentOrder(BuildContext c, int ammoutn, int shortage,
+  Future<bool> sendAgentOrder(BuildContext c, double ammoutn, int shortage,
       String type, String status) async {
     final List<int> itemsId = <int>[];
     final List<int> itemsQuantity = <int>[];
-    final List<int> itemsPrice = <int>[];
+    final List<double> itemsPrice = <double>[];
     final List<int> itemsUnit = <int>[];
     final List<String> itemsNote = <String>[];
     for (int i = 0; i < ordersList.length; i++) {
       itemsId.add(ordersList[i].id);
       itemsQuantity.add(ordersList[i].queantity);
-      itemsPrice.add(double.parse(ordersList[i].unitPrice).round());
+      itemsPrice.add(double.parse(ordersList[i].unitPrice));
       itemsUnit.add(ordersList[i].unitId);
       itemsNote.add(ordersList[i].notes);
     }
@@ -389,10 +395,13 @@ class OrderListProvider with ChangeNotifier {
   }
 
   Future<void> payMYOrdersAndReturnList(
-      BuildContext c, int benId, double amount) async {
-    final Response<dynamic> response = await dio.post<dynamic>(
-        "transaction/pay",
-        data: <String, dynamic>{"amount": amount, "beneficiary_id": benId});
+      BuildContext c, int benId, double amount, String note) async {
+    final Response<dynamic> response = await dio
+        .post<dynamic>("transaction/pay", data: <String, dynamic>{
+      "amount": amount,
+      "beneficiary_id": benId,
+      "note": note
+    });
     if (response.statusCode == 200) {
       Navigator.of(c).pushNamedAndRemoveUntil("/Beneficiary_Center",
           (Route<dynamic> route) {
@@ -403,7 +412,7 @@ class OrderListProvider with ChangeNotifier {
       getIt<GlobalVars>()
           .setBalanceForBen(benId, response.data['balance'].toString());
       getIt<GlobalVars>().clearOrderTotAndReturnTotal(benId);
-
+      getIt<TransactionProvider>().pagewiseCollectionController.reset();
       print("pay response value :  ${response.data}");
       // transactionTopAyIds.clear();
       notifyListeners();
@@ -425,13 +434,17 @@ class OrderListProvider with ChangeNotifier {
   }
 
   Future<void> getItemsBalances() async {
+    itemsBalanceDataLoaded = false;
+    indexedStackBalance = 0;
+    notifyListeners();
     await dio
         .get<dynamic>("items_info/balance")
         .then((Response<dynamic> value) {
       itemsBalances = ItemsBalance.fromJson(value.data).itemsList;
       itemsBalanceDataLoaded = true;
-      indexedStack = 1;
+      indexedStackBalance = 1;
       notifyListeners();
+      return null;
     });
   }
 
