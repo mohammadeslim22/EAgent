@@ -42,7 +42,6 @@ class _OrderScreenState extends State<OrderScreen> {
   final TextEditingController searchController = TextEditingController();
   Map<String, String> itemsBalances = <String, String>{};
   List<int> prices = <int>[];
-
   Widget childForDragging(
       SingleItem item, OrderListProvider orsderListProvider) {
     return Card(
@@ -177,7 +176,14 @@ class _OrderScreenState extends State<OrderScreen> {
           ),
         ],
       ),
-      body: Row(
+      body:
+          // Consumer<OrderListProvider>(
+          //   builder: (BuildContext context, OrderListProvider value, Widget child) {
+          //     return
+          //     Stack(
+          //       children: <Widget>[
+          //   if (value.loadingStar) loadingStarWidget(),
+          Row(
         children: <Widget>[
           Expanded(
             child: Consumer<OrderListProvider>(
@@ -443,6 +449,10 @@ class _OrderScreenState extends State<OrderScreen> {
           ),
         ],
       ),
+      //       ],
+      //     );
+      //   },
+      // ),
     );
   }
 
@@ -480,10 +490,8 @@ class _OrderScreenState extends State<OrderScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // const SizedBox(height: 2),
             Text(item.name, style: styles.typeNameinOrderScreen),
             const Spacer(),
-            //   const SizedBox(height: 2),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -642,10 +650,12 @@ class _OrderScreenState extends State<OrderScreen> {
                                 entryAnimation: EntryAnimation.TOP,
                                 onOkButtonPressed: () async {
                                   Navigator.pop(context);
+                                  // value.changeLoadingStare(true);
                                   awaitTransaction();
                                   if (await sendTransFunction(
                                       context, widget.isAgentOrder, "draft")) {
-                                    // Navigator.pop(context);
+                                    // value.changeLoadingStare(false);
+                                    Navigator.pop(context);
                                   } else {
                                     final SnackBar snackBar = SnackBar(
                                       content: Text(
@@ -681,7 +691,6 @@ class _OrderScreenState extends State<OrderScreen> {
                     ),
                     color: colors.blue,
                     onPressed: () async {
-                      print("hello from the other side ${widget.isAgentOrder}");
                       if (!widget.isAgentOrder) {
                         showDialog<dynamic>(
                           context: context,
@@ -692,7 +701,7 @@ class _OrderScreenState extends State<OrderScreen> {
                             buttonPadding: EdgeInsets.zero,
                             insetPadding: EdgeInsets.zero,
                             title: Image.asset("assets/images/movingcloud.gif",
-                                height: 200.0, width: 400.0, fit: BoxFit.cover),
+                                height: 260.0, width: 400.0, fit: BoxFit.cover),
                             content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
@@ -713,6 +722,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                       ),
                                       onPressed: () async {
                                         Navigator.pop(context);
+                                        // value.changeLoadingStare(true);
+
                                         awaitTransaction();
                                         if (widget.isORderOrReturn) {
                                           if (value
@@ -721,6 +732,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 context,
                                                 widget.isAgentOrder,
                                                 "confirmed")) {
+                                              // value.changeLoadingStare(false);
+
                                               Navigator.pop(context);
                                             } else {
                                               Navigator.pop(context);
@@ -781,14 +794,16 @@ class _OrderScreenState extends State<OrderScreen> {
                           ),
                         );
                       } else {
-                        print("where am i ? ");
                         awaitTransaction();
+
+                        value.changeLoadingStare(true);
+
                         if (await sendTransFunction(
                             context, true, "confirmed")) {
-                          print("cotchi cotchi  ");
+                          value.changeLoadingStare(false);
+
                           Navigator.pop(context);
                         } else {
-                          print("i have no idea  ");
                           showOverQuantitySnakBar(context);
                         }
                       }
@@ -823,6 +838,53 @@ class _OrderScreenState extends State<OrderScreen> {
         ],
       );
     });
+  }
+
+  Widget loadingStarWidget() {
+    return Stack(
+      children: <Widget>[
+        Transform.rotate(
+            angle: 10,
+            child: Center(
+                child: SizedBox(
+              height: 100,
+              width: 500,
+              child: CircularProgressIndicator(
+                strokeWidth: 5,
+                backgroundColor: Colors.transparent,
+              ),
+            ))),
+        Transform.rotate(
+            angle: -10,
+            child: Center(
+                child: SizedBox(
+              height: 100,
+              width: 500,
+              child: CircularProgressIndicator(
+                strokeWidth: 5,
+                backgroundColor: Colors.transparent,
+              ),
+            ))),
+        Center(
+            child: SizedBox(
+          height: 100,
+          width: 500,
+          child: CircularProgressIndicator(
+            strokeWidth: 5,
+            backgroundColor: Colors.transparent,
+          ),
+        )),
+        Center(
+            child: SizedBox(
+          height: 400,
+          width: 80,
+          child: CircularProgressIndicator(
+            strokeWidth: 5,
+            backgroundColor: Colors.transparent,
+          ),
+        ))
+      ],
+    );
   }
 
   Future<bool> sendTransFunction(

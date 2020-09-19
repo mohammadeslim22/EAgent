@@ -900,6 +900,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
           children: <Widget>[
             FlatButton(
               onPressed: () async {
+                getIt<TransactionProvider>().getTransactionsToPrint(ben.id);
                 Navigator.pushNamed(context, "/Bluetooth",
                     arguments: <String, dynamic>{"transaction": transaction});
               },

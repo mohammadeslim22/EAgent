@@ -56,18 +56,15 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
                     Text(agentName, style: styles.underHeadwhite),
                   ],
                 ),
-                   ClipRRect(
-                                borderRadius: BorderRadius.circular(80.0),
-                                child: CircleAvatar(
-                                  maxRadius: 45,
-                                  minRadius: 30,
-                                  backgroundColor: colors.white,
-                                  child: SvgPicture.asset(
-                                      'assets/images/drawer_logo.svg',
-                                      width: 80.0,
-                                      height: 80.0),
-                                )),
-           
+                ClipRRect(
+                    borderRadius: BorderRadius.circular(80.0),
+                    child: CircleAvatar(
+                      maxRadius: 45,
+                      minRadius: 30,
+                      backgroundColor: colors.white,
+                      child: SvgPicture.asset('assets/images/drawer_logo.svg',
+                          width: 80.0, height: 80.0),
+                    )),
               ],
             ),
             decoration: const BoxDecoration(

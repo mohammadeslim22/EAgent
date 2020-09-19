@@ -39,7 +39,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     paymentAmountController.text = "${widget.orderTotal.toStringAsFixed(2)}";
     if (widget.orderTotal != null)
       paymentCashController.selection = TextSelection(
-          baseOffset: 0, extentOffset: widget.cashTotal.toString().length + 2);
+          baseOffset: 0, extentOffset: widget.cashTotal.toString().length+1);
 
     paymentDeptController.text = "${widget.returnTotal.toStringAsFixed(2)}";
   }

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Bluetooth extends StatefulWidget {
   const Bluetooth({Key key, this.transaction}) : super(key: key);
@@ -144,17 +145,19 @@ class _MyAppState extends State<Bluetooth> {
                     const EdgeInsets.only(left: 10.0, right: 10.0, top: 50),
                 child: RaisedButton(
                   color: colors.blue,
-                  onPressed: () {
-                    final List<Transaction> orders =
+                  onPressed: () async {
+                    if (getIt<TransactionProvider>()
+                            .printingOrdersDataArrived &&
                         getIt<TransactionProvider>()
-                            .getTodayOrderTransactions();
-                    final List<Transaction> returns =
-                        getIt<TransactionProvider>()
-                            .getTodayReturnTransactions();
-
-                    // print(orders[0].details);
-                    // print(returns[0].details);
-                    printTodayTransactions(orders, returns);
+                            .printingReturnsDataArrived) {
+                      printTodayTransactions(
+                          getIt<TransactionProvider>().ordersToPrint,
+                          getIt<TransactionProvider>().returnsToPrint);
+                    } else {
+                      await getIt<TransactionProvider>()
+                          .getTransactionsToPrint(transaction.beneficiaryId);
+                      Fluttertoast.showToast(msg: "Failed to get data");
+                    }
                   },
                   child: Text(trans(context, 'print_today_invoices'),
                       style: TextStyle(color: colors.white)),
@@ -304,24 +307,29 @@ class _MyAppState extends State<Bluetooth> {
       List<Transaction> returnTransactions) async {
     double orderAmount = 0.0;
     double returnAmount = 0.0;
-    orderTransactions.forEach((Transaction element) {
-      for (int i = 0; i < element.details.length; i++) {
-        print(
-            "$i  ${element.details[i].item}  ${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total}");
-      }
-      //orderAmount += element.amount;
-      print("new line");
-    });
-    print("RETURN");
-    returnTransactions.forEach((Transaction element) {
-      for (int i = 0; i < element.details.length; i++) {
-        print(
-            "$i  ${element.details[i].item}  ${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total}");
-      }
-     // returnAmount += element.amount;
-      print("new line");
-    });
-    // final double taxMony = config.tax / 100 * orderAmount;
+    double taxMony=0.0;
+    // orderTransactions.forEach((Transaction element) {
+    //   taxMony += element.tax;
+    //   print("trans amount : ${element.amount}");
+    //   for (int i = 0; i < element.details.length; i++) {
+    //     print(
+    //         "$i  ${element.details[i].item}  ${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total}");
+    //   }
+    //   orderAmount += element.amount;
+    //   print("new line");
+    // });
+    // print("RETURN");
+    // returnTransactions.forEach((Transaction element) {
+    //   print("trans amount : ${element.amount}");
+    //   for (int i = 0; i < element.details.length; i++) {
+    //     print(
+    //         "$i  ${element.details[i].item}  ${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total}");
+    //   }
+    //   returnAmount += element.amount;
+    //   print("new line");
+    // });
+    // print("config.tax: ${config.tax}");
+    // // final double taxMony = (config.tax / 100) * orderAmount;
     // final double totalfterReturn = orderAmount - returnAmount;
     // print(
     //     "tax money ${taxMony.toStringAsFixed(2)}  total: ${totalfterReturn.toStringAsFixed(2)}");
@@ -348,14 +356,15 @@ class _MyAppState extends State<Bluetooth> {
         bluetooth.printNewLine();
         bluetooth.printCustom(
             "SLNO  PRODUCT NAME        OYT  RATE  TOTAL", 1, 0);
-            bluetooth.printNewLine();
+        bluetooth.printNewLine();
         // bluetooth.printCustom("OYT  RATE  TOTAL", 1, 2);
 
         orderTransactions.forEach((Transaction element) {
+           taxMony += element.tax;
           for (int i = 0; i < element.details.length; i++) {
             bluetooth.printCustom(
-                "$i  ${element.details[i].item}  ${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total.toStringAsFixed(2)}",
-                0,
+                "$i  ${element.details[i].item}   ${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total.toStringAsFixed(2)}",
+                1,
                 0);
             // bluetooth.printCustom(
             //     "${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total}",
@@ -369,10 +378,11 @@ class _MyAppState extends State<Bluetooth> {
         bluetooth.printCustom("RETURN", 1, 1);
         bluetooth.printNewLine();
         returnTransactions.forEach((Transaction element) {
+           taxMony += element.tax;
           for (int i = 0; i < element.details.length; i++) {
             bluetooth.printCustom(
                 "$i  ${element.details[i].item}   ${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total.toStringAsFixed(2)}",
-                0,
+                1,
                 0);
             // bluetooth.printCustom(
             //     "${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total}",
@@ -382,7 +392,7 @@ class _MyAppState extends State<Bluetooth> {
           returnAmount += element.amount;
           bluetooth.printNewLine();
         });
-        final double taxMony = config.tax / 100 * orderAmount;
+        // final double taxMony = (config.tax / 100) * orderAmount;
         final double totalfterReturn = orderAmount - returnAmount;
 
         bluetooth.printNewLine();

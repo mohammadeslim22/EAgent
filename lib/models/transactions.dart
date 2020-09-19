@@ -38,6 +38,7 @@ class Transaction {
       this.latitude,
       this.longitude,
       this.createdAt,
+      this.tax,
       this.details});
 
   Transaction.fromJson(dynamic json) {
@@ -51,12 +52,12 @@ class Transaction {
     status = json['status'].toString();
     type = json['type'].toString();
     notes = json['notes'].toString();
-    amount =double.parse(json['amount'].toString());
+    amount = double.parse(json['amount'].toString());
     shortage = json['shortage'] as int;
-    if(json['latitude']!=null)
-    latitude =double.parse(json['latitude'].toString());
-   if(json['longitude']!=null)
-    longitude =double.parse(json['longitude'].toString());
+    if (json['latitude'] != null)
+      latitude = double.parse(json['latitude'].toString());
+    if (json['longitude'] != null)
+      longitude = double.parse(json['longitude'].toString());
     createdAt = json['created_at'].toString();
     if (json['details'] != null) {
       details = <MiniItems>[];
@@ -64,6 +65,8 @@ class Transaction {
         details.add(MiniItems.fromJson(v));
       });
     }
+    tax = double.parse(json['taxed'].toString());
+    print("tax  $tax");
   }
 
   dynamic toJson() {
@@ -103,6 +106,7 @@ class Transaction {
   double latitude;
   double longitude;
   String createdAt;
+  double tax;
   List<MiniItems> details;
 }
 
@@ -122,9 +126,9 @@ class MiniItems {
     itemId = json['item_id'] as int;
     item = json['item'].toString();
     unit = json['unit'].toString();
-    itemPrice =double.parse(json['item_price'].toString());
+    itemPrice = double.parse(json['item_price'].toString());
     quantity = json['quantity'] as int;
-    total =double.parse(json['total'].toString());
+    total = double.parse(json['total'].toString());
     notes = json['notes'].toString();
   }
 

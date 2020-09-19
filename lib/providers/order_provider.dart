@@ -480,4 +480,10 @@ class OrderListProvider with ChangeNotifier {
       return false;
     }
   }
+
+  bool loadingStar = false;
+  void changeLoadingStare(bool state) {
+    loadingStar = state;
+    notifyListeners();
+  }
 }
