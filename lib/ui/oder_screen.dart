@@ -107,7 +107,6 @@ class _OrderScreenState extends State<OrderScreen> {
                 textAlign: TextAlign.center,
               ),
             ),
-            //const Spacer(),
             Text(item.unitPrice.toString(), style: styles.mystyle),
           ],
         ),
@@ -176,309 +175,298 @@ class _OrderScreenState extends State<OrderScreen> {
           ),
         ],
       ),
-      body:
-          // Consumer<OrderListProvider>(
-          //   builder: (BuildContext context, OrderListProvider value, Widget child) {
-          //     return
-          //     Stack(
-          //       children: <Widget>[
-          //   if (value.loadingStar) loadingStarWidget(),
-          Row(
-        children: <Widget>[
-          Expanded(
-            child: Consumer<OrderListProvider>(
-              builder: (BuildContext context, OrderListProvider orderProvider,
-                  Widget child) {
-                return Container(
-                  alignment: Alignment.topCenter,
-                  width: MediaQuery.of(context).size.width / 2,
-                  child: IndexedStack(
-                      index: orderProvider.indexedStack,
+      body: Consumer<OrderListProvider>(
+        builder: (BuildContext context, OrderListProvider value, Widget child) {
+          return Stack(
+            children: <Widget>[
+              if (value.loadingStar) loadingStarWidget(),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Consumer<OrderListProvider>(
+                      builder: (BuildContext context,
+                          OrderListProvider orderProvider, Widget child) {
+                        return Container(
+                          alignment: Alignment.topCenter,
+                          width: MediaQuery.of(context).size.width / 2,
+                          child: IndexedStack(
+                              index: orderProvider.indexedStack,
+                              children: <Widget>[
+                                Container(
+                                  width: 600,
+                                  height: 450,
+                                  child: FlareActor(
+                                      "assets/images/analysis_new.flr",
+                                      alignment: Alignment.center,
+                                      fit: BoxFit.cover,
+                                      isPaused: orderProvider.itemsDataLoaded,
+                                      animation: "analysis"),
+                                ),
+                                if (orderProvider.itemsDataLoaded)
+                                  GridView.count(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 12),
+                                      physics: const ScrollPhysics(),
+                                      shrinkWrap: true,
+                                      primary: true,
+                                      crossAxisSpacing: 4,
+                                      mainAxisSpacing: 1,
+                                      crossAxisCount: 6,
+                                      childAspectRatio: .7,
+                                      addRepaintBoundaries: true,
+                                      children: orderProvider.itemsList
+                                          .where((SingleItem element) {
+                                        return element.name
+                                            .trim()
+                                            .toLowerCase()
+                                            .contains(searchController.text
+                                                .trim()
+                                                .toLowerCase());
+                                      }).map((SingleItem item) {
+                                        return !getIt<OrderListProvider>()
+                                                .selectedOptions
+                                                .contains(item.id)
+                                            ? Draggable<SingleItem>(
+                                                childWhenDragging:
+                                                    childForDragging(
+                                                        item, orderProvider),
+                                                onDragStarted: () {
+                                                  setState(() {
+                                                    indexedStackId = 1;
+                                                    animatedHight = 160;
+                                                  });
+                                                },
+                                                onDragEnd:
+                                                    (DraggableDetails t) {
+                                                  setState(() {
+                                                    indexedStackId = 0;
+                                                    animatedHight = 0;
+                                                  });
+                                                },
+                                                data: item,
+                                                feedback: Column(
+                                                  children: <Widget>[
+                                                    CachedNetworkImage(
+                                                      imageUrl: (item.image !=
+                                                              "null")
+                                                          ? "http://edisagents.altariq.ps/public/image/${item.image}"
+                                                          : "",
+                                                      height: 30,
+                                                      width: 50,
+                                                      progressIndicatorBuilder: (BuildContext
+                                                                  context,
+                                                              String url,
+                                                              DownloadProgress
+                                                                  downloadProgress) =>
+                                                          CircularProgressIndicator(
+                                                              value:
+                                                                  downloadProgress
+                                                                      .progress),
+                                                      errorWidget: (BuildContext
+                                                                  context,
+                                                              String url,
+                                                              dynamic error) =>
+                                                          const Icon(
+                                                              Icons.error),
+                                                    ),
+                                                    Material(
+                                                        color:
+                                                            Colors.transparent,
+                                                        textStyle: styles
+                                                            .smallItembluestyle,
+                                                        child: Text(item.name)),
+                                                  ],
+                                                ),
+                                                child: childForDragging(
+                                                    item, orderProvider))
+                                            : childForDragging(
+                                                item, orderProvider);
+                                      }).toList())
+                                else
+                                  Container()
+                              ]),
+                        );
+                      },
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width / 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Container(
-                          width: 600,
-                          height: 450,
-                          child: FlareActor("assets/images/analysis_new.flr",
-                              alignment: Alignment.center,
-                              fit: BoxFit.cover,
-                              isPaused: orderProvider.itemsDataLoaded,
-                              animation: "analysis"),
-                        ),
-                        if (orderProvider.itemsDataLoaded)
-                          GridView.count(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 12),
-                              physics: const ScrollPhysics(),
-                              shrinkWrap: true,
-                              primary: true,
-                              crossAxisSpacing: 4,
-                              mainAxisSpacing: 1,
-                              crossAxisCount: 6,
-                              childAspectRatio: .7,
-                              addRepaintBoundaries: true,
-                              children: orderProvider.itemsList
-                                  .where((SingleItem element) {
-                                return element.name
-                                    .trim()
-                                    .toLowerCase()
-                                    .contains(searchController.text
-                                        .trim()
-                                        .toLowerCase());
-                              }).map((SingleItem item) {
-                                return !getIt<OrderListProvider>()
-                                        .selectedOptions
-                                        .contains(item.id)
-                                    ? Draggable<SingleItem>(
-                                        childWhenDragging: childForDragging(
-                                            item, orderProvider),
-                                        onDragStarted: () {
-                                          setState(() {
-                                            indexedStackId = 1;
-                                            animatedHight = 160;
-                                          });
-                                        },
-                                        onDragEnd: (DraggableDetails t) {
-                                          setState(() {
-                                            indexedStackId = 0;
-                                            animatedHight = 0;
-                                          });
-                                        },
-                                        data: item,
-                                        feedback: Column(
-                                          children: <Widget>[
-                                            CachedNetworkImage(
-                                              imageUrl: (item.image != "null")
-                                                  ? "http://edisagents.altariq.ps/public/image/${item.image}"
-                                                  : "",
-                                              height: 30,
-                                              width: 50,
-                                              progressIndicatorBuilder:
-                                                  (BuildContext context,
-                                                          String url,
-                                                          DownloadProgress
-                                                              downloadProgress) =>
-                                                      CircularProgressIndicator(
-                                                          value:
-                                                              downloadProgress
-                                                                  .progress),
-                                              errorWidget:
-                                                  (BuildContext context,
-                                                          String url,
-                                                          dynamic error) =>
-                                                      const Icon(Icons.error),
-                                            ),
-                                            Material(
-                                                color: Colors.transparent,
-                                                textStyle:
-                                                    styles.smallItembluestyle,
-                                                child: Text(item.name)),
-                                          ],
-                                        ),
-                                        child: childForDragging(
-                                            item, orderProvider))
-                                    : childForDragging(item, orderProvider);
-                              }).toList())
-                        else
-                          Container()
-                      ]),
-                );
-              },
-            ),
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width / 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      color: Colors.grey[300]),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Expanded(
-                          flex: 1,
-                          child: Text(trans(context, "type"),
-                              style: styles.mystyle)),
-                      Expanded(
-                          flex: 2,
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 4, horizontal: 8),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.grey[300]),
                           child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              const SizedBox(width: 32),
-                              Text(trans(context, "quantity"),
+                              Expanded(
+                                  flex: 1,
+                                  child: Text(trans(context, "type"),
+                                      style: styles.mystyle)),
+                              Expanded(
+                                  flex: 2,
+                                  child: Row(
+                                    children: <Widget>[
+                                      const SizedBox(width: 32),
+                                      Text(trans(context, "quantity"),
+                                          style: styles.mystyle,
+                                          textAlign: TextAlign.start),
+                                    ],
+                                  )),
+                              Expanded(
+                                  flex: 1,
+                                  child: Text(trans(context, "unit"),
+                                      style: styles.mystyle)),
+                              Expanded(
+                                  flex: 1,
+                                  child: Text(trans(context, "u_price"),
+                                      style: styles.mystyle)),
+                              Expanded(
+                                flex: 1,
+                                child: Text(
+                                  trans(context, "t_price"),
                                   style: styles.mystyle,
-                                  textAlign: TextAlign.start),
+                                  textAlign: TextAlign.end,
+                                ),
+                              )
                             ],
-                          )),
-                      Expanded(
-                          flex: 1,
-                          child: Text(trans(context, "unit"),
-                              style: styles.mystyle)),
-                      Expanded(
-                          flex: 1,
-                          child: Text(trans(context, "u_price"),
-                              style: styles.mystyle)),
-                      Expanded(
-                        flex: 1,
-                        child: Text(
-                          trans(context, "t_price"),
-                          style: styles.mystyle,
-                          textAlign: TextAlign.end,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                if (indexedStackId == 1)
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 8),
-                    color: Colors.grey[300],
-                    child: Stack(
-                      children: <Widget>[
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            const SizedBox(height: 36),
-                            Center(
-                              child: Text(
-                                trans(context, 'drage_here'),
-                                style: styles.dargHereStyle,
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        ),
-                        AnimatedContainer(
-                          height: animatedHight,
-                          duration: const Duration(milliseconds: 900),
-                          child: DottedBorder(
-                            color: colors.black,
-                            borderType: BorderType.RRect,
-                            strokeWidth: 2,
-                            child: DragTarget<SingleItem>(
-                              onWillAccept: (SingleItem data) {
-                                return true;
-                              },
-                              onAccept: (SingleItem value) {
-                                setState(() {
-                                  getIt<OrderListProvider>().addItemToList(
-                                      value.id,
-                                      value.name,
-                                      value.notes,
-                                      value.queantity,
-                                      value.unit,
-                                      value.unitPrice.toString(),
-                                      value.image);
-                                  getIt<OrderListProvider>()
-                                      .selectedOptions
-                                      .add(value.id);
-                                  indexedStackId = 0;
-                                  animatedHight = 0;
-                                });
-                              },
-                              onLeave: (dynamic value) {},
-                              builder: (BuildContext context,
-                                  List<SingleItem> candidateData,
-                                  List<dynamic> rejectedData) {
-                                return Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 2,
-                                    height:
-                                        MediaQuery.of(context).size.width / 2,
-                                    color: Colors.transparent);
-                              },
-                            ),
                           ),
                         ),
+                        if (indexedStackId == 1)
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 8),
+                            color: Colors.grey[300],
+                            child: Stack(
+                              children: <Widget>[
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    const SizedBox(height: 36),
+                                    Center(
+                                      child: Text(
+                                        trans(context, 'drage_here'),
+                                        style: styles.dargHereStyle,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                AnimatedContainer(
+                                  height: animatedHight,
+                                  duration: const Duration(milliseconds: 900),
+                                  child: DottedBorder(
+                                    color: colors.black,
+                                    borderType: BorderType.RRect,
+                                    strokeWidth: 2,
+                                    child: DragTarget<SingleItem>(
+                                      onWillAccept: (SingleItem data) {
+                                        return true;
+                                      },
+                                      onAccept: (SingleItem value) {
+                                        setState(() {
+                                          getIt<OrderListProvider>()
+                                              .addItemToList(
+                                                  value.id,
+                                                  value.name,
+                                                  value.notes,
+                                                  value.queantity,
+                                                  value.unit,
+                                                  value.unitPrice.toString(),
+                                                  value.image);
+                                          getIt<OrderListProvider>()
+                                              .selectedOptions
+                                              .add(value.id);
+                                          indexedStackId = 0;
+                                          animatedHight = 0;
+                                        });
+                                      },
+                                      onLeave: (dynamic value) {},
+                                      builder: (BuildContext context,
+                                          List<SingleItem> candidateData,
+                                          List<dynamic> rejectedData) {
+                                        return Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                2,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                2,
+                                            color: Colors.transparent);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          Container(),
+                        Expanded(
+                          child: (getIt<OrderListProvider>()
+                                  .selectedOptions
+                                  .isNotEmpty)
+                              ? Consumer<OrderListProvider>(
+                                  builder: (BuildContext context,
+                                      OrderListProvider value, Widget child) {
+                                    return GridView.count(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 6, vertical: 2),
+                                        physics: const ScrollPhysics(),
+                                        shrinkWrap: true,
+                                        primary: true,
+                                        crossAxisSpacing: 3,
+                                        mainAxisSpacing: 3,
+                                        crossAxisCount: 1,
+                                        childAspectRatio: 6,
+                                        addRepaintBoundaries: true,
+                                        children: value.ordersList
+                                            .map((SingleItemForSend item) {
+                                          return Slidable(
+                                              actionPane:
+                                                  const SlidableDrawerActionPane(),
+                                              actionExtentRatio: 0.25,
+                                              secondaryActions: <Widget>[
+                                                IconSlideAction(
+                                                  caption: 'Delete',
+                                                  color: Colors.red,
+                                                  icon: Icons.delete,
+                                                  onTap: () {
+                                                    setState(() {
+                                                      value.removeItemFromList(
+                                                          item.id);
+                                                      // getIt<OrderListProvider>()
+                                                      //     .selectedOptions
+                                                      //     .remove(item.id);
+                                                    });
+                                                  },
+                                                ),
+                                              ],
+                                              child: cartItem(item));
+                                        }).toList());
+                                  },
+                                )
+                              : Container(),
+                        ),
+                        bottomTotal()
                       ],
                     ),
-                  )
-                else
-                  Container(),
-                Expanded(
-                  child: (getIt<OrderListProvider>().selectedOptions.isNotEmpty)
-                      ? Consumer<OrderListProvider>(
-                          builder: (BuildContext context,
-                              OrderListProvider value, Widget child) {
-                            return GridView.count(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 2),
-                                physics: const ScrollPhysics(),
-                                shrinkWrap: true,
-                                primary: true,
-                                crossAxisSpacing: 3,
-                                mainAxisSpacing: 3,
-                                crossAxisCount: 1,
-                                childAspectRatio: 6,
-                                addRepaintBoundaries: true,
-                                children: value.ordersList
-                                    .map((SingleItemForSend item) {
-                                  return Slidable(
-                                      actionPane:
-                                          const SlidableDrawerActionPane(),
-                                      actionExtentRatio: 0.25,
-                                      secondaryActions: <Widget>[
-                                        IconSlideAction(
-                                          caption: 'Delete',
-                                          color: Colors.red,
-                                          icon: Icons.delete,
-                                          onTap: () {
-                                            setState(() {
-                                              value.removeItemFromList(item.id);
-                                              // getIt<OrderListProvider>()
-                                              //     .selectedOptions
-                                              //     .remove(item.id);
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                      child: cartItem(item));
-                                }).toList());
-                          },
-                        )
-                      : Container(),
-                ),
-                bottomTotal()
-              ],
-            ),
-          ),
-        ],
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
       ),
-      //       ],
-      //     );
-      //   },
-      // ),
     );
   }
-
-  // void showUnitDialog(SingleItem item) {
-  //   showGeneralDialog<dynamic>(
-  //     barrierLabel: "Label",
-  //     barrierDismissible: true,
-  //     barrierColor: Colors.black.withOpacity(0.73),
-  //     transitionDuration: const Duration(milliseconds: 350),
-  //     context: context,
-  //     pageBuilder: (BuildContext context, Animation<double> anim1,
-  //         Animation<double> anim2) {
-  //       return UnitsCooficientsDialog(item: item);
-  //     },
-  //     transitionBuilder: (BuildContext context, Animation<double> anim1,
-  //         Animation<double> anim2, Widget child) {
-  //       return SlideTransition(
-  //         position:
-  //             Tween<Offset>(begin: const Offset(0, 1), end: const Offset(0, 0))
-  //                 .animate(anim1),
-  //         child: child,
-  //       );
-  //     },
-  //   );
-  // }
-
   Widget cartItem(SingleItemForSend item) {
     return Card(
       shape: RoundedRectangleBorder(
@@ -650,12 +638,10 @@ class _OrderScreenState extends State<OrderScreen> {
                                 entryAnimation: EntryAnimation.TOP,
                                 onOkButtonPressed: () async {
                                   Navigator.pop(context);
-                                  // value.changeLoadingStare(true);
-                                  awaitTransaction();
+                                  value.changeLoadingStare(true);
                                   if (await sendTransFunction(
                                       context, widget.isAgentOrder, "draft")) {
-                                    // value.changeLoadingStare(false);
-                                    Navigator.pop(context);
+                                    value.changeLoadingStare(false);
                                   } else {
                                     final SnackBar snackBar = SnackBar(
                                       content: Text(
@@ -722,9 +708,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                       ),
                                       onPressed: () async {
                                         Navigator.pop(context);
-                                        // value.changeLoadingStare(true);
-
-                                        awaitTransaction();
+                                        value.changeLoadingStare(true);
                                         if (widget.isORderOrReturn) {
                                           if (value
                                               .checkItemsBalancesBrforeLeaving()) {
@@ -732,17 +716,13 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 context,
                                                 widget.isAgentOrder,
                                                 "confirmed")) {
-                                              // value.changeLoadingStare(false);
-
-                                              Navigator.pop(context);
                                             } else {
-                                              Navigator.pop(context);
                                               showErrorSnakBar(context);
                                             }
                                           } else {
-                                            Navigator.pop(context);
                                             showOverQuantitySnakBar(context);
                                           }
+                                          value.changeLoadingStare(false);
                                         } else {
                                           if (await sendTransFunction(
                                               context,
@@ -794,15 +774,10 @@ class _OrderScreenState extends State<OrderScreen> {
                           ),
                         );
                       } else {
-                        awaitTransaction();
-
                         value.changeLoadingStare(true);
-
                         if (await sendTransFunction(
                             context, true, "confirmed")) {
                           value.changeLoadingStare(false);
-
-                          Navigator.pop(context);
                         } else {
                           showOverQuantitySnakBar(context);
                         }
@@ -893,11 +868,8 @@ class _OrderScreenState extends State<OrderScreen> {
       bool res;
       res = await getIt<OrderListProvider>().sendAgentOrder(
           c, getIt<OrderListProvider>().sumTotal, 0, "preorder", status);
-      print("iam after res $res");
-      // Navigator.pop(context);
       return res;
     } else {
-      print("order details: ben_id:${ben.id} ");
       return await getIt<OrderListProvider>().sendOrder(
           context,
           ben.id,
@@ -950,27 +922,6 @@ class _OrderScreenState extends State<OrderScreen> {
           return TransactionDeleteDialog(downCacel: downCacel, c: context);
         });
   }
-
-  void awaitTransaction() {
-    showGeneralDialog<dynamic>(
-        barrierDismissible: true,
-        barrierColor: Colors.black.withOpacity(0.73),
-        transitionDuration: const Duration(milliseconds: 350),
-        context: context,
-        pageBuilder: (BuildContext context, Animation<double> anim1,
-            Animation<double> anim2) {
-          return Container(
-            height: 600,
-            width: 600,
-            child: const FlareActor("assets/images/Animatedorb.flr",
-                alignment: Alignment.center,
-                fit: BoxFit.cover,
-                isPaused: false,
-                animation: "Aura"),
-          );
-        });
-  }
-
   TextEditingController quantityController = TextEditingController();
   Future<dynamic> showQuantityDialog(int itemId) async {
     await showDialog<String>(

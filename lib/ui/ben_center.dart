@@ -475,16 +475,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             pageLoadController: getIt<TransactionProvider>()
                                 .pagewiseOrderController,
                             loadingBuilder: (BuildContext context) {
-                              return Container(
-                                width: 200,
-                                height: 200,
-                                child: FlareActor("assets/images/counter.flr",
-                                    alignment: Alignment.center,
-                                    fit: BoxFit.fill,
-                                    isPaused: getIt<TransactionProvider>()
-                                        .transactionsDataLoaded,
-                                    animation: "play"),
-                              );
+                              return loadTransactions();
                             },
                             padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                             itemBuilder: (BuildContext context, dynamic entry,
@@ -509,16 +500,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             pageLoadController: getIt<TransactionProvider>()
                                 .pagewiseReturnController,
                             loadingBuilder: (BuildContext context) {
-                              return Container(
-                                width: 200,
-                                height: 200,
-                                child: FlareActor("assets/images/counter.flr",
-                                    alignment: Alignment.center,
-                                    fit: BoxFit.fill,
-                                    isPaused: getIt<TransactionProvider>()
-                                        .transactionsDataLoaded,
-                                    animation: "play"),
-                              );
+                              return loadTransactions();
                             },
                             padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                             itemBuilder: (BuildContext context, dynamic entry,
@@ -540,16 +522,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                             physics: const ScrollPhysics(),
                             shrinkWrap: true,
                             loadingBuilder: (BuildContext context) {
-                              return Container(
-                                width: 200,
-                                height: 200,
-                                child: FlareActor("assets/images/counter.flr",
-                                    alignment: Alignment.center,
-                                    fit: BoxFit.fill,
-                                    isPaused: getIt<TransactionProvider>()
-                                        .transactionsDataLoaded,
-                                    animation: "play"),
-                              );
+                              return loadTransactions();
                             },
                             padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
                             itemBuilder: (BuildContext context, dynamic entry,
@@ -663,6 +636,18 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget loadTransactions() {
+    return Container(
+      width: 400,
+      height: 400,
+      child: FlareActor("assets/images/new_intro.flr",
+          alignment: Alignment.center,
+         color: colors.blue, 
+          fit: BoxFit.fill,
+          animation: "intro"),
     );
   }
 
