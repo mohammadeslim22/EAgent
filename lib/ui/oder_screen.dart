@@ -91,7 +91,7 @@ class _OrderScreenState extends State<OrderScreen> {
               width: 60,
               height: 25,
               imageUrl: (item.image != "null")
-                  ? "http://edisagents.altariq.ps/public/image/${item.image}"
+                  ? "http://edisagents2.altariq.ps/public/image/${item.image}"
                   : "",
               progressIndicatorBuilder: (BuildContext context, String url,
                       DownloadProgress downloadProgress) =>
@@ -249,7 +249,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                     CachedNetworkImage(
                                                       imageUrl: (item.image !=
                                                               "null")
-                                                          ? "http://edisagents.altariq.ps/public/image/${item.image}"
+                                                          ? "http://edisagents2.altariq.ps/public/image/${item.image}"
                                                           : "",
                                                       height: 30,
                                                       width: 50,
@@ -497,7 +497,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         child: CachedNetworkImage(
                           fit: BoxFit.cover,
                           imageUrl: (item.image != "null")
-                              ? "http://edisagents.altariq.ps/public/image/${item.image}"
+                              ? "http://edisagents2.altariq.ps/public/image/${item.image}"
                               : "",
                         ),
                       ),
