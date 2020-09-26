@@ -65,8 +65,7 @@ class Transaction {
         details.add(MiniItems.fromJson(v));
       });
     }
-    tax = double.parse(json['taxed'].toString());
-    print("tax  $tax");
+    if (json['taxed'] != null) tax = double.parse(json['taxed'].toString());
   }
 
   dynamic toJson() {

@@ -193,7 +193,7 @@ class _AgentOrdersState extends State<AgentOrders>
               Expanded(
                 flex: 1,
                 child: (entry.status == 'draft')
-                    ? Icon(Icons.edit, color: Colors.amber)
+                    ? const Icon(Icons.edit, color: Colors.amber)
                     : Container(),
               ),
               Expanded(

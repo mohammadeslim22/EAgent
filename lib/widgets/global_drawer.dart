@@ -2,7 +2,6 @@ import 'package:agent_second/constants/styles.dart';
 import 'package:agent_second/localization/trans.dart';
 import 'package:agent_second/util/data.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:agent_second/util/dio.dart';
 import 'package:location/location.dart';
 import 'package:agent_second/constants/colors.dart';
@@ -62,7 +61,7 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
                       maxRadius: 45,
                       minRadius: 30,
                       backgroundColor: colors.white,
-                      child: SvgPicture.asset('assets/images/drawer_logo.svg',
+                      child: Image.asset('assets/images/logo.png',
                           width: 80.0, height: 80.0),
                     )),
               ],

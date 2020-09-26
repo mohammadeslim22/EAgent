@@ -4,6 +4,7 @@ import 'package:agent_second/localization/trans.dart';
 import 'package:agent_second/util/data.dart';
 import 'package:agent_second/util/dio.dart';
 import 'package:agent_second/widgets/custom_toast_widget.dart';
+import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:agent_second/providers/global_variables.dart';
 
 class Auth with ChangeNotifier {
-  Auth();
+  // Auth();
   Future<dynamic> login(
       String usernametext, String passwordText, BuildContext context) async {
     SystemChannels.textInput.invokeMethod<String>('TextInput.hide');
@@ -33,9 +34,9 @@ class Auth with ChangeNotifier {
               "authorization", "Bearer ${value.data['api_token']}");
           dio.options.headers['authorization'] =
               'Bearer ${value.data['api_token']}';
-          config.verchilId = value.data['agent']['vehicle_id'].toString();
+          config.verchilId = value.data['vehicle_board_no'].toString();
           data.setData(
-              "verchil_id", value.data['agent']['vehicle_id'].toString());
+              "verchil_id", value.data['vehicle_board_no'].toString());
           data.setData("agent_id", value.data['id'].toString());
           data.setData("company_name", value.data['company_name'].toString());
           data.setData("agent_name", value.data['username'].toString());
@@ -87,4 +88,8 @@ class Auth with ChangeNotifier {
   void signInAnonymously() {}
 
   void signOut() {}
+
+  BluetoothDevice device;
+  bool connected = false;
+  BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
 }

@@ -38,8 +38,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
     paymentCashController.text = "${widget.cashTotal.toStringAsFixed(2)}";
     paymentAmountController.text = "${widget.orderTotal.toStringAsFixed(2)}";
     if (widget.orderTotal != null)
-      paymentCashController.selection = TextSelection(
-          baseOffset: 0, extentOffset: widget.cashTotal.toString().length+1);
+      try {
+        paymentCashController.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: widget.cashTotal.toString().length + 1);
+      } catch (e) {
+        print("i am in catch");
+      }
 
     paymentDeptController.text = "${widget.returnTotal.toStringAsFixed(2)}";
   }
@@ -347,7 +352,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.edit, color: Colors.green),
+                      icon:const Icon(Icons.edit, color: Colors.green),
                       onPressed: () {
                         showDialog<String>(
                           context: context,

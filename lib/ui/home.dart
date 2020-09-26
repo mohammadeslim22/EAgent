@@ -215,10 +215,8 @@ class _DashBoardState extends State<DashBoard> {
                                   maxRadius: 45,
                                   minRadius: 30,
                                   backgroundColor: colors.white,
-                                  child: SvgPicture.asset(
-                                      'assets/images/drawer_logo.svg',
-                                      width: 80.0,
-                                      height: 80.0),
+                                  child: Image.asset('assets/images/logo.png',
+                                      width: 80.0, height: 80.0),
                                 ))
                           ],
                         ),
@@ -511,27 +509,12 @@ class _DashBoardState extends State<DashBoard> {
 
   Future<void> _animateToUser() async {
     try {
-      final Uint8List markerIcon =
-          await getBytesFromAsset('assets/images/logo.jpg', 100);
       await location.getLocation().then((LocationData value) {
         mapController
             .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
           target: LatLng(value.latitude, value.longitude),
           zoom: 13,
         )));
-        getPositionSubscription =
-            location.onLocationChanged.listen((LocationData value) {
-          final Marker marker = Marker(
-            markerId: MarkerId('current_location'),
-            position: LatLng(value.latitude, value.longitude),
-            icon: BitmapDescriptor.fromBytes(markerIcon),
-          );
-          final MarkerId markerId = MarkerId('current_location');
-
-          setState(() {
-            markers[markerId] = marker;
-          });
-        });
         setState(() {
           lat = value.latitude;
           long = value.longitude;
@@ -549,18 +532,9 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  double width = 200;
-  double hihg = 200;
   @override
   void initState() {
     super.initState();
-
-    Future<void>.delayed(const Duration(seconds: 0), () {
-      setState(() {
-        width = 250;
-        hihg = 250;
-      });
-    });
   }
 
   @override

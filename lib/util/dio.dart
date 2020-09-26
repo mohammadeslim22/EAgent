@@ -62,6 +62,7 @@ Future<void> dioDefaults() async {
     }
     return response; // continue
   }, onError: (DioError e) async {
+      Fluttertoast.showToast(msg: "Error Happened");
     print(e.message);
     // Do something with response error
     return e; //continue

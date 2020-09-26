@@ -16,6 +16,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import 'package:agent_second/providers/order_provider.dart';
 import 'package:giffy_dialog/giffy_dialog.dart';
+import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen(
@@ -50,7 +51,7 @@ class _OrderScreenState extends State<OrderScreen> {
           borderRadius: BorderRadius.circular(8.0)),
       color: getIt<OrderListProvider>().selectedOptions.contains(item.id)
           ? Colors.grey
-          : Colors.white,
+          : colors.white,
       child: InkWell(
         onTap: () {
           !orsderListProvider.selectedOptions.contains(item.id)
@@ -91,7 +92,7 @@ class _OrderScreenState extends State<OrderScreen> {
               width: 60,
               height: 25,
               imageUrl: (item.image != "null")
-                  ? "http://edisagents2.altariq.ps/public/image/${item.image}"
+                  ? "http://sahrawy.agentsmanage.com/image/${item.image}"
                   : "",
               progressIndicatorBuilder: (BuildContext context, String url,
                       DownloadProgress downloadProgress) =>
@@ -107,7 +108,11 @@ class _OrderScreenState extends State<OrderScreen> {
                 textAlign: TextAlign.center,
               ),
             ),
-            Text(item.unitPrice.toString(), style: styles.mystyle),
+            Text(
+                (ben != null)
+                    ? ben.itemsPrices[item.id.toString()] ?? ""
+                    : item.unitPrice.toString(),
+                style: styles.mystyle),
           ],
         ),
       ),
@@ -179,7 +184,6 @@ class _OrderScreenState extends State<OrderScreen> {
         builder: (BuildContext context, OrderListProvider value, Widget child) {
           return Stack(
             children: <Widget>[
-              if (value.loadingStar) loadingStarWidget(),
               Row(
                 children: <Widget>[
                   Expanded(
@@ -249,7 +253,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                     CachedNetworkImage(
                                                       imageUrl: (item.image !=
                                                               "null")
-                                                          ? "http://edisagents2.altariq.ps/public/image/${item.image}"
+                                                          ? "http://edisagents.altariq.ps/public/image/${item.image}"
                                                           : "",
                                                       height: 30,
                                                       width: 50,
@@ -461,12 +465,14 @@ class _OrderScreenState extends State<OrderScreen> {
                   ),
                 ],
               ),
+              if (value.loadingStar) Center(child: loadingStarWidget()),
             ],
           );
         },
       ),
     );
   }
+
   Widget cartItem(SingleItemForSend item) {
     return Card(
       shape: RoundedRectangleBorder(
@@ -497,8 +503,11 @@ class _OrderScreenState extends State<OrderScreen> {
                         child: CachedNetworkImage(
                           fit: BoxFit.cover,
                           imageUrl: (item.image != "null")
-                              ? "http://edisagents2.altariq.ps/public/image/${item.image}"
+                              ? "http://sahrawy.agentsmanage.com/image/${item.image}"
                               : "",
+                          errorWidget: (BuildContext c, String a, dynamic d) {
+                            return Container();
+                          },
                         ),
                       ),
                     ],
@@ -574,12 +583,16 @@ class _OrderScreenState extends State<OrderScreen> {
                     // ),
                     ),
                 Expanded(
-                  child: Text(item.unitPrice,
-                      style: styles.mystyle, textAlign: TextAlign.center),
+                  child: Text(
+                      (ben != null)
+                          ? ben.itemsPrices[item.id.toString()] ?? ""
+                          : item.unitPrice,
+                      style: styles.mystyle,
+                      textAlign: TextAlign.center),
                 ),
                 Expanded(
                   child: Text(
-                    "${double.parse(item.unitPrice) * item.queantity}",
+                    "${double.parse((ben != null) ? ben.itemsPrices[item.id.toString()] ?? "" : item.unitPrice) * item.queantity}",
                     style: styles.mystyle,
                     textAlign: TextAlign.end,
                   ),
@@ -639,27 +652,13 @@ class _OrderScreenState extends State<OrderScreen> {
                                 onOkButtonPressed: () async {
                                   Navigator.pop(context);
                                   value.changeLoadingStare(true);
+
                                   if (await sendTransFunction(
-                                      context, widget.isAgentOrder, "draft")) {
-                                    value.changeLoadingStare(false);
+                                      widget.isAgentOrder, "draft")) {
                                   } else {
-                                    final SnackBar snackBar = SnackBar(
-                                      content: Text(
-                                          trans(context,
-                                              "some_items_quantities are more than_u_have"),
-                                          style: styles.angrywhitestyle),
-                                      duration:
-                                          const Duration(milliseconds: 700),
-                                      action: SnackBarAction(
-                                          label: trans(context, 'ok'),
-                                          onPressed: () {
-                                            Scaffold.of(context)
-                                                .hideCurrentSnackBar();
-                                          }),
-                                      backgroundColor: const Color(0xFF3B3B3B),
-                                    );
-                                    Scaffold.of(context).showSnackBar(snackBar);
+                                    showOverQuantitySnakBar(context);
                                   }
+                                  value.changeLoadingStare(false);
                                   Navigator.pop(context);
                                 },
                               ));
@@ -677,31 +676,68 @@ class _OrderScreenState extends State<OrderScreen> {
                     ),
                     color: colors.blue,
                     onPressed: () async {
-                      if (!widget.isAgentOrder) {
-                        showDialog<dynamic>(
-                          context: context,
-                          builder: (BuildContext contex) => AlertDialog(
-                            titlePadding: EdgeInsets.zero,
-                            contentPadding: EdgeInsets.zero,
-                            actionsPadding: EdgeInsets.zero,
-                            buttonPadding: EdgeInsets.zero,
-                            insetPadding: EdgeInsets.zero,
-                            title: Image.asset("assets/images/movingcloud.gif",
-                                height: 260.0, width: 400.0, fit: BoxFit.cover),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                const SizedBox(height: 8),
-                                Text(trans(context, 'confirm_or_pay'),
-                                    style: styles.typeOrderScreen,
-                                    textAlign: TextAlign.center),
-                                const SizedBox(height: 12),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: <Widget>[
+                      showDialog<dynamic>(
+                        context: context,
+                        builder: (BuildContext contex) => AlertDialog(
+                          titlePadding: EdgeInsets.zero,
+                          contentPadding: EdgeInsets.zero,
+                          actionsPadding: EdgeInsets.zero,
+                          buttonPadding: EdgeInsets.zero,
+                          insetPadding: EdgeInsets.zero,
+                          title: Image.asset("assets/images/movingcloud.gif",
+                              height: 260.0, width: 400.0, fit: BoxFit.cover),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              const SizedBox(height: 8),
+                              Text(trans(context, 'confirm_or_pay'),
+                                  style: styles.typeOrderScreen,
+                                  textAlign: TextAlign.center),
+                              const SizedBox(height: 12),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  FlatButton(
+                                    color: colors.pink,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18.0),
+                                    ),
+                                    onPressed: () async {
+                                      Navigator.pop(context);
+                                      value.changeLoadingStare(true);
+                                      if (isORderOrReturn) {
+                                        if (value
+                                            .checkItemsBalancesBrforeLeaving()) {
+                                          if (await sendTransFunction(
+                                              widget.isAgentOrder,
+                                              "confirmed")) {
+                                            print("order sent");
+                                            Navigator.pop(context);
+                                          } else {
+                                            showErrorSnakBar(context);
+                                          }
+                                        } else {
+                                          showOverQuantitySnakBar(context);
+                                        }
+                                      } else {
+                                        if (await sendTransFunction(
+                                            widget.isAgentOrder, "confirmed")) {
+                                          print("order sent");
+                                          Navigator.pop(context);
+                                        } else {
+                                          showErrorSnakBar(context);
+                                        }
+                                      }
+
+                                      value.changeLoadingStare(false);
+                                    },
+                                    child: Text(trans(context, 'other_confirm'),
+                                        style: styles.screenOrderDialoge),
+                                  ),
+                                  if (!widget.isAgentOrder)
                                     FlatButton(
-                                      color: Colors.pink,
+                                      color: Colors.grey,
                                       shape: RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(18.0),
@@ -709,79 +745,47 @@ class _OrderScreenState extends State<OrderScreen> {
                                       onPressed: () async {
                                         Navigator.pop(context);
                                         value.changeLoadingStare(true);
-                                        if (widget.isORderOrReturn) {
-                                          if (value
-                                              .checkItemsBalancesBrforeLeaving()) {
-                                            if (await sendTransFunction(
-                                                context,
-                                                widget.isAgentOrder,
-                                                "confirmed")) {
-                                            } else {
-                                              showErrorSnakBar(context);
-                                            }
-                                          } else {
-                                            showOverQuantitySnakBar(context);
-                                          }
-                                          value.changeLoadingStare(false);
-                                        } else {
+                                        if (value
+                                            .checkItemsBalancesBrforeLeaving()) {
                                           if (await sendTransFunction(
-                                              context,
                                               widget.isAgentOrder,
                                               "confirmed")) {
-                                            Navigator.pop(context);
+                                            Navigator.popAndPushNamed(
+                                                context, "/Payment_Screen",
+                                                arguments: <String, dynamic>{
+                                                  // "orderTotal": isORderOrReturn
+                                                  //     ? value.sumTotal
+                                                  //     : 0.0,
+                                                  // "returnTotal": isORderOrReturn
+                                                  //     ? 0.0
+                                                  //     : value.sumTotal,
+                                                  // "cashTotal": isORderOrReturn
+                                                  //     ? value.sumTotal
+                                                  //     : -value.sumTotal,
+                                                  // "orderOrRetunOrCollection": 0
+                                                  "orderTotal": ben.totalOrders,
+                                                  "returnTotal":
+                                                      ben.totalReturns,
+                                                  "cashTotal":
+                                                      double.parse(ben.balance),
+                                                });
                                           } else {
-                                            Navigator.pop(context);
                                             showErrorSnakBar(context);
                                           }
+                                        } else {
+                                          showOverQuantitySnakBar(context);
                                         }
-                                      },
-                                      child: Text(
-                                          trans(context, 'other_confirm'),
-                                          style: styles.screenOrderDialoge),
-                                    ),
-                                    FlatButton(
-                                      color: Colors.grey,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(18.0),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        sendTransFunction(context,
-                                            widget.isAgentOrder, "confirmed");
-                                        Navigator.pushNamed(
-                                            context, "/Payment_Screen",
-                                            arguments: <String, dynamic>{
-                                              "orderTotal": isORderOrReturn
-                                                  ? value.sumTotal
-                                                  : 0.0,
-                                              "returnTotal": isORderOrReturn
-                                                  ? 0.0
-                                                  : value.sumTotal,
-                                              "cashTotal": isORderOrReturn
-                                                  ? value.sumTotal
-                                                  : -value.sumTotal,
-                                              "orderOrRetunOrCollection": 0
-                                            });
+                                        value.changeLoadingStare(false);
                                       },
                                       child: Text(trans(context, 'confirm&pay'),
                                           style: styles.screenOrderDialoge),
                                     )
-                                  ],
-                                )
-                              ],
-                            ),
+                                ],
+                              )
+                            ],
                           ),
-                        );
-                      } else {
-                        value.changeLoadingStare(true);
-                        if (await sendTransFunction(
-                            context, true, "confirmed")) {
-                          value.changeLoadingStare(false);
-                        } else {
-                          showOverQuantitySnakBar(context);
-                        }
-                      }
+                        ),
+                      );
                     },
                     child: Text(
                         widget.isAgentOrder
@@ -816,62 +820,82 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Widget loadingStarWidget() {
-    return Stack(
-      children: <Widget>[
-        Transform.rotate(
-            angle: 10,
-            child: Center(
-                child: SizedBox(
-              height: 100,
-              width: 500,
-              child: CircularProgressIndicator(
-                strokeWidth: 5,
-                backgroundColor: Colors.transparent,
-              ),
-            ))),
-        Transform.rotate(
-            angle: -10,
-            child: Center(
-                child: SizedBox(
-              height: 100,
-              width: 500,
-              child: CircularProgressIndicator(
-                strokeWidth: 5,
-                backgroundColor: Colors.transparent,
-              ),
-            ))),
-        Center(
-            child: SizedBox(
-          height: 100,
-          width: 500,
-          child: CircularProgressIndicator(
-            strokeWidth: 5,
-            backgroundColor: Colors.transparent,
-          ),
-        )),
-        Center(
-            child: SizedBox(
-          height: 400,
-          width: 80,
-          child: CircularProgressIndicator(
-            strokeWidth: 5,
-            backgroundColor: Colors.transparent,
-          ),
-        ))
-      ],
+    return RotatedBox(
+      quarterTurns: 1,
+      child: Container(
+        width: 100,
+        height: 1000,
+        child: LiquidLinearProgressIndicator(
+          value: getIt<OrderListProvider>().progress, // Defaults to 0.5.
+          valueColor: AlwaysStoppedAnimation<Color>(
+              colors.blue), // Defaults to the current Theme's accentColor.
+          backgroundColor:
+              colors.white, // Defaults to the current Theme's backgroundColor.
+          borderColor: colors.pink,
+          borderWidth: 5.0,
+          borderRadius: 12.0,
+          direction: Axis
+              .vertical, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.horizontal.
+          center: const RotatedBox(quarterTurns: 3, child: Text("Loading...")),
+        ),
+      ),
     );
+
+    // return Stack(
+    //   children: <Widget>[
+    //     Transform.rotate(
+    //         angle: 10,
+    //         child: Center(
+    //             child: SizedBox(
+    //           height: 100,
+    //           width: 500,
+    //           child: CircularProgressIndicator(
+    //             strokeWidth: 5,
+    //             backgroundColor: Colors.transparent,
+    //           ),
+    //         ))),
+    //     Transform.rotate(
+    //         angle: -10,
+    //         child: Center(
+    //             child: SizedBox(
+    //           height: 100,
+    //           width: 500,
+    //           child: CircularProgressIndicator(
+    //             strokeWidth: 5,
+    //             backgroundColor: Colors.transparent,
+    //           ),
+    //         ))),
+    //     Center(
+    //         child: SizedBox(
+    //       height: 100,
+    //       width: 500,
+    //       child: CircularProgressIndicator(
+    //         strokeWidth: 5,
+    //         backgroundColor: Colors.transparent,
+    //       ),
+    //     )),
+    //     Center(
+    //         child: SizedBox(
+    //       height: 400,
+    //       width: 80,
+    //       child: CircularProgressIndicator(
+    //         strokeWidth: 5,
+    //         backgroundColor: Colors.transparent,
+    //       ),
+    //     ))
+    //   ],
+    // );
   }
 
-  Future<bool> sendTransFunction(
-      BuildContext c, bool agentOrBen, String status) async {
+  Future<bool> sendTransFunction(bool agentOrBen, String status) async {
     if (agentOrBen) {
       bool res;
       res = await getIt<OrderListProvider>().sendAgentOrder(
-          c, getIt<OrderListProvider>().sumTotal, 0, "preorder", status);
+          getIt<OrderListProvider>().sumTotal, 0, "preorder", status);
+
       return res;
     } else {
       return await getIt<OrderListProvider>().sendOrder(
-          context,
           ben.id,
           getIt<OrderListProvider>().sumTotal,
           0,
@@ -922,6 +946,7 @@ class _OrderScreenState extends State<OrderScreen> {
           return TransactionDeleteDialog(downCacel: downCacel, c: context);
         });
   }
+
   TextEditingController quantityController = TextEditingController();
   Future<dynamic> showQuantityDialog(int itemId) async {
     await showDialog<String>(

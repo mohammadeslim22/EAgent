@@ -1,4 +1,3 @@
-import 'package:agent_second/constants/config.dart';
 import 'package:agent_second/models/ben.dart';
 import 'package:agent_second/models/transactions.dart';
 import 'package:agent_second/providers/export.dart';
@@ -14,13 +13,10 @@ class OrderListProvider with ChangeNotifier {
   List<SingleItemForSend> ordersList = <SingleItemForSend>[];
   List<SingleItem> itemsList;
   List<Balance> itemsBalances;
-
   bool itemsDataLoaded = false;
   bool itemsBalanceDataLoaded = false;
-
   int indexedStack = 0;
   int indexedStackBalance = 0;
-
   Set<int> selectedOptions = <int>{};
   double sumTotal = 0;
   List<SingleItemForSend> get currentordersList => ordersList;
@@ -28,7 +24,7 @@ class OrderListProvider with ChangeNotifier {
   SingleItem dummySiglItem = SingleItem(balanceInventory: 99999999);
   int howManyscreensToPop;
   List<int> transactionTopAyIds = <int>[];
-
+  double progress = 0.0;
   String getUnitNme(int itemId, int unitId) {
     String name;
     name = itemsList
@@ -43,6 +39,10 @@ class OrderListProvider with ChangeNotifier {
     return name;
   }
 
+  // void changeProgress(double d) {
+  //   progress = d;
+  //   notifyListeners();
+  // }
   // void addIdTOTransactionToPayIdsList(int id) {
   //   transactionTopAyIds.add(id);
   //   notifyListeners();
@@ -92,17 +92,16 @@ class OrderListProvider with ChangeNotifier {
     final int quantity = ordersList.firstWhere((SingleItemForSend element) {
       return element.id == itemId;
     }).queantity;
-    if (checkValidation(itemId, quantity + 1)) {
-      ordersList.firstWhere((SingleItemForSend element) {
-        return element.id == itemId;
-      }).queantity += 1;
-      sumTotal +=
-          double.parse(ordersList.firstWhere((SingleItemForSend element) {
-        return element.id == itemId;
-      }).unitPrice);
-    } else {
-      Vibration.vibrate(duration: 600);
-    }
+//  if (checkValidation(itemId, quantity + 1)) {
+    ordersList.firstWhere((SingleItemForSend element) {
+      return element.id == itemId;
+    }).queantity += 1;
+    sumTotal += double.parse(ordersList.firstWhere((SingleItemForSend element) {
+      return element.id == itemId;
+    }).unitPrice);
+    // } else {
+    //   Vibration.vibrate(duration: 600);
+    // }
 
     notifyListeners();
   }
@@ -142,7 +141,8 @@ class OrderListProvider with ChangeNotifier {
   }
 
   void setQuantity(int itemId, int quantity) {
-    if (checkValidation(itemId, quantity)) {
+    if (quantity > 0) {
+      // if (checkValidation(itemId, quantity)) {
       ordersList.firstWhere((SingleItemForSend element) {
         return element.id == itemId;
       }).queantity = quantity;
@@ -270,8 +270,8 @@ class OrderListProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> sendOrder(BuildContext c, int benId, double ammoutn,
-      int shortage, String type, String status, int fromTransactionId) async {
+  Future<bool> sendOrder(int benId, double ammoutn, int shortage, String type,
+      String status, int fromTransactionId) async {
     final List<int> itemsId = <int>[];
     final List<int> itemsQuantity = <int>[];
     final List<double> itemsPrice = <double>[];
@@ -285,20 +285,30 @@ class OrderListProvider with ChangeNotifier {
       itemsNote.add(ordersList[i].notes);
     }
 
-    final Response<dynamic> response =
-        await dio.post<dynamic>("btransactions", data: <String, dynamic>{
-      "beneficiary_id": benId,
-      "status": status,
-      "type": type,
-      "notes": "",
-      "amount": ammoutn,
-      "shortage": shortage,
-      "item_id": itemsId,
-      "item_price": itemsPrice,
-      "quantity": itemsQuantity,
-      "unit": itemsUnit,
-      "from_transaction_id": fromTransactionId
-    });
+    final Response<dynamic> response = await dio.post<dynamic>(
+      "btransactions",
+      data: <String, dynamic>{
+        "beneficiary_id": benId,
+        "status": status,
+        "type": type,
+        "notes": "",
+        "amount": ammoutn,
+        "shortage": shortage,
+        "item_id": itemsId,
+        "item_price": itemsPrice,
+        "quantity": itemsQuantity,
+        "unit": itemsUnit,
+        "from_transaction_id": fromTransactionId
+      },
+      onSendProgress: (int count, int total) {
+        progress = count.toDouble() / total.toDouble() / 2.0;
+        print('progress send: $progress');
+      },
+      onReceiveProgress: (int count, int total) {
+        // progress = count.toDouble() / total.toDouble()/2.0;
+        print('progress receive: $count');
+      },
+    );
     print("respons ::::::::: $response");
 
     if (response.statusCode == 200) {
@@ -319,11 +329,10 @@ class OrderListProvider with ChangeNotifier {
       // });
       //     howManyscreensToPop = 2;
       if (type == "order") {
-        getIt<GlobalVars>().setOrderTotalsAfterPay(
-            (ammoutn * config.tax / 100 + ammoutn).toString(), benId);
+        getIt<GlobalVars>().setOrderTotalsAfterPay((ammoutn).toString(), benId);
       } else {
-        getIt<GlobalVars>().setReturnTotalsAfterPay(
-            ((ammoutn * config.tax / 100) + ammoutn).toString(), benId);
+        getIt<GlobalVars>()
+            .setReturnTotalsAfterPay((ammoutn).toString(), benId);
       }
       if (getIt<TransactionProvider>().pagewiseOrderController != null) {
         print("انت بتفوت هنا يسطا ؟ ");
@@ -333,7 +342,6 @@ class OrderListProvider with ChangeNotifier {
           getIt<TransactionProvider>().pagewiseReturnController.reset();
         }
       }
-      Navigator.pop(c);
       notifyListeners();
       return true;
     } else if (response.statusCode == 422) {
@@ -346,13 +354,12 @@ class OrderListProvider with ChangeNotifier {
 
     } else {
       notifyListeners();
-      Navigator.pop(c);
       return false;
     }
   }
 
-  Future<bool> sendAgentOrder(BuildContext c, double ammoutn, int shortage,
-      String type, String status) async {
+  Future<bool> sendAgentOrder(
+      double ammoutn, int shortage, String type, String status) async {
     final List<int> itemsId = <int>[];
     final List<int> itemsQuantity = <int>[];
     final List<double> itemsPrice = <double>[];
@@ -380,7 +387,7 @@ class OrderListProvider with ChangeNotifier {
     });
     if (response.statusCode == 200) {
       clearOrcerList();
-      Navigator.pop(c);
+
       getIt<TransactionProvider>().pagewiseAgentOrderController.reset();
       notifyListeners();
       return true;
@@ -432,6 +439,19 @@ class OrderListProvider with ChangeNotifier {
       return null;
     });
   }
+
+  // Future<void> getPricesForBen(int benId) async {
+  //   final Response<dynamic> response = await dio.get<dynamic>("item_caps",
+  //       queryParameters: <String, dynamic>{"beneficiary_id": benId});
+  //   itemsCaps = ItemCap.fromJson(response.data).itesmcaps;
+  //   if (response.statusCode == 200) {
+  //     itemsList.forEach((SingleItem signleItem) {
+  //       signleItem..unitPrice = itemsCaps.firstWhere((SingleItemCap element) {
+  //         return signleItem.id == element.itemId;
+  //       }).price;
+  //     });
+  //   }
+  // }
 
   Future<void> getItemsBalances() async {
     itemsBalanceDataLoaded = false;

@@ -38,7 +38,7 @@ class OrderListCell extends StatelessWidget {
               ],
               rows: items.map((MiniItems e) {
                 return DataRow(cells: <DataCell>[
-                  DataCell(Text(e.id.toString())),
+                  DataCell(Text(e.itemId.toString())),
                   DataCell(Text(e.item)),
                   DataCell(Text(e.quantity.toString())),
                   DataCell(Text(e.unit.toString())),

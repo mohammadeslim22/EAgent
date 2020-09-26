@@ -4,6 +4,7 @@ import 'package:agent_second/constants/colors.dart';
 import 'package:agent_second/constants/config.dart';
 import 'package:agent_second/localization/trans.dart';
 import 'package:agent_second/models/transactions.dart';
+import 'package:agent_second/providers/auth.dart';
 import 'package:agent_second/providers/global_variables.dart';
 import 'package:agent_second/providers/transaction_provider.dart';
 import 'package:agent_second/util/service_locator.dart';
@@ -23,11 +24,9 @@ class Bluetooth extends StatefulWidget {
 }
 
 class _MyAppState extends State<Bluetooth> {
-  BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
-
   List<BluetoothDevice> _devices = <BluetoothDevice>[];
-  BluetoothDevice _device;
-  bool _connected = false;
+  // BluetoothDevice _device;
+  // bool _connected = false;
   String pathImage;
   Transaction transaction;
   @override
@@ -38,24 +37,24 @@ class _MyAppState extends State<Bluetooth> {
   }
 
   Future<void> initPlatformState() async {
-    final bool isConnected = await bluetooth.isConnected;
+    final bool isConnected = await getIt<Auth>().bluetooth.isConnected;
     List<BluetoothDevice> devices = <BluetoothDevice>[];
     try {
-      devices = await bluetooth.getBondedDevices();
+      devices = await getIt<Auth>().bluetooth.getBondedDevices();
     } on PlatformException {
       print("exception happened");
     }
 
-    bluetooth.onStateChanged().listen((int state) {
+    getIt<Auth>().bluetooth.onStateChanged().listen((int state) {
       switch (state) {
         case BlueThermalPrinter.CONNECTED:
           setState(() {
-            _connected = true;
+            getIt<Auth>().connected = true;
           });
           break;
         case BlueThermalPrinter.DISCONNECTED:
           setState(() {
-            _connected = false;
+            getIt<Auth>().connected = false;
           });
           break;
         default:
@@ -74,7 +73,7 @@ class _MyAppState extends State<Bluetooth> {
 
     if (isConnected) {
       setState(() {
-        _connected = true;
+        getIt<Auth>().connected = true;
       });
     }
   }
@@ -97,7 +96,7 @@ class _MyAppState extends State<Bluetooth> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   const SizedBox(width: 10),
-                  Text(
+                  const Text(
                     'Device:',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -107,9 +106,9 @@ class _MyAppState extends State<Bluetooth> {
                   Expanded(
                     child: DropdownButton<dynamic>(
                       items: _getDeviceItems(),
-                      onChanged: (dynamic value) =>
-                          setState(() => _device = value as BluetoothDevice),
-                      value: _device,
+                      onChanged: (dynamic value) => setState(() =>
+                          getIt<Auth>().device = value as BluetoothDevice),
+                      value: getIt<Auth>().device,
                     ),
                   ),
                 ],
@@ -131,10 +130,10 @@ class _MyAppState extends State<Bluetooth> {
                   ),
                   const SizedBox(width: 20),
                   RaisedButton(
-                    color: _connected ? colors.red : colors.green,
-                    onPressed: _connected ? _disconnect : _connect,
+                    color: getIt<Auth>().connected ? colors.red : colors.green,
+                    onPressed: getIt<Auth>().connected ? _disconnect : _connect,
                     child: Text(
-                      _connected ? 'Disconnect' : 'Connect',
+                      getIt<Auth>().connected ? 'Disconnect' : 'Connect',
                       style: TextStyle(color: colors.white),
                     ),
                   ),
@@ -201,23 +200,26 @@ class _MyAppState extends State<Bluetooth> {
   }
 
   void _connect() {
-    if (_device == null) {
+    if (getIt<Auth>().device == null) {
       show('No device selected.');
     } else {
-      bluetooth.isConnected.then((bool isConnected) {
+      getIt<Auth>().bluetooth.isConnected.then((bool isConnected) {
         if (!isConnected) {
-          bluetooth.connect(_device).catchError((dynamic error) {
-            setState(() => _connected = false);
+          getIt<Auth>()
+              .bluetooth
+              .connect(getIt<Auth>().device)
+              .catchError((dynamic error) {
+            setState(() => getIt<Auth>().connected = false);
           });
-          setState(() => _connected = true);
+          setState(() => getIt<Auth>().connected = true);
         }
       });
     }
   }
 
   void _disconnect() {
-    bluetooth.disconnect();
-    setState(() => _connected = true);
+    getIt<Auth>().bluetooth.disconnect();
+    setState(() => getIt<Auth>().connected = true);
   }
 
 //write to app path
@@ -246,57 +248,74 @@ class _MyAppState extends State<Bluetooth> {
   }
 
   Future<void> _tesPrint(Transaction transaction) async {
-    bluetooth.isConnected.then((bool isConnected) {
+    getIt<Auth>().bluetooth.isConnected.then((bool isConnected) {
       if (isConnected) {
-        bluetooth.printImage("asstes/images/logo_trans.svg");
-        bluetooth.printCustom("AL SAHARI BAKERY", 1, 1);
+        getIt<Auth>().bluetooth.printImage("asstes/images/logo_trans.svg");
+        getIt<Auth>().bluetooth.printCustom("AL SAHARI BAKERY", 1, 1);
 
-        bluetooth.printCustom(
-            "MD BIN SALEM STREET RAK.UAE Tel:072226355", 1, 1);
-        bluetooth.printNewLine();
-        bluetooth.printCustom("TRN : ${config.trn}", 1, 1);
-        bluetooth.printNewLine();
-        bluetooth.printCustom("TAX INVOICE #${transaction.id}", 1, 1);
-        bluetooth.printCustom("Invoice Type\nCredit", 1, 2);
-        bluetooth.printNewLine();
-        bluetooth.printNewLine();
-        bluetooth.printCustom("CUST : ${transaction.beneficiary}", 1, 0);
-        bluetooth.printCustom(
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("MD BIN SALEM STREET RAK.UAE ", 1, 1);
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("Tel:072226355 ,Mob: 0544117087", 1, 1);
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printCustom("TRN : ${config.trn}", 1, 1);
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printLeftRight(
+            "TAX INVOICE  ${transaction.agent.substring(0, 2)}  / #${transaction.id}",
+            "",
+            0);
+        // getIt<Auth>().bluetooth.printCustom("Invoice Type\nCredit", 1, 2);
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("CUST : ${transaction.beneficiary}", 1, 0);
+        getIt<Auth>().bluetooth.printCustom(
             "CUST TRN : ${getIt<GlobalVars>().getbenInFocus().trn ?? "N/A"}",
             1,
             0);
-        bluetooth.printCustom("Date : ${transaction.transDate}", 1, 0);
-        bluetooth.printCustom("Place : ${transaction.address}", 1, 0);
-        bluetooth.printNewLine();
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("Date : ${transaction.transDate}", 1, 0);
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("Place : ${transaction.address}", 1, 0);
+        getIt<Auth>().bluetooth.printNewLine();
 
-        bluetooth.printCustom(
+        getIt<Auth>().bluetooth.printCustom(
             "SLNO  PRODUCT NAME            OYT  RATE  TOTAL", 1, 1);
         for (int i = 0; i < transaction.details.length; i++) {
-          bluetooth.printCustom(
+          getIt<Auth>().bluetooth.printCustom(
               "$i  ${transaction.details[i].item}   ${transaction.details[i].quantity}   ${transaction.details[i].itemPrice}   ${transaction.details[i].total}",
               1,
-              1);
+              0);
         }
         final double taxMony = config.tax / 100 * transaction.amount;
         final double totalBeforTax =
             transaction.amount - config.tax / 100 * transaction.amount;
 
-        bluetooth.printNewLine();
-        bluetooth.printCustom("DISCOUNT 0.0", 1, 2);
-        bluetooth.printNewLine();
-        bluetooth.printCustom("SUB TOTAL $totalBeforTax", 1, 2);
-        bluetooth.printNewLine();
-        bluetooth.printCustom("VAT AMOUNT ${taxMony.toStringAsFixed(2)}", 1, 2);
-        bluetooth.printNewLine();
-        bluetooth.printCustom("NET TOTAL  ${transaction.amount}", 1, 2);
-        bluetooth.printNewLine();
-        bluetooth.printNewLine();
-        bluetooth.printNewLine();
-        bluetooth.printLeftRight("Salesman:${transaction.agent}",
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printCustom("DISCOUNT 0.0", 1, 2);
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printCustom("SUB TOTAL $totalBeforTax", 1, 2);
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("VAT AMOUNT ${taxMony.toStringAsFixed(2)}", 1, 2);
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("NET TOTAL  ${transaction.amount}", 1, 2);
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printLeftRight("Salesman:${transaction.agent}",
             "     Car No:${config.verchilId}", 0);
-        bluetooth.printLeftRight("SIGNATURE", "", 0);
+        getIt<Auth>().bluetooth.printLeftRight("SIGNATURE", "", 0);
 
-        bluetooth.paperCut();
+        getIt<Auth>().bluetooth.paperCut();
       } else {
         print("iam not connected ");
       }
@@ -307,115 +326,130 @@ class _MyAppState extends State<Bluetooth> {
       List<Transaction> returnTransactions) async {
     double orderAmount = 0.0;
     double returnAmount = 0.0;
-    double taxMony=0.0;
-    // orderTransactions.forEach((Transaction element) {
-    //   taxMony += element.tax;
-    //   print("trans amount : ${element.amount}");
-    //   for (int i = 0; i < element.details.length; i++) {
-    //     print(
-    //         "$i  ${element.details[i].item}  ${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total}");
-    //   }
-    //   orderAmount += element.amount;
-    //   print("new line");
-    // });
-    // print("RETURN");
-    // returnTransactions.forEach((Transaction element) {
-    //   print("trans amount : ${element.amount}");
-    //   for (int i = 0; i < element.details.length; i++) {
-    //     print(
-    //         "$i  ${element.details[i].item}  ${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total}");
-    //   }
-    //   returnAmount += element.amount;
-    //   print("new line");
-    // });
-    // print("config.tax: ${config.tax}");
-    // // final double taxMony = (config.tax / 100) * orderAmount;
-    // final double totalfterReturn = orderAmount - returnAmount;
-    // print(
-    //     "tax money ${taxMony.toStringAsFixed(2)}  total: ${totalfterReturn.toStringAsFixed(2)}");
-    bluetooth.isConnected.then((bool isConnected) {
+    double taxMony = 0.0;
+    orderTransactions.forEach((Transaction element) {
+      taxMony += element.tax;
+      print("trans amount : ${element.amount}");
+      for (int i = 0; i < element.details.length; i++) {
+        print(
+            "$i  ${element.details[i].item}  ${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total}");
+      }
+      orderAmount += element.amount;
+      print("new line");
+    });
+    print("RETURN");
+    returnTransactions.forEach((Transaction element) {
+      print("trans amount : ${element.amount}");
+      for (int i = 0; i < element.details.length; i++) {
+        print(
+            "$i  ${element.details[i].item}  ${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total}");
+      }
+      returnAmount += element.amount;
+      print("new line");
+    });
+    print("config.tax: ${config.tax}");
+    // final double taxMony = (config.tax / 100) * orderAmount;
+    final double totalfterReturn = orderAmount - returnAmount;
+    print(
+        "tax money ${taxMony.toStringAsFixed(2)}  total: ${totalfterReturn.toStringAsFixed(2)}");
+    getIt<Auth>().bluetooth.isConnected.then((bool isConnected) {
       if (isConnected) {
-        bluetooth.printCustom("AL SAHARI BAKERY", 1, 1);
+        getIt<Auth>().bluetooth.printCustom("AL SAHARI BAKERY", 1, 1);
 
-        bluetooth.printCustom(
-            "MD BIN SALEM STREET RAK.UAE Tel:072226355", 1, 1);
-        bluetooth.printNewLine();
-        bluetooth.printCustom("TRN : ${config.trn}", 1, 1);
-        bluetooth.printNewLine();
-        bluetooth.printLeftRight("TAX INVOICE #${transaction.id}", "", 0);
-        bluetooth.printNewLine();
-        bluetooth.printNewLine();
-        bluetooth.printCustom("CUST : ${transaction.beneficiary}", 1, 0);
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("MD BIN SALEM STREET RAK.UAE ", 1, 1);
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("Tel: 072226355 ,Mob: 0544117087", 1, 1);
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printCustom("TRN : ${config.trn}", 1, 1);
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printLeftRight(
+            "TAX INVOICE  ${transaction.agent.substring(0, 2)}  / #${transaction.id}",
+            "",
+            0);
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("CUST : ${transaction.beneficiary}", 1, 0);
         final String custTRN =
             (getIt<GlobalVars>().getbenInFocus().trn) != "null"
                 ? getIt<GlobalVars>().getbenInFocus().trn
                 : "N/A";
-        bluetooth.printCustom("CUST TRN : $custTRN", 1, 0);
-        bluetooth.printCustom("Date : ${transaction.transDate}", 1, 0);
-        bluetooth.printCustom("Place : ${transaction.address}", 1, 0);
-        bluetooth.printNewLine();
-        bluetooth.printCustom(
-            "SLNO  PRODUCT NAME        OYT  RATE  TOTAL", 1, 0);
-        bluetooth.printNewLine();
-        // bluetooth.printCustom("OYT  RATE  TOTAL", 1, 2);
+        getIt<Auth>().bluetooth.printCustom("CUST TRN : $custTRN", 1, 0);
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("Date : ${transaction.transDate}", 1, 0);
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("Place : ${transaction.address}", 1, 0);
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("SLNO  PRODUCT NAME        OYT  RATE  TOTAL", 1, 0);
+        getIt<Auth>().bluetooth.printNewLine();
+        // getIt<Auth>().bluetooth.printCustom("OYT  RATE  TOTAL", 1, 2);
 
         orderTransactions.forEach((Transaction element) {
-           taxMony += element.tax;
+          taxMony += element.tax;
           for (int i = 0; i < element.details.length; i++) {
-            bluetooth.printCustom(
+            getIt<Auth>().bluetooth.printCustom(
                 "$i  ${element.details[i].item}   ${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total.toStringAsFixed(2)}",
                 1,
                 0);
-            // bluetooth.printCustom(
+            // getIt<Auth>().bluetooth.printCustom(
             //     "${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total}",
             //     1,
             //     2);
           }
           orderAmount += element.amount;
-          bluetooth.printNewLine();
+          getIt<Auth>().bluetooth.printNewLine();
         });
-        bluetooth.printNewLine();
-        bluetooth.printCustom("RETURN", 1, 1);
-        bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printCustom("RETURN", 1, 1);
+        getIt<Auth>().bluetooth.printNewLine();
         returnTransactions.forEach((Transaction element) {
-           taxMony += element.tax;
+          taxMony += element.tax;
           for (int i = 0; i < element.details.length; i++) {
-            bluetooth.printCustom(
+            getIt<Auth>().bluetooth.printCustom(
                 "$i  ${element.details[i].item}   ${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total.toStringAsFixed(2)}",
                 1,
                 0);
-            // bluetooth.printCustom(
+            // getIt<Auth>().bluetooth.printCustom(
             //     "${element.details[i].quantity}   ${element.details[i].itemPrice}   ${element.details[i].total}",
             //     1,
             //     2);
           }
           returnAmount += element.amount;
-          bluetooth.printNewLine();
+          getIt<Auth>().bluetooth.printNewLine();
         });
         // final double taxMony = (config.tax / 100) * orderAmount;
         final double totalfterReturn = orderAmount - returnAmount;
 
-        bluetooth.printNewLine();
-        bluetooth.printCustom("DISCOUNT: 0.0", 1, 2);
-        bluetooth.printNewLine();
-        bluetooth.printCustom(
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printCustom("DISCOUNT: 0.0", 1, 2);
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printCustom(
             "ORDER with Tax: ${orderAmount.toStringAsFixed(2)}", 1, 2);
-        bluetooth.printNewLine();
-        bluetooth.printCustom(
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printCustom(
             "RETURN with Tax: ${returnAmount.toStringAsFixed(2)}", 1, 2);
-        bluetooth.printNewLine();
-        bluetooth.printCustom(
-            "VAT AMOUNT: ${taxMony.toStringAsFixed(2)}", 1, 2);
-        bluetooth.printNewLine();
-        bluetooth.printCustom(
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>()
+            .bluetooth
+            .printCustom("VAT AMOUNT: ${taxMony.toStringAsFixed(2)}", 1, 2);
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printCustom(
             "NET TOTAL:  ${totalfterReturn.toStringAsFixed(2)}", 1, 2);
-        bluetooth.printNewLine();
-        bluetooth.printNewLine();
-        bluetooth.printNewLine();
-        bluetooth.printLeftRight("Salesman:${transaction.agent}",
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printNewLine();
+        getIt<Auth>().bluetooth.printLeftRight("Salesman:${transaction.agent}",
             "    Car No:${config.verchilId}", 0);
-        bluetooth.printLeftRight("SIGNATURE", "", 0);
-        bluetooth.paperCut();
+        getIt<Auth>().bluetooth.printLeftRight("SIGNATURE", "", 0);
+        getIt<Auth>().bluetooth.paperCut();
       } else {
         print("iam not connected ");
       }

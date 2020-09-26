@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen>
 
     final MyCounter bolc = Provider.of<MyCounter>(context);
     return Scaffold(
-        backgroundColor: Colors.blue,
+        backgroundColor: colors.blue,
         body: GestureDetector(
           onTap: () {
             FocusScope.of(context).requestFocus(FocusNode());
@@ -199,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen>
                                     }
                                   },
                                   color: colors.blue,
-                                  textColor: Colors.white,
+                                  textColor: colors.white,
                                   child: bolc
                                       .returnchild(trans(context, 'login'))),
                             ),

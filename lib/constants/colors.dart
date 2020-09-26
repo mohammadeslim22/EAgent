@@ -8,7 +8,7 @@ class MyColors {
   MyColors._internal();
 
   static final MyColors _colors = MyColors._internal();
-
+  Color pink = Colors.pink;
   Color white = const Color(0xffffffff);
   Color grey = const Color(0xFFCCCCCC);
   Color black = const Color(0xff101010);

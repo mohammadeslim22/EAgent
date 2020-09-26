@@ -49,13 +49,14 @@ class SingleItem {
     price3 = json['price3'].toString();
     price4 = json['price4'].toString();
     price5 = json['price5'].toString();
-    if(json['balance_inventory']!=null)
-    balanceInventory = json['balance_inventory'] as int;
+    if (json['balance_inventory'] != null)
+      balanceInventory = json['balance_inventory'] as int;
     else
-    balanceInventory=9999;
+      balanceInventory = 9999;
     wholesalePrice = json['wholesale_price'].toString();
     barcode = json['barcode'].toString();
     image = json['image'].toString();
+    print("iamge $image");
     vat = json['vat'].toString();
     link = json['link'].toString();
     notes = json['notes'].toString();

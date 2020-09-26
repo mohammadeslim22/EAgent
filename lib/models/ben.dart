@@ -77,6 +77,7 @@ class Ben {
     if (json['items_cap'] != null) {
       itemsCap = <ItemsCap>[];
       itemsBalances = <String, String>{};
+      itemsPrices = <String, String>{};
       json['items_cap'].forEach((dynamic v) {
         itemsCap.add(ItemsCap.fromJson(v));
       });
@@ -87,6 +88,8 @@ class Ben {
 
     itemsCap.forEach((ItemsCap element) {
       itemsBalances[element.itemId.toString()] = element.balanceCap.toString();
+     itemsPrices[element.itemId.toString()] = element.price.toString();
+
     });
     visited = false;
     orderTransTotal = json['order_trans_total'].toString();
@@ -123,6 +126,7 @@ class Ben {
   String transTotal;
   int transCount;
   Map<String, String> itemsBalances;
+  Map<String, String> itemsPrices;
   List<ItemsCap> itemsCap;
   bool visited;
   String orderTransTotal;

@@ -346,8 +346,8 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                                 indexedStack = 0;
                               });
                             },
-                            child: SvgPicture.asset(
-                                "assets/images/order_icon.svg")),
+                            child:
+                                SvgPicture.asset("assets/images/invoice.svg")),
                       ),
                       Container(
                         width: 50,
@@ -645,7 +645,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
       height: 400,
       child: FlareActor("assets/images/new_intro.flr",
           alignment: Alignment.center,
-         color: colors.blue, 
+          color: colors.blue,
           fit: BoxFit.fill,
           animation: "intro"),
     );
@@ -753,7 +753,7 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
                 Expanded(
                   flex: 1,
                   child: (entry.status == 'draft')
-                      ? Icon(Icons.edit, color: Colors.amber)
+                      ? const Icon(Icons.edit, color: Colors.amber)
                       : Container(),
                 ),
                 Expanded(
@@ -885,9 +885,12 @@ class _BeneficiaryCenterState extends State<BeneficiaryCenter> {
           children: <Widget>[
             FlatButton(
               onPressed: () async {
-                getIt<TransactionProvider>().getTransactionsToPrint(ben.id);
-                Navigator.pushNamed(context, "/Bluetooth",
-                    arguments: <String, dynamic>{"transaction": transaction});
+                if (transaction.status == "draft") {
+                } else {
+                  getIt<TransactionProvider>().getTransactionsToPrint(ben.id);
+                  Navigator.pushNamed(context, "/Bluetooth",
+                      arguments: <String, dynamic>{"transaction": transaction});
+                }
               },
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
