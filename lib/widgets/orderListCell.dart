@@ -12,7 +12,7 @@ class OrderListCell extends StatelessWidget {
         child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: DataTable(
-              columnSpacing: 36,
+              columnSpacing: 26,
               columns: <DataColumn>[
                 DataColumn(
                   label: Text(trans(context, '#'), style: styles.bill),

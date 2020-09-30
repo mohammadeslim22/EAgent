@@ -62,7 +62,10 @@ class _OrderScreenState extends State<OrderScreen> {
                       item.notes,
                       item.queantity,
                       item.unit,
-                      item.unitPrice.toString(),
+                      (ben != null)
+                          ? ben.itemsPrices[item.id.toString()] ??
+                              item.unitPrice.toString()
+                          : item.unitPrice.toString(),
                       item.image);
                   orsderListProvider.selectedOptions.add(item.id);
                 })
@@ -90,7 +93,7 @@ class _OrderScreenState extends State<OrderScreen> {
             CachedNetworkImage(
               fit: BoxFit.cover,
               width: 60,
-              height: 25,
+              height: 40,
               imageUrl: (item.image != "null")
                   ? "http://sahrawy.agentsmanage.com/image/${item.image}"
                   : "",
@@ -110,7 +113,8 @@ class _OrderScreenState extends State<OrderScreen> {
             ),
             Text(
                 (ben != null)
-                    ? ben.itemsPrices[item.id.toString()] ?? ""
+                    ? ben.itemsPrices[item.id.toString()] ??
+                        item.unitPrice.toString()
                     : item.unitPrice.toString(),
                 style: styles.mystyle),
           ],
@@ -381,7 +385,14 @@ class _OrderScreenState extends State<OrderScreen> {
                                                   value.notes,
                                                   value.queantity,
                                                   value.unit,
-                                                  value.unitPrice.toString(),
+                                                  (ben != null)
+                                                      ? ben.itemsPrices[value.id
+                                                              .toString()] ??
+                                                          value.unitPrice
+                                                              .toString()
+                                                      : value.unitPrice
+                                                          .toString(),
+                                                  // value.unitPrice.toString(),
                                                   value.image);
                                           getIt<OrderListProvider>()
                                               .selectedOptions
@@ -414,49 +425,49 @@ class _OrderScreenState extends State<OrderScreen> {
                         else
                           Container(),
                         Expanded(
-                          child: (getIt<OrderListProvider>()
-                                  .selectedOptions
-                                  .isNotEmpty)
-                              ? Consumer<OrderListProvider>(
-                                  builder: (BuildContext context,
-                                      OrderListProvider value, Widget child) {
-                                    return GridView.count(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 6, vertical: 2),
-                                        physics: const ScrollPhysics(),
-                                        shrinkWrap: true,
-                                        primary: true,
-                                        crossAxisSpacing: 3,
-                                        mainAxisSpacing: 3,
-                                        crossAxisCount: 1,
-                                        childAspectRatio: 6,
-                                        addRepaintBoundaries: true,
-                                        children: value.ordersList
-                                            .map((SingleItemForSend item) {
-                                          return Slidable(
-                                              actionPane:
-                                                  const SlidableDrawerActionPane(),
-                                              actionExtentRatio: 0.25,
-                                              secondaryActions: <Widget>[
-                                                IconSlideAction(
-                                                  caption: 'Delete',
-                                                  color: Colors.red,
-                                                  icon: Icons.delete,
-                                                  onTap: () {
-                                                    setState(() {
-                                                      value.removeItemFromList(
-                                                          item.id);
-                                                      // getIt<OrderListProvider>()
-                                                      //     .selectedOptions
-                                                      //     .remove(item.id);
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                              child: cartItem(item));
-                                        }).toList());
-                                  },
-                                )
+                          child: value.selectedOptions.isNotEmpty
+                              ?
+                              // Consumer<OrderListProvider>(
+                              //     builder: (BuildContext context,
+                              //         OrderListProvider value, Widget child) {
+                              //       return
+                              GridView.count(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  physics: const ScrollPhysics(),
+                                  shrinkWrap: true,
+                                  primary: true,
+                                  crossAxisSpacing: 3,
+                                  mainAxisSpacing: 3,
+                                  crossAxisCount: 1,
+                                  childAspectRatio: 6,
+                                  addRepaintBoundaries: true,
+                                  children: value.ordersList.reversed
+                                      .map((SingleItemForSend item) {
+                                    return Slidable(
+                                        actionPane:
+                                            const SlidableDrawerActionPane(),
+                                        actionExtentRatio: 0.25,
+                                        secondaryActions: <Widget>[
+                                          IconSlideAction(
+                                            caption: 'Delete',
+                                            color: Colors.red,
+                                            icon: Icons.delete,
+                                            onTap: () {
+                                              setState(() {
+                                                value.removeItemFromList(
+                                                    item.id);
+                                                // getIt<OrderListProvider>()
+                                                //     .selectedOptions
+                                                //     .remove(item.id);
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                        child: cartItem(item));
+                                  }).toList())
+                              //   },
+                              // )
                               : Container(),
                         ),
                         bottomTotal()
@@ -524,7 +535,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         child: IconButton(
                           padding: EdgeInsets.zero,
                           icon: const Icon(Icons.add),
-                          color: Colors.white,
+                          color: colors.white,
                           onPressed: () {
                             !widget.isAgentOrder
                                 ? getIt<OrderListProvider>()
@@ -550,7 +561,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         child: IconButton(
                           padding: EdgeInsets.zero,
                           icon: const Icon(Icons.remove),
-                          color: Colors.white,
+                          color: colors.white,
                           onPressed: () {
                             getIt<OrderListProvider>()
                                 .decrementQuantity(item.id);
@@ -592,7 +603,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 ),
                 Expanded(
                   child: Text(
-                    "${double.parse((ben != null) ? ben.itemsPrices[item.id.toString()] ?? "" : item.unitPrice) * item.queantity}",
+                    "${double.parse((ben != null) ? ben.itemsPrices[item.id.toString()] ?? item.unitPrice : item.unitPrice) * item.queantity}",
                     style: styles.mystyle,
                     textAlign: TextAlign.end,
                   ),
