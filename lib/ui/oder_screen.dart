@@ -95,7 +95,7 @@ class _OrderScreenState extends State<OrderScreen> {
               width: 60,
               height: 40,
               imageUrl: (item.image != "null")
-                  ? "http://sahrawy.agentsmanage.com/image/${item.image}"
+                  ? "http://sahary.agentsmanage.com/image/${item.image}"
                   : "",
               progressIndicatorBuilder: (BuildContext context, String url,
                       DownloadProgress downloadProgress) =>
@@ -234,59 +234,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                         return !getIt<OrderListProvider>()
                                                 .selectedOptions
                                                 .contains(item.id)
-                                            ? Draggable<SingleItem>(
-                                                childWhenDragging:
-                                                    childForDragging(
-                                                        item, orderProvider),
-                                                onDragStarted: () {
-                                                  setState(() {
-                                                    indexedStackId = 1;
-                                                    animatedHight = 160;
-                                                  });
-                                                },
-                                                onDragEnd:
-                                                    (DraggableDetails t) {
-                                                  setState(() {
-                                                    indexedStackId = 0;
-                                                    animatedHight = 0;
-                                                  });
-                                                },
-                                                data: item,
-                                                feedback: Column(
-                                                  children: <Widget>[
-                                                    CachedNetworkImage(
-                                                      imageUrl: (item.image !=
-                                                              "null")
-                                                          ? "http://edisagents.altariq.ps/public/image/${item.image}"
-                                                          : "",
-                                                      height: 30,
-                                                      width: 50,
-                                                      progressIndicatorBuilder: (BuildContext
-                                                                  context,
-                                                              String url,
-                                                              DownloadProgress
-                                                                  downloadProgress) =>
-                                                          CircularProgressIndicator(
-                                                              value:
-                                                                  downloadProgress
-                                                                      .progress),
-                                                      errorWidget: (BuildContext
-                                                                  context,
-                                                              String url,
-                                                              dynamic error) =>
-                                                          const Icon(
-                                                              Icons.error),
-                                                    ),
-                                                    Material(
-                                                        color:
-                                                            Colors.transparent,
-                                                        textStyle: styles
-                                                            .smallItembluestyle,
-                                                        child: Text(item.name)),
-                                                  ],
-                                                ),
-                                                child: childForDragging(
-                                                    item, orderProvider))
+                                            ? dragableItem(item, orderProvider)
                                             : childForDragging(
                                                 item, orderProvider);
                                       }).toList())
@@ -484,6 +432,45 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
+  Widget dragableItem(SingleItem item, OrderListProvider orderProvider) {
+    return Draggable<SingleItem>(
+        childWhenDragging: childForDragging(item, orderProvider),
+        onDragStarted: () {
+          setState(() {
+            indexedStackId = 1;
+            animatedHight = 160;
+          });
+        },
+        onDragEnd: (DraggableDetails t) {
+          setState(() {
+            indexedStackId = 0;
+            animatedHight = 0;
+          });
+        },
+        data: item,
+        feedback: Column(
+          children: <Widget>[
+            CachedNetworkImage(
+              imageUrl: (item.image != "null")
+                  ? "http://edisagents.altariq.ps/public/image/${item.image}"
+                  : "",
+              height: 30,
+              width: 50,
+              progressIndicatorBuilder: (BuildContext context, String url,
+                      DownloadProgress downloadProgress) =>
+                  CircularProgressIndicator(value: downloadProgress.progress),
+              errorWidget: (BuildContext context, String url, dynamic error) =>
+                  const Icon(Icons.error),
+            ),
+            Material(
+                color: Colors.transparent,
+                textStyle: styles.smallItembluestyle,
+                child: Text(item.name)),
+          ],
+        ),
+        child: childForDragging(item, orderProvider));
+  }
+
   Widget cartItem(SingleItemForSend item) {
     return Card(
       shape: RoundedRectangleBorder(
@@ -509,12 +496,12 @@ class _OrderScreenState extends State<OrderScreen> {
                         width: 25,
                         clipBehavior: Clip.hardEdge,
                         decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(120)),
-                        ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(120))),
                         child: CachedNetworkImage(
                           fit: BoxFit.cover,
                           imageUrl: (item.image != "null")
-                              ? "http://sahrawy.agentsmanage.com/image/${item.image}"
+                              ? "http://sahary.agentsmanage.com/image/${item.image}"
                               : "",
                           errorWidget: (BuildContext c, String a, dynamic d) {
                             return Container();
@@ -764,16 +751,6 @@ class _OrderScreenState extends State<OrderScreen> {
                                             Navigator.popAndPushNamed(
                                                 context, "/Payment_Screen",
                                                 arguments: <String, dynamic>{
-                                                  // "orderTotal": isORderOrReturn
-                                                  //     ? value.sumTotal
-                                                  //     : 0.0,
-                                                  // "returnTotal": isORderOrReturn
-                                                  //     ? 0.0
-                                                  //     : value.sumTotal,
-                                                  // "cashTotal": isORderOrReturn
-                                                  //     ? value.sumTotal
-                                                  //     : -value.sumTotal,
-                                                  // "orderOrRetunOrCollection": 0
                                                   "orderTotal": ben.totalOrders,
                                                   "returnTotal":
                                                       ben.totalReturns,
@@ -851,51 +828,6 @@ class _OrderScreenState extends State<OrderScreen> {
         ),
       ),
     );
-
-    // return Stack(
-    //   children: <Widget>[
-    //     Transform.rotate(
-    //         angle: 10,
-    //         child: Center(
-    //             child: SizedBox(
-    //           height: 100,
-    //           width: 500,
-    //           child: CircularProgressIndicator(
-    //             strokeWidth: 5,
-    //             backgroundColor: Colors.transparent,
-    //           ),
-    //         ))),
-    //     Transform.rotate(
-    //         angle: -10,
-    //         child: Center(
-    //             child: SizedBox(
-    //           height: 100,
-    //           width: 500,
-    //           child: CircularProgressIndicator(
-    //             strokeWidth: 5,
-    //             backgroundColor: Colors.transparent,
-    //           ),
-    //         ))),
-    //     Center(
-    //         child: SizedBox(
-    //       height: 100,
-    //       width: 500,
-    //       child: CircularProgressIndicator(
-    //         strokeWidth: 5,
-    //         backgroundColor: Colors.transparent,
-    //       ),
-    //     )),
-    //     Center(
-    //         child: SizedBox(
-    //       height: 400,
-    //       width: 80,
-    //       child: CircularProgressIndicator(
-    //         strokeWidth: 5,
-    //         backgroundColor: Colors.transparent,
-    //       ),
-    //     ))
-    //   ],
-    // );
   }
 
   Future<bool> sendTransFunction(bool agentOrBen, String status) async {

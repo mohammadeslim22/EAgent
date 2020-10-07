@@ -249,7 +249,7 @@ class _MyAppState extends State<Bluetooth> {
 
   Future<void> _tesPrint(Transaction transaction) async {
     getIt<Auth>().bluetooth.isConnected.then((bool isConnected) {
-       double taxMony = 0.0;
+       
       if (isConnected) {
         getIt<Auth>().bluetooth.printImage("asstes/images/logo_trans.svg");
         getIt<Auth>().bluetooth.printCustom("AL SAHARI BAKERY", 1, 1);
@@ -285,16 +285,16 @@ class _MyAppState extends State<Bluetooth> {
             .printCustom("Place : ${transaction.address}", 1, 0);
         getIt<Auth>().bluetooth.printNewLine();
 
-        getIt<Auth>()
+         getIt<Auth>()
             .bluetooth
-            .printCustom("SLNO  PRODUCT NAME           OYT  RATE  TOTAL", 1, 1);
+            .printCustom("SLNO  PRODUCT NAME          OYT  RATE  TOTAL", 1, 0);
         for (int i = 0; i < transaction.details.length; i++) {
           String itemName = transaction.details[i].item;
           for (int u = itemName.length; u < 24; u++) {
             itemName = itemName + " ";
           }
           getIt<Auth>().bluetooth.printCustom(
-              "$i  $itemName    ${transaction.details[i].quantity}    ${transaction.details[i].itemPrice}   ${transaction.details[i].total.toStringAsFixed(2)}",
+              "${i+1}  $itemName    ${transaction.details[i].quantity}    ${transaction.details[i].itemPrice}   ${transaction.details[i].total.toStringAsFixed(2)}",
               1,
               0);
             
@@ -413,7 +413,7 @@ class _MyAppState extends State<Bluetooth> {
               itemName = itemName + " ";
             }
             getIt<Auth>().bluetooth.printCustom(
-                "$i  $itemName  ${element.details[i].quantity}    ${element.details[i].itemPrice}   ${element.details[i].total.toStringAsFixed(2)}",
+                "${i+1}  $itemName  ${element.details[i].quantity}    ${element.details[i].itemPrice}   ${element.details[i].total.toStringAsFixed(2)}",
                 1,
                 0);
 
@@ -438,7 +438,7 @@ class _MyAppState extends State<Bluetooth> {
               itemName = itemName + " ";
             }
             getIt<Auth>().bluetooth.printCustom(
-                "$i  $itemName  ${element.details[i].quantity}    ${element.details[i].itemPrice}   ${element.details[i].total.toStringAsFixed(2)}",
+                "${i+1}  $itemName  ${element.details[i].quantity}    ${element.details[i].itemPrice}   ${element.details[i].total.toStringAsFixed(2)}",
                 1,
                 0);
             // getIt<Auth>().bluetooth.printCustom(
