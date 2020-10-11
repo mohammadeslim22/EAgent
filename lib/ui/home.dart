@@ -206,7 +206,8 @@ class _DashBoardState extends State<DashBoard> {
                           children: <Widget>[
                             Row(
                               children: <Widget>[
-                                Text("agentName", style: styles.underHeadwhite),
+                                Text(trans(context, 'agentName'),
+                                    style: styles.underHeadwhite),
                               ],
                             ),
                             ClipRRect(

@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:agent_second/models/ben.dart';
 import 'package:agent_second/models/transactions.dart';
 import 'package:agent_second/providers/export.dart';
+import 'package:agent_second/util/data.dart';
 import 'package:agent_second/util/dio.dart';
 import 'package:agent_second/util/functions.dart';
 import 'package:agent_second/util/service_locator.dart';
@@ -430,14 +433,34 @@ class OrderListProvider with ChangeNotifier {
     itemsDataLoaded = false;
     indexedStack = 0;
     notifyListeners();
-    await dio.get<dynamic>("items").then((Response<dynamic> value) {
-      itemsList = Items.fromJson(value.data).itemsList;
-      itemsDataLoaded = true;
-      indexedStack = 1;
-      picksForbringOrderToOrderScreen();
-      notifyListeners();
-      return null;
-    });
+    final String items = await data.getData("items");
+
+
+    if (items != "" &&
+        items != null &&
+        items.isNotEmpty &&
+        items.toLowerCase() != "null") {
+      final dynamic json = jsonDecode(items);
+      print("enter here ");
+      itemsList = Items.fromJson(json).itemsList;
+      await Future<void>.delayed(const Duration(seconds: 3), () {});
+    itemsDataLoaded = true;
+        indexedStack = 1;
+        picksForbringOrderToOrderScreen();
+        notifyListeners();
+       
+      return;
+    } else {
+      await dio.get<dynamic>("items").then((Response<dynamic> value) async {
+        itemsList = Items.fromJson(value.data).itemsList;
+        data.setData("items", jsonEncode(value.data));
+        itemsDataLoaded = true;
+        indexedStack = 1;
+        picksForbringOrderToOrderScreen();
+        notifyListeners();
+        return;
+      });
+    }
   }
 
   // Future<void> getPricesForBen(int benId) async {

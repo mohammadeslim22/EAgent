@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:agent_second/constants/config.dart';
 import 'package:agent_second/models/ben.dart';
 import 'package:agent_second/util/data.dart';
@@ -36,13 +38,32 @@ class GlobalVars with ChangeNotifier {
   }
 
   Future<BeneficiariesModel> getBenData() async {
-    final Response<dynamic> response = await dio.get<dynamic>("beneficaries");
-    getIt<GlobalVars>().setBens(BeneficiariesModel.fromJson(response.data));
-    await Future<void>.delayed(const Duration(seconds: 3), () {});
+    final String customers = await data.getData("customers");
+    print("customers: $customers");
+    
+    if (customers != "" &&
+        customers != null &&
+        customers.isNotEmpty &&
+        customers.toLowerCase() != "null") {
+          final dynamic json = jsonDecode(customers);
+      print("enter here ");
+      getIt<GlobalVars>().setBens(BeneficiariesModel.fromJson(json));
+      await Future<void>.delayed(const Duration(seconds: 3), () {});
+      getUserData();
+      config.agentId = int.parse(await data.getData("agent_id"));
+      return beneficiaries;
+    } else {
+       print("enter here 222");
+      final Response<dynamic> response = await dio.get<dynamic>("beneficaries");
+      await data.setData("customers", jsonEncode(response.data));
+      getIt<GlobalVars>().setBens(BeneficiariesModel.fromJson(response.data));
+      await Future<void>.delayed(const Duration(seconds: 3), () {});
 
-    getUserData();
-    config.agentId = int.parse(await data.getData("agent_id"));
-    return beneficiaries;
+      getUserData();
+      config.agentId = int.parse(await data.getData("agent_id"));
+      return beneficiaries;
+    }
+    
   }
 
   Future<void> getUserData() async {
@@ -130,14 +151,18 @@ class GlobalVars with ChangeNotifier {
     }).totalReturns += double.parse(returntot ?? "0.0");
     notifyListeners();
   }
-void clearOrderTotAndReturnTotal(int benId){
-  beneficiaries.data.firstWhere((Ben element) {
+
+  void clearOrderTotAndReturnTotal(int benId) {
+    beneficiaries.data.firstWhere((Ben element) {
       return element.id == benId;
     }, orElse: () {
       return;
-    })..totalReturns = 0.0..totalOrders=0.0;
+    })
+      ..totalReturns = 0.0
+      ..totalOrders = 0.0;
     notifyListeners();
-}
+  }
+
   void incrementTimeSinceLogin() {
     timeSinceLoginn = timeSinceLoginn.add(const Duration(minutes: 1));
     timeSinceLogin = DateFormat.Hm().format(timeSinceLoginn);

@@ -11,7 +11,7 @@ class Config {
   static final Config _config = Config._internal();
 
   String baseUrl = "http://sahary.agentsmanage.com/api/";
-  // String baseUrl = "http://192.168.0.25:8000/api/";
+  String imageUrl = "http://sahary.agentsmanage.com/image/";
   int agentId;
   bool looded = false;
   final TextEditingController locationController = TextEditingController();

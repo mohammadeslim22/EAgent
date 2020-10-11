@@ -145,6 +145,8 @@ class _MyAppState extends State<Bluetooth> {
                 child: RaisedButton(
                   color: colors.blue,
                   onPressed: () async {
+
+                    
                     if (getIt<TransactionProvider>()
                             .printingOrdersDataArrived &&
                         getIt<TransactionProvider>()
